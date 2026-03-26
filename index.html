@@ -173,6 +173,13 @@ function parseCsv(text){
     return rows.map(r => r.map(c => String(c || '').trim())).filter(r => r.some(c => c));
 }
 
+function findHeaderRow(rows) {
+    return rows.findIndex((row) => {
+        const joined = row.join(' | ').toLowerCase();
+        return joined.includes('deal name') && joined.includes('deal stage') && joined.includes('company name');
+    });
+}
+
 async function fetchSheet() {
     const proxyUrl = `${API_BASE}/api/sheet?sheetId=${encodeURIComponent(SHEET_ID)}&sheet=${encodeURIComponent(SHEET_NAME)}&format=csv&_t=${Date.now()}`;
     const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&_t=${Date.now()}`;
@@ -188,12 +195,14 @@ async function fetchSheet() {
 }
 
 function rowsToObjects(rows){
-    const headers = rows[1].map((h, idx) => {
+    const headerIndex = findHeaderRow(rows);
+    if (headerIndex < 0) throw new Error('Could not find GTMDB-Deals header row');
+    const headers = rows[headerIndex].map((h, idx) => {
         let value = String(h || '').replace(/\s+/g,' ').trim();
-        if(idx === 0 && value.includes('Deal ID')) value = 'Deal ID';
+        if (idx === 0 && value.toLowerCase().includes('deal id')) value = 'Deal ID';
         return value;
     });
-    return rows.slice(2).filter(r => r.some(c => c)).map(r => {
+    return rows.slice(headerIndex + 1).filter(r => r.some(c => c)).map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = r[i] ?? '');
         const closeDate = new Date(obj['Close Date'] || obj['Create Date'] || '');
