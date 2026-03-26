@@ -47,7 +47,7 @@
         .ch-label{font-size:.72em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:4px}
         .ch-pill{padding:8px 20px;border-radius:100px;font-size:.82em;font-weight:600;border:1.5px solid var(--card-border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
         .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
-        .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+        .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:18px}
         .card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
         .stack{display:grid;gap:18px}
         .scorecard-row{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:12px;margin-bottom:18px}
@@ -56,7 +56,10 @@
         .card-sub{font-size:.75em;color:var(--dim);margin-bottom:10px}
         .chart{height:290px}
         .chart.tall{height:360px}
-        .kpi{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:14px;padding:16px}
+        .chart-card{margin-bottom:18px;padding-top:20px}
+        .chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+        .chart-card .campaign-picker{min-width:210px}
+        .kpi{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:16px;padding:16px 16px 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
         .kpi-label{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.6px;margin-bottom:8px}
         .kpi-value{font-size:2em;font-weight:900;line-height:1;letter-spacing:-1px}
         .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
@@ -73,6 +76,7 @@
         .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
         @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
         @media(max-width:1200px){.scorecard-row{grid-template-columns:repeat(3,minmax(170px,1fr))}.data-row{grid-template-columns:1fr}}
+        @media(max-width:900px){.filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.chart-head{flex-direction:column;align-items:stretch}.chart-card .campaign-picker{width:100%}}
     </style>
 </head>
 <body class="is-refreshing">
@@ -143,8 +147,10 @@
             </div>
         </div>
 
-        <div class="card" style="margin-bottom:18px">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px">
+        <div class="scorecard-row" id="kpiGrid"></div>
+
+        <div class="card chart-card">
+            <div class="chart-head">
                 <div>
                     <h3 id="trendChartTitle">Net ARR Trends (Yearly)</h3>
                     <div class="card-sub">Interactive chart view based on current filters</div>
@@ -160,8 +166,6 @@
             </div>
             <div class="chart tall" id="trendChart"></div>
         </div>
-
-        <div class="scorecard-row" id="kpiGrid"></div>
 
         <div class="data-row">
             <div class="card">
@@ -251,6 +255,42 @@ function money(v){ return '$' + Number(v || 0).toLocaleString(); }
 function shortMoney(v){ const n = Number(v || 0); if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(0) + 'K'; return String(Math.round(n)); }
 function num(v){ return parseFloat(String(v || '').replace(/[$,%\s,]/g,'')) || 0; }
 
+function parseSheetDate(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return null;
+    const direct = new Date(raw);
+    if (!Number.isNaN(direct.getTime())) return direct;
+    const match = raw.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/);
+    if (!match) return null;
+    let [, a, b, c] = match;
+    let month = Number(a);
+    let day = Number(b);
+    let year = Number(c);
+    if (year < 100) year += 2000;
+    if (month > 12 && day <= 12) {
+        const swap = month;
+        month = day;
+        day = swap;
+    }
+    const parsed = new Date(year, month - 1, day);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function canonicalDealType(value) {
+    const v = String(value || '').trim();
+    const lower = v.toLowerCase();
+    if (!v) return 'Unknown';
+    if (lower.includes('upsell')) return 'Upsell';
+    if (lower.includes('downsell')) return 'Downsell';
+    if (lower.includes('new') || lower.includes('logo') || lower.includes('standard') || lower.includes('key')) return 'New Logo';
+    return v;
+}
+
+function canonicalStatus(value) {
+    const v = String(value || '').trim();
+    return v || 'Unknown';
+}
+
 function parseCsv(text){
     const rows=[]; let row=[]; let cell=''; let inQuotes=false;
     for(let i=0;i<text.length;i++){
@@ -296,11 +336,11 @@ function rowsToObjects(rows){
     return rows.slice(headerIndex + 1).filter(r => r.some(c => c)).map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = r[i] ?? '');
-        const closeDate = new Date(obj['Close Date'] || obj['Create Date'] || '');
-        obj.__date = Number.isNaN(closeDate.getTime()) ? null : closeDate;
+        const closeDate = parseSheetDate(obj['Close Date'] || obj['Create Date'] || '');
+        obj.__date = closeDate;
         obj.__amount = num(obj['Amount']);
-        obj.__dealType = obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || 'Unknown';
-        obj.__status = obj['#Status'] || obj['#status'] || obj['Deal Stage'] || 'Unknown';
+        obj.__dealType = canonicalDealType(obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || '');
+        obj.__status = canonicalStatus(obj['#Status'] || obj['#status'] || obj['Deal Stage'] || '');
         obj.__year = obj.__date ? String(obj.__date.getFullYear()) : 'Unknown';
         obj.__quarter = obj.__date ? `Q${Math.floor(obj.__date.getMonth()/3)+1} ${obj.__date.getFullYear()}` : 'Unknown';
         obj.__month = obj.__date ? `${obj.__date.toLocaleString('en-US',{month:'short'})} ${obj.__date.getFullYear()}` : 'Unknown';
@@ -324,8 +364,10 @@ function setupFilters() {
         'Q1 2025','Q2 2025','Q3 2025','Q4 2025',
         'Q1 2026','Q2 2026','Q3 2026','Q4 2026'
     ];
-    STATE.filterOptions.status = [...new Set(STATE.rows.map(r => r.__status).filter(v => v && v !== 'Unknown'))].sort();
-    STATE.filterOptions.dealType = ['New Logo','Upsell','Downsell'].filter(v => STATE.rows.some(r => r.__dealType === v));
+    STATE.filterOptions.status = [...new Set(STATE.rows.map(r => r.__status).filter(v => v && v !== 'Unknown'))].sort((a,b) => a.localeCompare(b));
+    const preferredTypes = ['New Logo','Upsell','Downsell'];
+    const liveTypes = [...new Set(STATE.rows.map(r => r.__dealType).filter(v => v && v !== 'Unknown'))];
+    STATE.filterOptions.dealType = preferredTypes.filter(v => liveTypes.includes(v)).concat(liveTypes.filter(v => !preferredTypes.includes(v)).sort((a,b) => a.localeCompare(b)));
     renderFilterOptions();
 }
 
@@ -378,7 +420,7 @@ function stageBucket(row){
 function lowerDealType(v){ return String(v || '').trim().toLowerCase(); }
 
 function getMetrics(rows){
-    const newArr = rows.filter(r => lowerDealType(r.__dealType).includes('standard') || lowerDealType(r.__dealType).includes('key')).reduce((a,r)=>a+r.__amount,0);
+    const newArr = rows.filter(r => lowerDealType(r.__dealType).includes('new') || lowerDealType(r.__dealType).includes('logo') || lowerDealType(r.__dealType).includes('standard') || lowerDealType(r.__dealType).includes('key')).reduce((a,r)=>a+r.__amount,0);
     const upsell = rows.filter(r => lowerDealType(r.__dealType) === 'upsell').reduce((a,r)=>a+r.__amount,0);
     const downsell = rows.filter(r => lowerDealType(r.__dealType) === 'downsell').reduce((a,r)=>a+r.__amount,0);
     const churn = rows.filter(r => /closed-lost|rejected|derailed/i.test(r.__status)).reduce((a,r)=>a+r.__amount,0);
@@ -418,26 +460,29 @@ function renderKpis(metrics){
 }
 
 function plotTrend(elId, title, groups, orderedKeys){
+    const target = document.getElementById(elId);
+    if (!target) return;
     const dealCounts = orderedKeys.map(k => groups[k]?.deals || 0);
     const amounts = orderedKeys.map(k => groups[k]?.amount || 0);
     const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
     const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
     const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
     const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
-    Plotly.newPlot(elId, [
+    Plotly.react(elId, [
         { x: orderedKeys, y: dealCounts, type:'bar', name:'Deals', marker:{ color:'#0d0d12', line:{ color:'#0d0d12', width:0 }, opacity:.95 }, hovertemplate:'%{x}<br>Deals: %{y}<extra></extra>' },
         { x: orderedKeys, y: amounts, type:'scatter', mode:'lines+markers', name:'Amount', yaxis:'y2', line:{ color:'#00c875', width:3, shape:'spline', smoothing:0.55 }, marker:{ size:7, color:'#00c875', line:{ color:'#ffffff', width:1.5 } }, hovertemplate:'%{x}<br>Amount: $%{y:,.0f}<extra></extra>' }
     ], {
-        margin:{ l:50, r:60, t:18, b:70 },
+        margin:{ l:56, r:72, t:18, b:48 },
         paper_bgcolor:'transparent',
         plot_bgcolor:surface,
         font:{ family:'Inter, sans-serif', color:textColor, size:12 },
-        xaxis:{ tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, tickangle: orderedKeys.length > 10 ? -35 : 0 },
-        yaxis:{ title:'Deals', tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false },
-        yaxis2:{ title:'Amount', overlaying:'y', side:'right', tickfont:{ color:axisColor }, tickprefix:'$', separatethousands:true, showgrid:false },
-        legend:{ orientation:'h', y:1.14, x:0 },
+        xaxis:{ domain:[0.03,0.9], tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, tickangle: orderedKeys.length > 10 ? -35 : 0, automargin:true },
+        yaxis:{ title:'Deals', tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, automargin:true },
+        yaxis2:{ title:'Amount', overlaying:'y', side:'right', anchor:'free', position:0.94, tickfont:{ color:axisColor }, tickprefix:'$', separatethousands:true, showgrid:false, automargin:true },
+        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' },
         barmode:'group'
     }, { displayModeBar:false, responsive:true });
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
 }
 
 function renderTables(rows){
@@ -493,10 +538,10 @@ async function manualRefresh(){
         const rows = await fetchSheet();
         STATE.rows = rowsToObjects(rows);
         setupFilters();
+        document.body.classList.remove('is-refreshing');
         applyFilters();
         document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toLocaleString();
     } finally {
-        document.body.classList.remove('is-refreshing');
         btn.classList.remove('is-loading');
     }
 }
@@ -509,6 +554,11 @@ document.addEventListener('click', (e) => {
             if (trigger) trigger.setAttribute('aria-expanded', 'false');
         }
     });
+});
+
+window.addEventListener('resize', () => {
+    const chart = document.getElementById('trendChart');
+    if (chart && chart.data) Plotly.Plots.resize(chart);
 });
 
 manualRefresh();
