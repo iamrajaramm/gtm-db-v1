@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTMD Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        [data-theme="light"]{--bg:#EEEEEE;--surface:#ffffff;--card-border:#dcdcdc;--text:#0d0d12;--text2:#3d3d4e;--dim:#8a8a99;--green:#00c875;--green-dark:#00a35c;--green-bg:#e6faf0;--navy:#0d0d12;--blue:#4361ee;--amber:#f59e0b;--red:#ef4444;--purple:#7c3aed;--hover-bg:#f0f0f2;--grid-color:#f0f0f2;--pill-active-bg:#0d0d12;--pill-active-text:#fff;--chip-bg:white;--chip-border:#ebebeb}
+        [data-theme="dim"]{--bg:#212121;--surface:#2f2f2f;--card-border:#3a3a3a;--text:#ececec;--text2:#b4b4b4;--dim:#9a9a9a;--green:#19c37d;--green-dark:#34d399;--green-bg:rgba(25,195,125,.12);--navy:#ececec;--blue:#7aa2ff;--amber:#f5b14c;--red:#f87171;--purple:#b794f6;--hover-bg:#262626;--grid-color:#3a3a3a;--pill-active-bg:#ececec;--pill-active-text:#212121;--chip-bg:#262626;--chip-border:#3a3a3a}
+        [data-theme="midnight"]{--bg:#000000;--surface:#0a0a0a;--card-border:#1a1a1a;--text:#e4e4e7;--text2:#a1a1aa;--dim:#52525b;--green:#00e88a;--green-dark:#00ff99;--green-bg:rgba(0,232,138,.08);--navy:#e4e4e7;--blue:#818cf8;--amber:#fbbf24;--red:#f87171;--purple:#c4b5fd;--hover-bg:#111;--grid-color:#1a1a1a;--pill-active-bg:#00e88a;--pill-active-text:#000;--chip-bg:#0f0f0f;--chip-border:#1a1a1a}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;padding:0;overflow-x:auto;zoom:.75}
+        .container{width:max-content;min-width:1260px;max-width:none;margin:0 auto;padding:20px 0 10px}
+        .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+        .header-left{display:flex;align-items:center;gap:10px}
+        .logo-icon{width:36px;height:36px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:white}
+        .header-left h1{font-size:1.6em;font-weight:900;letter-spacing:-.5px;color:var(--text)}
+        .header-left .badge{background:none;color:var(--text);font-size:1.6em;font-weight:900;letter-spacing:-.5px;padding:0;margin-left:0}
+        .theme-switch{display:flex;gap:6px;background:var(--surface);border:1px solid var(--card-border);border-radius:12px;padding:4px}
+        .theme-btn{width:36px;height:36px;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:.78em;font-weight:800;line-height:1}
+        .theme-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+        .theme-btn:hover{border-color:var(--green)}
+        .theme-btn.active{border-color:var(--green);box-shadow:0 0 0 2px var(--green-bg)}
+        .refresh-btn{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--card-border);background:linear-gradient(180deg,var(--surface) 0%,var(--hover-bg) 100%);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease,color .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35)}
+        .refresh-btn:hover{transform:translateY(-1px);border-color:var(--green);box-shadow:0 8px 18px rgba(0,0,0,.12),0 0 0 3px var(--green-bg)}
+        .refresh-btn svg{width:20px;height:20px;overflow:visible}
+        .refresh-btn .icon-refresh,.refresh-btn .icon-stop{transition:opacity .2s ease,transform .2s ease}
+        .refresh-btn:hover .icon-refresh .r-body{transform:rotate(-18deg);transform-origin:12px 12px;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+        .refresh-btn .icon-stop{display:none}
+        .refresh-btn.is-loading .icon-refresh{display:none}
+        .refresh-btn.is-loading .icon-stop{display:block}
+        .refresh-btn.is-loading .spin-ring{animation:refreshSpin .95s linear infinite;transform-origin:12px 12px}
+        @keyframes refreshSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        .ch-row{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+        .ch-label{font-size:.72em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:4px}
+        .ch-pill{padding:8px 20px;border-radius:100px;font-size:.82em;font-weight:600;border:1.5px solid var(--card-border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+        .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
+        .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+        .filter-card,.card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
+        .filter-card label{display:block;font-size:.66em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.7px;margin-bottom:8px}
+        .filter-card select{width:100%;background:transparent;border:0;outline:none;color:var(--text);font:inherit;font-size:.95em;font-weight:700}
+        .grid-two{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-bottom:18px}
+        .stack{display:grid;gap:18px}
+        .card h3{font-size:1em;font-weight:800;margin-bottom:8px;color:var(--text)}
+        .card-sub{font-size:.75em;color:var(--dim);margin-bottom:10px}
+        .chart{height:290px}
+        .chart.tall{height:360px}
+        .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .kpi{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:14px;padding:16px}
+        .kpi-label{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.6px;margin-bottom:8px}
+        .kpi-value{font-size:2em;font-weight:900;line-height:1;letter-spacing:-1px}
+        .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
+        .tbl{width:100%;border-collapse:collapse}
+        .tbl th{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;text-align:left;padding:12px 14px;border-bottom:2px solid var(--card-border)}
+        .tbl td{font-size:.88em;padding:12px 14px;border-bottom:1px solid var(--card-border);color:var(--text2)}
+        .tbl tbody tr:last-child td{border-bottom:none}
+        .num{font-weight:800;font-variant-numeric:tabular-nums}
+        .footer{text-align:center;margin-top:28px;font-size:.68em;color:var(--dim);letter-spacing:.5px}
+        .loading-state{display:none;min-height:calc(100vh - 160px);align-items:center;justify-content:center;padding:20px 0 40px}
+        .is-refreshing .loading-state{display:flex}
+        .is-refreshing .report-content{display:none}
+        .loading-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+        .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
+        @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body class="is-refreshing">
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-icon" aria-label="Dashboard icon" title="Dashboard">&#x1F4CA;</div>
+            <h1>GTMD</h1>
+            <span class="badge">Dashboard</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto">
+            <button class="refresh-btn" id="refreshBtn" onclick="manualRefresh()" title="Refresh data" aria-label="Refresh data" type="button">
+                <svg class="icon-refresh" viewBox="0 0 24 24" aria-hidden="true"><g class="r-body" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></g></svg>
+                <svg class="icon-stop" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="spin-ring" cx="12" cy="12" r="7.5" stroke-dasharray="24 14"></circle><path d="M9 9L15 15M15 9L9 15"></path></svg>
+            </button>
+            <div class="theme-switch">
+                <button class="theme-btn active" onclick="setTheme('light',this)" title="Light theme" aria-label="Light theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.5M12 19v2.5M21.5 12H19M5 12H2.5M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8M18.7 18.7l-1.8-1.8M7.1 7.1L5.3 5.3"></path></svg></button>
+                <button class="theme-btn" onclick="setTheme('dim',this)" title="Dim theme" aria-label="Dim theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5Z"></path></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ch-row">
+        <span class="ch-label">Tab</span>
+        <button class="ch-pill on" type="button">GTMB - Revenue</button>
+    </div>
+
+    <div class="loading-state" id="loadingState">
+        <div class="loading-panel">
+            <div class="loading-spinner"></div>
+            <div style="font-size:1em;font-weight:700;letter-spacing:.2px;color:var(--text)">Fetching live data</div>
+        </div>
+    </div>
+
+    <div class="report-content">
+        <div class="filters">
+            <div class="filter-card"><label>Deal Type</label><select id="dealTypeFilter"></select></div>
+            <div class="filter-card"><label>Status</label><select id="statusFilter"></select></div>
+            <div class="filter-card"><label>Year</label><select id="yearFilter"></select></div>
+            <div class="filter-card"><label>Quarter</label><select id="quarterFilter"></select></div>
+        </div>
+
+        <div class="grid-two">
+            <div class="stack">
+                <div class="card">
+                    <h3>Net ARR Trends (Yearly)</h3>
+                    <div class="chart" id="yearChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Net ARR Trends (Quarterly)</h3>
+                    <div class="chart" id="quarterChart"></div>
+                </div>
+                <div class="card">
+                    <h3>Net ARR Trends (Monthly)</h3>
+                    <div class="chart tall" id="monthChart"></div>
+                </div>
+            </div>
+            <div class="stack">
+                <div class="card">
+                    <h3>ARR Summary</h3>
+                    <div class="card-sub">Live from `GTMDB-Deals`</div>
+                    <div class="kpi-grid" id="kpiGrid"></div>
+                </div>
+                <div class="card">
+                    <h3>Customers</h3>
+                    <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="customersTbl"></tbody></table>
+                </div>
+                <div class="card">
+                    <h3>Churns</h3>
+                    <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="churnTbl"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">GTMD Revenue Dashboard | <span id="ts">Last refreshed: -</span></div>
+</div>
+
+<script>
+const SHEET_ID = '1PvgKWPJTfnZgtRyKTcUUteTWEoALBe_qBiSY0kLT-Lo';
+const SHEET_NAME = 'GTMDB-Deals';
+const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8788' : '';
+const STATE = { rows: [], filtered: [], theme: 'light' };
+
+function setTheme(t, el) {
+    document.documentElement.setAttribute('data-theme', t);
+    document.querySelectorAll('.theme-switch .theme-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    STATE.theme = t;
+    if (STATE.filtered.length) renderAll();
+}
+
+function money(v){ return '$' + Number(v || 0).toLocaleString(); }
+function shortMoney(v){ const n = Number(v || 0); if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(0) + 'K'; return String(Math.round(n)); }
+function num(v){ return parseFloat(String(v || '').replace(/[$,%\s,]/g,'')) || 0; }
+
+function parseCsv(text){
+    const rows=[]; let row=[]; let cell=''; let inQuotes=false;
+    for(let i=0;i<text.length;i++){
+        const ch=text[i], next=text[i+1];
+        if(ch === '"'){ if(inQuotes && next === '"'){ cell += '"'; i++; } else { inQuotes = !inQuotes; } }
+        else if(ch === ',' && !inQuotes){ row.push(cell); cell=''; }
+        else if((ch === '\n' || ch === '\r') && !inQuotes){ if(ch === '\r' && next === '\n') i++; row.push(cell); rows.push(row); row=[]; cell=''; }
+        else { cell += ch; }
+    }
+    if(cell.length || row.length){ row.push(cell); rows.push(row); }
+    return rows.map(r => r.map(c => String(c || '').trim())).filter(r => r.some(c => c));
+}
+
+async function fetchSheet() {
+    const proxyUrl = `${API_BASE}/api/sheet?sheetId=${encodeURIComponent(SHEET_ID)}&sheet=${encodeURIComponent(SHEET_NAME)}&format=csv&_t=${Date.now()}`;
+    const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&_t=${Date.now()}`;
+    let resp = await fetch(proxyUrl, { cache: 'no-store' });
+    let text = await resp.text();
+    const looksLikeHtml = (text || '').trim().toLowerCase().startsWith('<!doctype html') || (text || '').trim().toLowerCase().startsWith('<html');
+    if ((!resp.ok || looksLikeHtml) && window.location.protocol !== 'file:') {
+        resp = await fetch(directUrl, { cache: 'no-store' });
+        text = await resp.text();
+    }
+    if (!resp.ok) throw new Error('Failed to fetch deals sheet');
+    return parseCsv(text);
+}
+
+function rowsToObjects(rows){
+    const headers = rows[1].map((h, idx) => {
+        let value = String(h || '').replace(/\s+/g,' ').trim();
+        if(idx === 0 && value.includes('Deal ID')) value = 'Deal ID';
+        return value;
+    });
+    return rows.slice(2).filter(r => r.some(c => c)).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i] ?? '');
+        const closeDate = new Date(obj['Close Date'] || obj['Create Date'] || '');
+        obj.__date = Number.isNaN(closeDate.getTime()) ? null : closeDate;
+        obj.__amount = num(obj['Amount']);
+        obj.__dealType = obj['Deal Type'] || 'Unknown';
+        obj.__status = obj['Deal Stage'] || 'Unknown';
+        obj.__year = obj.__date ? String(obj.__date.getFullYear()) : 'Unknown';
+        obj.__quarter = obj.__date ? `Q${Math.floor(obj.__date.getMonth()/3)+1}, ${obj.__date.getFullYear()}` : 'Unknown';
+        obj.__month = obj.__date ? `${obj.__date.toLocaleString('en-US',{month:'short'})} ${obj.__date.getFullYear()}` : 'Unknown';
+        return obj;
+    });
+}
+
+function fillSelect(id, values, allLabel){
+    const sel = document.getElementById(id);
+    const current = sel.value;
+    sel.innerHTML = [`<option value="all">${allLabel}</option>`].concat(values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)).join('');
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+}
+
+function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function setupFilters() {
+    const dealTypes = [...new Set(STATE.rows.map(r => r.__dealType))].sort();
+    const statuses = [...new Set(STATE.rows.map(r => r.__status))].sort();
+    const years = [...new Set(STATE.rows.map(r => r.__year).filter(v => v !== 'Unknown'))].sort();
+    const quarters = [...new Set(STATE.rows.map(r => r.__quarter).filter(v => v !== 'Unknown'))].sort((a,b) => {
+        const [qa, ya] = a.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
+        const [qb, yb] = b.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
+        return ya === yb ? qa - qb : ya - yb;
+    });
+    fillSelect('dealTypeFilter', dealTypes, 'All Deal Types');
+    fillSelect('statusFilter', statuses, 'All Statuses');
+    fillSelect('yearFilter', years, 'All Years');
+    fillSelect('quarterFilter', quarters, 'All Quarters');
+    ['dealTypeFilter','statusFilter','yearFilter','quarterFilter'].forEach(id => document.getElementById(id).onchange = applyFilters);
+}
+
+function applyFilters(){
+    const dealType = document.getElementById('dealTypeFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const year = document.getElementById('yearFilter').value;
+    const quarter = document.getElementById('quarterFilter').value;
+    STATE.filtered = STATE.rows.filter(r =>
+        (dealType === 'all' || r.__dealType === dealType) &&
+        (status === 'all' || r.__status === status) &&
+        (year === 'all' || r.__year === year) &&
+        (quarter === 'all' || r.__quarter === quarter)
+    );
+    renderAll();
+}
+
+function stageBucket(row){
+    const s = String(row.__status || '').toLowerCase();
+    if (s.includes('closed-won')) return 'new';
+    if (s.includes('upsell')) return 'upsell';
+    if (s.includes('downsell')) return 'downsell';
+    if (s.includes('closed-lost') || s.includes('rejected') || s.includes('derailed')) return 'churn';
+    return lowerDealType(row.__dealType);
+}
+function lowerDealType(v){ return String(v || '').trim().toLowerCase(); }
+
+function getMetrics(rows){
+    const newArr = rows.filter(r => lowerDealType(r.__dealType).includes('standard') || lowerDealType(r.__dealType).includes('key')).reduce((a,r)=>a+r.__amount,0);
+    const upsell = rows.filter(r => lowerDealType(r.__dealType) === 'upsell').reduce((a,r)=>a+r.__amount,0);
+    const downsell = rows.filter(r => lowerDealType(r.__dealType) === 'downsell').reduce((a,r)=>a+r.__amount,0);
+    const churn = rows.filter(r => /closed-lost|rejected|derailed/i.test(r.__status)).reduce((a,r)=>a+r.__amount,0);
+    const net = newArr + upsell - Math.abs(downsell) - churn;
+    const gross = newArr + upsell + downsell;
+    return { newArr, upsell, downsell, churn, net, gross };
+}
+
+function aggregateBy(rows, keyFn){
+    const groups = {};
+    rows.forEach(r => {
+        if (!r.__date) return;
+        const key = keyFn(r);
+        groups[key] ||= { deals:0, amount:0 };
+        groups[key].deals += 1;
+        groups[key].amount += r.__amount;
+    });
+    return groups;
+}
+
+function renderKpis(metrics){
+    const items = [
+        ['Gross ARR', metrics.gross, 'Total deal amount'],
+        ['New ARR', metrics.newArr, 'Standard + key logo'],
+        ['Upsell', metrics.upsell, 'Expansion revenue'],
+        ['Downsell', metrics.downsell, 'Contraction revenue'],
+        ['Churn', metrics.churn, 'Lost / rejected / derailed'],
+        ['Net ARR', metrics.net, 'After churn + downsell']
+    ];
+    document.getElementById('kpiGrid').innerHTML = items.map(([label,value,sub]) => `<div class="kpi"><div class="kpi-label">${escapeHtml(label)}</div><div class="kpi-value">${money(value)}</div><div class="kpi-sub">${escapeHtml(sub)}</div></div>`).join('');
+}
+
+function plotTrend(elId, title, groups, orderedKeys){
+    const dealCounts = orderedKeys.map(k => groups[k]?.deals || 0);
+    const amounts = orderedKeys.map(k => groups[k]?.amount || 0);
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    Plotly.newPlot(elId, [
+        { x: orderedKeys, y: dealCounts, type:'bar', name:'Deals', marker:{ color:'#0d0d12' } },
+        { x: orderedKeys, y: amounts, type:'scatter', mode:'lines+markers', name:'Amount', yaxis:'y2', line:{ color:'#00c875', width:3 }, marker:{ size:7, color:'#00c875' } }
+    ], {
+        margin:{ l:50, r:60, t:10, b:50 },
+        paper_bgcolor:'transparent',
+        plot_bgcolor:surface,
+        font:{ family:'Inter, sans-serif', color:textColor, size:12 },
+        xaxis:{ tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false },
+        yaxis:{ title:'Deals', tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false },
+        yaxis2:{ title:'Amount', overlaying:'y', side:'right', tickfont:{ color:axisColor }, tickprefix:'$', separatethousands:true, showgrid:false },
+        legend:{ orientation:'h', y:1.12, x:0 },
+        barmode:'group'
+    }, { displayModeBar:false, responsive:true });
+}
+
+function renderTables(rows){
+    const customers = [...rows].filter(r => num(r['Total Revenue']) > 0).sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue'])).slice(0,10);
+    const churns = [...rows].filter(r => /closed-lost|rejected|derailed/i.test(r.__status)).sort((a,b) => num(b['Total Revenue'] || b.__amount) - num(a['Total Revenue'] || a.__amount)).slice(0,10);
+    document.getElementById('customersTbl').innerHTML = customers.map((r,i)=>`<tr><td>${i+1}. ${escapeHtml(r['Company name'] || '-')}</td><td class="num">${money(num(r['Total Revenue']))}</td></tr>`).join('');
+    document.getElementById('churnTbl').innerHTML = churns.map((r,i)=>`<tr><td>${i+1}. ${escapeHtml(r['Company name'] || '-')}</td><td class="num">${money(num(r['Total Revenue'] || r.__amount))}</td></tr>`).join('');
+}
+
+function renderAll(){
+    const rows = STATE.filtered;
+    const metrics = getMetrics(rows);
+    renderKpis(metrics);
+
+    const yearly = aggregateBy(rows, r => String(r.__date.getFullYear()));
+    const yearlyKeys = Object.keys(yearly).sort();
+
+    const quarterly = aggregateBy(rows, r => `Q${Math.floor(r.__date.getMonth()/3)+1}, ${r.__date.getFullYear()}`);
+    const quarterlyKeys = Object.keys(quarterly).sort((a,b) => {
+        const [qa, ya] = a.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
+        const [qb, yb] = b.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
+        return ya === yb ? qa - qb : ya - yb;
+    });
+
+    const monthly = aggregateBy(rows, r => `${r.__date.getFullYear()}-${String(r.__date.getMonth()+1).padStart(2,'0')}`);
+    const monthlyKeys = Object.keys(monthly).sort();
+    const monthLabels = monthlyKeys.map(k => {
+        const [y,m] = k.split('-').map(Number);
+        return new Date(y, m-1, 1).toLocaleString('en-US',{month:'short', year:'numeric'});
+    });
+    const monthlyLabelMap = {};
+    monthlyKeys.forEach((k,i) => monthlyLabelMap[monthLabels[i]] = monthly[k]);
+
+    plotTrend('yearChart', 'Net ARR Trends (Yearly)', yearly, yearlyKeys);
+    plotTrend('quarterChart', 'Net ARR Trends (Quarterly)', quarterly, quarterlyKeys);
+    plotTrend('monthChart', 'Net ARR Trends (Monthly)', monthlyLabelMap, monthLabels);
+    renderTables(rows);
+}
+
+async function manualRefresh(){
+    const btn = document.getElementById('refreshBtn');
+    document.body.classList.add('is-refreshing');
+    btn.classList.add('is-loading');
+    try{
+        const rows = await fetchSheet();
+        STATE.rows = rowsToObjects(rows);
+        setupFilters();
+        applyFilters();
+        document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toLocaleString();
+    } finally {
+        document.body.classList.remove('is-refreshing');
+        btn.classList.remove('is-loading');
+    }
+}
+
+manualRefresh();
+</script>
+</body>
+</html>
