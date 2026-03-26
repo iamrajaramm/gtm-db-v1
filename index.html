@@ -23,6 +23,16 @@
         .theme-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
         .theme-btn:hover{border-color:var(--green)}
         .theme-btn.active{border-color:var(--green);box-shadow:0 0 0 2px var(--green-bg)}
+        .campaign-picker{position:relative;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px 10px 6px 12px;min-width:180px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+        .campaign-picker .cp-label{font-size:.62em;font-weight:700;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;white-space:nowrap}
+        .campaign-trigger{flex:1;min-width:120px;border:0;background:transparent;color:var(--text);font-size:.86em;font-weight:700;outline:none;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:2px 0;text-align:left}
+        .campaign-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
+        .campaign-picker.open .campaign-trigger svg{transform:rotate(180deg)}
+        .campaign-menu{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px;box-shadow:0 18px 40px rgba(0,0,0,.16);display:none;z-index:30;max-height:280px;overflow:auto}
+        .campaign-picker.open .campaign-menu{display:block}
+        .campaign-option{width:100%;border:0;background:transparent;color:var(--text);font:inherit;font-size:.86em;font-weight:700;text-align:left;padding:11px 12px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+        .campaign-option:hover{background:var(--hover-bg)}
+        .campaign-option.is-active{background:var(--pill-active-bg);color:var(--pill-active-text)}
         .refresh-btn{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--card-border);background:linear-gradient(180deg,var(--surface) 0%,var(--hover-bg) 100%);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease,color .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35)}
         .refresh-btn:hover{transform:translateY(-1px);border-color:var(--green);box-shadow:0 8px 18px rgba(0,0,0,.12),0 0 0 3px var(--green-bg)}
         .refresh-btn svg{width:20px;height:20px;overflow:visible}
@@ -38,9 +48,7 @@
         .ch-pill{padding:8px 20px;border-radius:100px;font-size:.82em;font-weight:600;border:1.5px solid var(--card-border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
         .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
         .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:20px}
-        .filter-card,.card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
-        .filter-card label{display:block;font-size:.66em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.7px;margin-bottom:8px}
-        .filter-card select{width:100%;background:transparent;border:0;outline:none;color:var(--text);font:inherit;font-size:.95em;font-weight:700}
+        .card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
         .grid-two{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-bottom:18px}
         .stack{display:grid;gap:18px}
         .card h3{font-size:1em;font-weight:800;margin-bottom:8px;color:var(--text)}
@@ -100,10 +108,38 @@
 
     <div class="report-content">
         <div class="filters">
-            <div class="filter-card"><label>Deal Type</label><select id="dealTypeFilter"></select></div>
-            <div class="filter-card"><label>Status</label><select id="statusFilter"></select></div>
-            <div class="filter-card"><label>Year</label><select id="yearFilter"></select></div>
-            <div class="filter-card"><label>Quarter</label><select id="quarterFilter"></select></div>
+            <div class="campaign-picker" id="dealTypePicker">
+                <span class="cp-label">Deal Type</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('dealType')" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="dealTypeTriggerText">All Deal Types</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="dealTypeMenu" role="listbox" aria-label="Deal Type options"></div>
+            </div>
+            <div class="campaign-picker" id="statusPicker">
+                <span class="cp-label">Status</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('status')" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="statusTriggerText">All Statuses</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="statusMenu" role="listbox" aria-label="Status options"></div>
+            </div>
+            <div class="campaign-picker" id="yearPicker">
+                <span class="cp-label">Year</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('year')" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="yearTriggerText">All Years</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="yearMenu" role="listbox" aria-label="Year options"></div>
+            </div>
+            <div class="campaign-picker" id="quarterPicker">
+                <span class="cp-label">Quarter</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('quarter')" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="quarterTriggerText">All Quarters</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="quarterMenu" role="listbox" aria-label="Quarter options"></div>
+            </div>
         </div>
 
         <div class="grid-two">
@@ -146,7 +182,23 @@
 const SHEET_ID = '1PvgKWPJTfnZgtRyKTcUUteTWEoALBe_qBiSY0kLT-Lo';
 const SHEET_NAME = 'GTMDB-Deals';
 const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8788' : '';
-const STATE = { rows: [], filtered: [], theme: 'light' };
+const STATE = {
+    rows: [],
+    filtered: [],
+    theme: 'light',
+    filters: {
+        year: 'all',
+        quarter: 'all',
+        status: 'all',
+        dealType: 'all'
+    },
+    filterOptions: {
+        year: [],
+        quarter: [],
+        status: [],
+        dealType: []
+    }
+};
 
 function setTheme(t, el) {
     document.documentElement.setAttribute('data-theme', t);
@@ -154,6 +206,36 @@ function setTheme(t, el) {
     el.classList.add('active');
     STATE.theme = t;
     if (STATE.filtered.length) renderAll();
+}
+
+function closeFilterMenu(key) {
+    const picker = document.getElementById(`${key}Picker`);
+    const trigger = picker ? picker.querySelector('.campaign-trigger') : null;
+    if (picker) picker.classList.remove('open');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function toggleFilterMenu(key) {
+    const picker = document.getElementById(`${key}Picker`);
+    const trigger = picker ? picker.querySelector('.campaign-trigger') : null;
+    if (!picker || !trigger) return;
+    const shouldOpen = !picker.classList.contains('open');
+    document.querySelectorAll('.campaign-picker').forEach((node) => {
+        node.classList.remove('open');
+        const btn = node.querySelector('.campaign-trigger');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+    if (shouldOpen) {
+        picker.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+    }
+}
+
+function setFilterValue(key, value) {
+    STATE.filters[key] = value;
+    closeFilterMenu(key);
+    renderFilterOptions();
+    applyFilters();
 }
 
 function money(v){ return '$' + Number(v || 0).toLocaleString(); }
@@ -208,45 +290,58 @@ function rowsToObjects(rows){
         const closeDate = new Date(obj['Close Date'] || obj['Create Date'] || '');
         obj.__date = Number.isNaN(closeDate.getTime()) ? null : closeDate;
         obj.__amount = num(obj['Amount']);
-        obj.__dealType = obj['Deal Type'] || 'Unknown';
-        obj.__status = obj['Deal Stage'] || 'Unknown';
+        obj.__dealType = obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || 'Unknown';
+        obj.__status = obj['#Status'] || obj['#status'] || obj['Deal Stage'] || 'Unknown';
         obj.__year = obj.__date ? String(obj.__date.getFullYear()) : 'Unknown';
-        obj.__quarter = obj.__date ? `Q${Math.floor(obj.__date.getMonth()/3)+1}, ${obj.__date.getFullYear()}` : 'Unknown';
+        obj.__quarter = obj.__date ? `Q${Math.floor(obj.__date.getMonth()/3)+1} ${obj.__date.getFullYear()}` : 'Unknown';
         obj.__month = obj.__date ? `${obj.__date.toLocaleString('en-US',{month:'short'})} ${obj.__date.getFullYear()}` : 'Unknown';
         return obj;
     });
 }
 
-function fillSelect(id, values, allLabel){
-    const sel = document.getElementById(id);
-    const current = sel.value;
-    sel.innerHTML = [`<option value="all">${allLabel}</option>`].concat(values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)).join('');
-    if ([...sel.options].some(o => o.value === current)) sel.value = current;
-}
-
 function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function quarterLabelFromDate(date) {
+    return `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`;
+}
+
 function setupFilters() {
-    const dealTypes = [...new Set(STATE.rows.map(r => r.__dealType))].sort();
-    const statuses = [...new Set(STATE.rows.map(r => r.__status))].sort();
-    const years = [...new Set(STATE.rows.map(r => r.__year).filter(v => v !== 'Unknown'))].sort();
-    const quarters = [...new Set(STATE.rows.map(r => r.__quarter).filter(v => v !== 'Unknown'))].sort((a,b) => {
-        const [qa, ya] = a.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
-        const [qb, yb] = b.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
-        return ya === yb ? qa - qb : ya - yb;
+    STATE.filterOptions.year = ['2021','2022','2023','2024','2025','2026'];
+    STATE.filterOptions.quarter = [
+        'Q4 2021',
+        'Q1 2022','Q2 2022','Q3 2022','Q4 2022',
+        'Q1 2023','Q2 2023','Q3 2023','Q4 2023',
+        'Q1 2024','Q2 2024','Q3 2024','Q4 2024',
+        'Q1 2025','Q2 2025','Q3 2025','Q4 2025',
+        'Q1 2026','Q2 2026','Q3 2026','Q4 2026'
+    ];
+    STATE.filterOptions.status = [...new Set(STATE.rows.map(r => r.__status).filter(v => v && v !== 'Unknown'))].sort();
+    STATE.filterOptions.dealType = ['New Logo','Upsell','Downsell'].filter(v => STATE.rows.some(r => r.__dealType === v));
+    renderFilterOptions();
+}
+
+function renderFilterOptions() {
+    const defs = {
+        dealType: { label: 'All Deal Types', trigger: 'dealTypeTriggerText', menu: 'dealTypeMenu' },
+        status: { label: 'All Statuses', trigger: 'statusTriggerText', menu: 'statusMenu' },
+        year: { label: 'All Years', trigger: 'yearTriggerText', menu: 'yearMenu' },
+        quarter: { label: 'All Quarters', trigger: 'quarterTriggerText', menu: 'quarterMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const current = STATE.filters[key];
+        const options = STATE.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) trigger.textContent = current === 'all' ? def.label : current;
+        if (!menu) return;
+        const allButton = `<button class="campaign-option ${current === 'all' ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === 'all'}" onclick="setFilterValue('${key}','all')">${def.label}</button>`;
+        const optionButtons = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" onclick="setFilterValue('${key}', ${JSON.stringify(value)})">${escapeHtml(value)}</button>`).join('');
+        menu.innerHTML = allButton + optionButtons;
     });
-    fillSelect('dealTypeFilter', dealTypes, 'All Deal Types');
-    fillSelect('statusFilter', statuses, 'All Statuses');
-    fillSelect('yearFilter', years, 'All Years');
-    fillSelect('quarterFilter', quarters, 'All Quarters');
-    ['dealTypeFilter','statusFilter','yearFilter','quarterFilter'].forEach(id => document.getElementById(id).onchange = applyFilters);
 }
 
 function applyFilters(){
-    const dealType = document.getElementById('dealTypeFilter').value;
-    const status = document.getElementById('statusFilter').value;
-    const year = document.getElementById('yearFilter').value;
-    const quarter = document.getElementById('quarterFilter').value;
+    const { dealType, status, year, quarter } = STATE.filters;
     STATE.filtered = STATE.rows.filter(r =>
         (dealType === 'all' || r.__dealType === dealType) &&
         (status === 'all' || r.__status === status) &&
@@ -375,6 +470,16 @@ async function manualRefresh(){
         btn.classList.remove('is-loading');
     }
 }
+
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('.campaign-picker').forEach((picker) => {
+        if (!picker.contains(e.target)) {
+            picker.classList.remove('open');
+            const trigger = picker.querySelector('.campaign-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+});
 
 manualRefresh();
 </script>
