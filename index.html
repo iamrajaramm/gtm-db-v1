@@ -49,13 +49,13 @@
         .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
         .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:20px}
         .card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
-        .grid-two{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-bottom:18px}
         .stack{display:grid;gap:18px}
+        .scorecard-row{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+        .data-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
         .card h3{font-size:1em;font-weight:800;margin-bottom:8px;color:var(--text)}
         .card-sub{font-size:.75em;color:var(--dim);margin-bottom:10px}
         .chart{height:290px}
         .chart.tall{height:360px}
-        .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
         .kpi{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:14px;padding:16px}
         .kpi-label{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.6px;margin-bottom:8px}
         .kpi-value{font-size:2em;font-weight:900;line-height:1;letter-spacing:-1px}
@@ -72,6 +72,7 @@
         .loading-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
         .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
         @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @media(max-width:1200px){.scorecard-row{grid-template-columns:repeat(3,minmax(170px,1fr))}.data-row{grid-template-columns:1fr}}
     </style>
 </head>
 <body class="is-refreshing">
@@ -142,35 +143,34 @@
             </div>
         </div>
 
-        <div class="grid-two">
-            <div class="stack">
-                <div class="card">
-                    <h3>Net ARR Trends (Yearly)</h3>
-                    <div class="chart" id="yearChart"></div>
+        <div class="card" style="margin-bottom:18px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px">
+                <div>
+                    <h3 id="trendChartTitle">Net ARR Trends (Yearly)</h3>
+                    <div class="card-sub">Interactive chart view based on current filters</div>
                 </div>
-                <div class="card">
-                    <h3>Net ARR Trends (Quarterly)</h3>
-                    <div class="chart" id="quarterChart"></div>
-                </div>
-                <div class="card">
-                    <h3>Net ARR Trends (Monthly)</h3>
-                    <div class="chart tall" id="monthChart"></div>
+                <div class="campaign-picker" id="trendViewPicker" style="min-width:210px">
+                    <span class="cp-label">View</span>
+                    <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('trendView')" aria-haspopup="listbox" aria-expanded="false">
+                        <span id="trendViewTriggerText">Yearly</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                    </button>
+                    <div class="campaign-menu" id="trendViewMenu" role="listbox" aria-label="Trend view options"></div>
                 </div>
             </div>
-            <div class="stack">
-                <div class="card">
-                    <h3>ARR Summary</h3>
-                    <div class="card-sub">Live from `GTMDB-Deals`</div>
-                    <div class="kpi-grid" id="kpiGrid"></div>
-                </div>
-                <div class="card">
-                    <h3>Customers</h3>
-                    <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="customersTbl"></tbody></table>
-                </div>
-                <div class="card">
-                    <h3>Churns</h3>
-                    <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="churnTbl"></tbody></table>
-                </div>
+            <div class="chart tall" id="trendChart"></div>
+        </div>
+
+        <div class="scorecard-row" id="kpiGrid"></div>
+
+        <div class="data-row">
+            <div class="card">
+                <h3>Customers</h3>
+                <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="customersTbl"></tbody></table>
+            </div>
+            <div class="card">
+                <h3>Churns</h3>
+                <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="churnTbl"></tbody></table>
             </div>
         </div>
     </div>
@@ -186,6 +186,7 @@ const STATE = {
     rows: [],
     filtered: [],
     theme: 'light',
+    trendView: 'yearly',
     filters: {
         year: 'all',
         quarter: 'all',
@@ -196,7 +197,8 @@ const STATE = {
         year: [],
         quarter: [],
         status: [],
-        dealType: []
+        dealType: [],
+        trendView: ['Yearly','Quarterly','Monthly']
     }
 };
 
@@ -232,6 +234,13 @@ function toggleFilterMenu(key) {
 }
 
 function setFilterValue(key, value) {
+    if (key === 'trendView') {
+        STATE.trendView = String(value || 'yearly').toLowerCase();
+        closeFilterMenu(key);
+        renderFilterOptions();
+        renderAll();
+        return;
+    }
     STATE.filters[key] = value;
     closeFilterMenu(key);
     renderFilterOptions();
@@ -325,15 +334,22 @@ function renderFilterOptions() {
         dealType: { label: 'All Deal Types', trigger: 'dealTypeTriggerText', menu: 'dealTypeMenu' },
         status: { label: 'All Statuses', trigger: 'statusTriggerText', menu: 'statusMenu' },
         year: { label: 'All Years', trigger: 'yearTriggerText', menu: 'yearMenu' },
-        quarter: { label: 'All Quarters', trigger: 'quarterTriggerText', menu: 'quarterMenu' }
+        quarter: { label: 'All Quarters', trigger: 'quarterTriggerText', menu: 'quarterMenu' },
+        trendView: { label: 'Yearly', trigger: 'trendViewTriggerText', menu: 'trendViewMenu' }
     };
     Object.entries(defs).forEach(([key, def]) => {
-        const current = STATE.filters[key];
+        const current = key === 'trendView'
+            ? `${STATE.trendView.charAt(0).toUpperCase()}${STATE.trendView.slice(1)}`
+            : STATE.filters[key];
         const options = STATE.filterOptions[key] || [];
         const trigger = document.getElementById(def.trigger);
         const menu = document.getElementById(def.menu);
         if (trigger) trigger.textContent = current === 'all' ? def.label : current;
         if (!menu) return;
+        if (key === 'trendView') {
+            menu.innerHTML = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" onclick="setFilterValue('trendView', ${JSON.stringify(value)})">${escapeHtml(value)}</button>`).join('');
+            return;
+        }
         const allButton = `<button class="campaign-option ${current === 'all' ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === 'all'}" onclick="setFilterValue('${key}','all')">${def.label}</button>`;
         const optionButtons = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" onclick="setFilterValue('${key}', ${JSON.stringify(value)})">${escapeHtml(value)}</button>`).join('');
         menu.innerHTML = allButton + optionButtons;
@@ -392,7 +408,13 @@ function renderKpis(metrics){
         ['Churn', metrics.churn, 'Lost / rejected / derailed'],
         ['Net ARR', metrics.net, 'After churn + downsell']
     ];
-    document.getElementById('kpiGrid').innerHTML = items.map(([label,value,sub]) => `<div class="kpi"><div class="kpi-label">${escapeHtml(label)}</div><div class="kpi-value">${money(value)}</div><div class="kpi-sub">${escapeHtml(sub)}</div></div>`).join('');
+    document.getElementById('kpiGrid').innerHTML = items.map(([label,value,sub]) => `
+        <div class="kpi">
+            <div class="kpi-label">${escapeHtml(label)}</div>
+            <div class="kpi-value">${money(value)}</div>
+            <div class="kpi-sub">${escapeHtml(sub)}</div>
+        </div>
+    `).join('');
 }
 
 function plotTrend(elId, title, groups, orderedKeys){
@@ -403,17 +425,17 @@ function plotTrend(elId, title, groups, orderedKeys){
     const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
     const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
     Plotly.newPlot(elId, [
-        { x: orderedKeys, y: dealCounts, type:'bar', name:'Deals', marker:{ color:'#0d0d12' } },
-        { x: orderedKeys, y: amounts, type:'scatter', mode:'lines+markers', name:'Amount', yaxis:'y2', line:{ color:'#00c875', width:3 }, marker:{ size:7, color:'#00c875' } }
+        { x: orderedKeys, y: dealCounts, type:'bar', name:'Deals', marker:{ color:'#0d0d12', line:{ color:'#0d0d12', width:0 }, opacity:.95 }, hovertemplate:'%{x}<br>Deals: %{y}<extra></extra>' },
+        { x: orderedKeys, y: amounts, type:'scatter', mode:'lines+markers', name:'Amount', yaxis:'y2', line:{ color:'#00c875', width:3, shape:'spline', smoothing:0.55 }, marker:{ size:7, color:'#00c875', line:{ color:'#ffffff', width:1.5 } }, hovertemplate:'%{x}<br>Amount: $%{y:,.0f}<extra></extra>' }
     ], {
-        margin:{ l:50, r:60, t:10, b:50 },
+        margin:{ l:50, r:60, t:18, b:70 },
         paper_bgcolor:'transparent',
         plot_bgcolor:surface,
         font:{ family:'Inter, sans-serif', color:textColor, size:12 },
-        xaxis:{ tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false },
+        xaxis:{ tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, tickangle: orderedKeys.length > 10 ? -35 : 0 },
         yaxis:{ title:'Deals', tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false },
         yaxis2:{ title:'Amount', overlaying:'y', side:'right', tickfont:{ color:axisColor }, tickprefix:'$', separatethousands:true, showgrid:false },
-        legend:{ orientation:'h', y:1.12, x:0 },
+        legend:{ orientation:'h', y:1.14, x:0 },
         barmode:'group'
     }, { displayModeBar:false, responsive:true });
 }
@@ -449,9 +471,17 @@ function renderAll(){
     const monthlyLabelMap = {};
     monthlyKeys.forEach((k,i) => monthlyLabelMap[monthLabels[i]] = monthly[k]);
 
-    plotTrend('yearChart', 'Net ARR Trends (Yearly)', yearly, yearlyKeys);
-    plotTrend('quarterChart', 'Net ARR Trends (Quarterly)', quarterly, quarterlyKeys);
-    plotTrend('monthChart', 'Net ARR Trends (Monthly)', monthlyLabelMap, monthLabels);
+    const trendTitle = document.getElementById('trendChartTitle');
+    if (STATE.trendView === 'yearly') {
+        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Yearly)';
+        plotTrend('trendChart', 'Net ARR Trends (Yearly)', yearly, yearlyKeys);
+    } else if (STATE.trendView === 'quarterly') {
+        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Quarterly)';
+        plotTrend('trendChart', 'Net ARR Trends (Quarterly)', quarterly, quarterlyKeys);
+    } else {
+        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Monthly)';
+        plotTrend('trendChart', 'Net ARR Trends (Monthly)', monthlyLabelMap, monthLabels);
+    }
     renderTables(rows);
 }
 
