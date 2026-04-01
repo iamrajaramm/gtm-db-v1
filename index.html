@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTMD Dashboard</title>
+    <title>GTMB Dashboard</title>
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        window.addEventListener('beforeunload', () => {
+            window.scrollTo(0, 0);
+        });
+        window.addEventListener('pageshow', () => {
+            window.scrollTo(0, 0);
+        });
+    </script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         [data-theme="light"]{--bg:#EEEEEE;--surface:#ffffff;--card-border:#dcdcdc;--text:#0d0d12;--text2:#3d3d4e;--dim:#8a8a99;--green:#00c875;--green-dark:#00a35c;--green-bg:#e6faf0;--navy:#0d0d12;--blue:#4361ee;--amber:#f59e0b;--red:#ef4444;--purple:#7c3aed;--hover-bg:#f0f0f2;--grid-color:#f0f0f2;--pill-active-bg:#0d0d12;--pill-active-text:#fff;--chip-bg:white;--chip-border:#ebebeb}
         [data-theme="dim"]{--bg:#212121;--surface:#2f2f2f;--card-border:#3a3a3a;--text:#ececec;--text2:#b4b4b4;--dim:#9a9a9a;--green:#19c37d;--green-dark:#34d399;--green-bg:rgba(25,195,125,.12);--navy:#ececec;--blue:#7aa2ff;--amber:#f5b14c;--red:#f87171;--purple:#b794f6;--hover-bg:#262626;--grid-color:#3a3a3a;--pill-active-bg:#ececec;--pill-active-text:#212121;--chip-bg:#262626;--chip-border:#3a3a3a}
         [data-theme="midnight"]{--bg:#000000;--surface:#0a0a0a;--card-border:#1a1a1a;--text:#e4e4e7;--text2:#a1a1aa;--dim:#52525b;--green:#00e88a;--green-dark:#00ff99;--green-bg:rgba(0,232,138,.08);--navy:#e4e4e7;--blue:#818cf8;--amber:#fbbf24;--red:#f87171;--purple:#c4b5fd;--hover-bg:#111;--grid-color:#1a1a1a;--pill-active-bg:#00e88a;--pill-active-text:#000;--chip-bg:#0f0f0f;--chip-border:#1a1a1a}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;padding:0;overflow-x:auto;zoom:.75}
-        .container{width:max-content;min-width:1260px;max-width:none;margin:0 auto;padding:20px 0 10px}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;padding:0;overflow-x:hidden}
+        .container{width:min(1690px, calc(100vw - 32px));min-width:0;max-width:1690px;margin:0 auto;padding:20px 0 10px}
         .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
         .header-left{display:flex;align-items:center;gap:10px}
         .logo-icon{width:36px;height:36px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:white}
@@ -23,16 +36,31 @@
         .theme-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
         .theme-btn:hover{border-color:var(--green)}
         .theme-btn.active{border-color:var(--green);box-shadow:0 0 0 2px var(--green-bg)}
-        .campaign-picker{position:relative;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px 10px 6px 12px;min-width:180px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+        .campaign-picker{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-width:0;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px 10px 6px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:border-color .16s ease,box-shadow .16s ease,background .16s ease}
+        .campaign-picker.is-active{border:3px solid var(--green);padding:4px 8px 4px 10px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
         .campaign-picker .cp-label{font-size:.62em;font-weight:700;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase;white-space:nowrap}
-        .campaign-trigger{flex:1;min-width:120px;border:0;background:transparent;color:var(--text);font-size:.86em;font-weight:700;outline:none;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:2px 0;text-align:left}
+        .campaign-trigger{flex:1;min-width:0;border:0;background:transparent;color:var(--text);font-size:.86em;font-weight:700;outline:none;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:2px 0;text-align:left}
+        .trigger-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .campaign-trigger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
         .campaign-picker.open .campaign-trigger svg{transform:rotate(180deg)}
-        .campaign-menu{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px;box-shadow:0 18px 40px rgba(0,0,0,.16);display:none;z-index:30;max-height:280px;overflow:auto}
+        .campaign-menu{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:6px;box-shadow:0 18px 40px rgba(0,0,0,.16);display:none;z-index:30;max-height:340px;overflow:auto}
         .campaign-picker.open .campaign-menu{display:block}
         .campaign-option{width:100%;border:0;background:transparent;color:var(--text);font:inherit;font-size:.86em;font-weight:700;text-align:left;padding:11px 12px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
         .campaign-option:hover{background:var(--hover-bg)}
         .campaign-option.is-active{background:var(--pill-active-bg);color:var(--pill-active-text)}
+        .campaign-search{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:6px;border:1px solid var(--card-border);border-radius:10px;background:var(--bg)}
+        .campaign-search svg{width:14px;height:14px;stroke:var(--dim);stroke-width:2;fill:none;flex:0 0 auto}
+        .campaign-search input{width:100%;border:0;outline:none;background:transparent;color:var(--text);font:600 .8em 'Inter',sans-serif}
+        .campaign-search input::placeholder{color:var(--dim)}
+        .multi-option{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--text);font:inherit;font-size:.84em;font-weight:700;text-align:left;padding:10px 10px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+        .multi-option:hover{background:var(--hover-bg)}
+        .multi-option.is-active{background:rgba(0,200,117,.08)}
+        .multi-box{width:18px;height:18px;border-radius:4px;border:1.5px solid #6d8ff0;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .15s}
+        .multi-option.is-active .multi-box{background:#5c8df6;border-color:#5c8df6}
+        .multi-box svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.5;fill:none}
+        .multi-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .multi-amount{font-size:.95em;font-weight:500;color:var(--text2);font-variant-numeric:tabular-nums}
+        .multi-empty{padding:12px 10px;font-size:.8em;font-weight:600;color:var(--dim)}
         .refresh-btn{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--card-border);background:linear-gradient(180deg,var(--surface) 0%,var(--hover-bg) 100%);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease,color .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35)}
         .refresh-btn:hover{transform:translateY(-1px);border-color:var(--green);box-shadow:0 8px 18px rgba(0,0,0,.12),0 0 0 3px var(--green-bg)}
         .refresh-btn svg{width:20px;height:20px;overflow:visible}
@@ -47,27 +75,101 @@
         .ch-label{font-size:.72em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:4px}
         .ch-pill{padding:8px 20px;border-radius:100px;font-size:.82em;font-weight:600;border:1.5px solid var(--card-border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
         .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
-        .filters{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:18px}
-        .card{background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
+        .filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .filters.sales-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .sales-filter-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:18px;align-items:start;width:100%}
+        .sales-filter-column{display:grid;grid-template-columns:1fr;gap:12px}
+        .sales-filter-column > .campaign-picker{width:86%}
+        .sales-filter-column:nth-child(1){justify-items:start}
+        .sales-filter-column:nth-child(2){justify-items:center}
+        .sales-filter-column:nth-child(3){justify-items:end}
+        .filters > *, .scorecard-row > *, .data-row > *, .chart-head > *{min-width:0}
+        .card{width:100%;min-width:0;background:var(--surface);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px}
         .stack{display:grid;gap:18px}
-        .scorecard-row{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+        .tab-panel{display:none}
+        .tab-panel.active{display:block}
+        .scorecard-row{display:grid;grid-template-columns:minmax(0,1.94fr) 28px minmax(0,1.94fr) 28px minmax(0,1fr);gap:10px;align-items:stretch;margin-bottom:18px}
+        .sales-scorecards{display:grid;grid-template-columns:repeat(5,288px);justify-content:space-between;gap:0;margin-bottom:18px}
         .data-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+        .revenue-table-card{margin-bottom:18px}
+        .sales-trend-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
+        .sales-pie-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
         .card h3{font-size:1em;font-weight:800;margin-bottom:8px;color:var(--text)}
         .card-sub{font-size:.75em;color:var(--dim);margin-bottom:10px}
-        .chart{height:290px}
+        .chart{width:100%;min-width:0;height:290px}
         .chart.tall{height:360px}
+        .chart.medium{height:320px}
+        .chart.pie{height:320px}
         .chart-card{margin-bottom:18px;padding-top:20px}
+        .revenue-trend-card{padding-bottom:22px}
+        .revenue-trend-chart{height:450px}
+        .chart.sales-trend-chart{height:469px}
+        .sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker{width:225px;min-width:225px;flex:0 0 225px}
         .chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
-        .chart-card .campaign-picker{min-width:210px}
-        .kpi{background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:16px;padding:16px 16px 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+        .chart-card .campaign-picker{width:220px;min-width:220px;flex:0 0 220px}
+        .revenue-trend-card #trendViewPicker,.revenue-trend-card #trendBreakdownPicker{width:225px;min-width:225px;flex:0 0 225px}
+        .chart-controls{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+        .chart-controls .campaign-picker{width:180px;min-width:180px;flex:0 0 180px}
+        .chart-toggle{display:flex;gap:20px;align-items:center;background:var(--surface);padding:10px 18px;border-radius:12px;border:1px solid var(--card-border);box-shadow:0 2px 8px rgba(0,0,0,.08);flex:0 0 auto}
+        .chart-toggle-option{display:flex;align-items:center;cursor:pointer;font-size:.95em;font-weight:500;color:var(--text)}
+        .chart-toggle-option input{margin-right:8px;width:18px;height:18px;cursor:pointer;accent-color:var(--green)}
+        .chart-toggle-option span{white-space:nowrap}
+        .metric-group{width:100%;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px;border-radius:20px;background:var(--surface);border:1.5px solid var(--card-border)}
+        .metric-group.two-card{width:100%}
+        .metric-group.is-yellow{border-color:rgba(245,158,11,.5);background:linear-gradient(180deg,rgba(245,158,11,.06),rgba(255,255,255,.98))}
+        .metric-group.is-red{border-color:rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(239,68,68,.05),rgba(255,255,255,.98))}
+        .metric-group.is-green{width:100%;grid-template-columns:minmax(0,1fr);border-color:rgba(0,200,117,.55);background:linear-gradient(180deg,rgba(0,200,117,.06),rgba(255,255,255,.98))}
+        .scorecard-symbol{font-size:2.2em;font-weight:900;line-height:1;color:var(--dim);display:flex;align-items:center;justify-content:center}
+        .kpi{min-height:100px;background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:16px;padding:16px 16px 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+        .kpi.is-yellow{border-color:rgba(245,158,11,.18)}
+        .kpi.is-red{border-color:rgba(239,68,68,.18)}
+        .kpi.is-green{border-color:rgba(0,200,117,.18)}
+        .kpi.is-blue{border-color:rgba(67,97,238,.18)}
+        .kpi.is-purple{border-color:rgba(124,58,237,.18)}
         .kpi-label{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.6px;margin-bottom:8px}
         .kpi-value{font-size:2em;font-weight:900;line-height:1;letter-spacing:-1px}
+        .sales-scorecards .kpi{min-height:81px;justify-content:center;border-width:1.5px}
+        .sales-scorecards .kpi-label{margin-bottom:12px}
+        .sales-scorecards .kpi.is-blue{border-color:rgba(67,97,238,.45);background:linear-gradient(180deg,rgba(67,97,238,.06),rgba(255,255,255,.98))}
+        .sales-scorecards .kpi.is-purple{border-color:rgba(124,58,237,.42);background:linear-gradient(180deg,rgba(124,58,237,.06),rgba(255,255,255,.98))}
+        .sales-scorecards .kpi.is-green{border-color:rgba(0,200,117,.45);background:linear-gradient(180deg,rgba(0,200,117,.06),rgba(255,255,255,.98))}
+        .sales-scorecards .kpi.is-red{border-color:rgba(239,68,68,.42);background:linear-gradient(180deg,rgba(239,68,68,.05),rgba(255,255,255,.98))}
+        .sales-scorecards .kpi.is-yellow{border-color:rgba(245,158,11,.48);background:linear-gradient(180deg,rgba(245,158,11,.06),rgba(255,255,255,.98))}
+        .kpi.is-yellow .kpi-value{color:var(--amber)}
+        .kpi.is-red .kpi-value{color:var(--red)}
+        .kpi.is-green .kpi-value{color:var(--green)}
+        .kpi.is-blue .kpi-value{color:var(--blue)}
+        .kpi.is-purple .kpi-value{color:var(--purple)}
         .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
+        .sales-pie-card{display:flex;flex-direction:column;gap:6px}
+        .sales-distribution-card{padding-top:20px;padding-bottom:8px}
+        .sales-distribution-card .chart-head{margin-bottom:10px}
+        .sales-pie-layout{display:grid;grid-template-columns:1fr;gap:0;align-items:center}
+        .chart.sales-distribution-chart{height:480px;max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center}
+        .sales-distribution-card #salesPieDimensionPicker{width:360px;min-width:360px;flex:0 0 360px}
+        .sales-distribution-svg{width:100%;height:100%;display:block;overflow:visible}
+        .sales-distribution-svg .pie-percent,.sales-distribution-svg .pie-callout{fill:var(--text);letter-spacing:0}
+        .pie-legend{display:none}
+        .pie-legend-empty{font-size:.76em;font-weight:600;color:var(--dim);padding-top:2px}
+        .pie-legend-list{list-style:none;display:grid;gap:12px;width:100%}
+        .pie-legend-item{display:grid;grid-template-columns:16px minmax(0,1fr);column-gap:10px;row-gap:2px;align-items:start}
+        .pie-legend-swatch{position:relative;width:14px;height:14px;border-radius:3px;display:block;background:var(--swatch-color);box-shadow:0 5px 0 var(--swatch-side),0 8px 12px rgba(0,0,0,.12)}
+        .pie-legend-swatch::after{content:'';position:absolute;left:1px;right:1px;top:1px;height:42%;border-radius:2px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0))}
+        .pie-legend-text{min-width:0}
+        .pie-legend-label{color:var(--text);font-weight:700;font-size:.86em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .pie-legend-metrics{font-size:.73em;font-weight:700;color:var(--text2);margin-top:3px;font-variant-numeric:tabular-nums}
         .tbl{width:100%;border-collapse:collapse}
         .tbl th{font-size:.62em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;text-align:left;padding:12px 14px;border-bottom:2px solid var(--card-border)}
         .tbl td{font-size:.88em;padding:12px 14px;border-bottom:1px solid var(--card-border);color:var(--text2)}
         .tbl tbody tr:last-child td{border-bottom:none}
         .num{font-weight:800;font-variant-numeric:tabular-nums}
+        .table-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--card-border);flex-wrap:wrap}
+        .table-footer-text{font-size:.82em;font-weight:600;color:var(--dim)}
+        .table-pager{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .table-page-badge{font-size:.82em;font-weight:700;color:var(--text);padding:8px 14px;border-radius:14px;border:2px solid var(--green);background:var(--surface)}
+        .table-page-btn{width:38px;height:34px;border-radius:14px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font:800 15px Inter,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .16s ease,box-shadow .16s ease,opacity .16s ease}
+        .table-page-btn:hover:not(:disabled){border-color:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
+        .table-page-btn:disabled{opacity:.38;cursor:not-allowed}
         .footer{text-align:center;margin-top:28px;font-size:.68em;color:var(--dim);letter-spacing:.5px}
         .loading-state{display:none;min-height:calc(100vh - 160px);align-items:center;justify-content:center;padding:20px 0 40px}
         .is-refreshing .loading-state{display:flex}
@@ -75,8 +177,8 @@
         .loading-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
         .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
         @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        @media(max-width:1200px){.scorecard-row{grid-template-columns:repeat(3,minmax(170px,1fr))}.data-row{grid-template-columns:1fr}}
-        @media(max-width:900px){.filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.chart-head{flex-direction:column;align-items:stretch}.chart-card .campaign-picker{width:100%}}
+        @media(max-width:1200px){.scorecard-row{display:grid;grid-template-columns:1fr}.scorecard-symbol{display:none}.metric-group,.metric-group.two-card,.metric-group.is-green{width:100%}.data-row,.sales-trend-grid,.sales-pie-grid,.sales-pie-layout{grid-template-columns:1fr}.sales-scorecards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:900px){.filters,.filters.sales-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}}
     </style>
 </head>
 <body class="is-refreshing">
@@ -84,7 +186,7 @@
     <div class="header">
         <div class="header-left">
             <div class="logo-icon" aria-label="Dashboard icon" title="Dashboard">&#x1F4CA;</div>
-            <h1>GTMD</h1>
+            <h1>GTMB</h1>
             <span class="badge">Dashboard</span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto">
@@ -101,7 +203,8 @@
 
     <div class="ch-row">
         <span class="ch-label">Tab</span>
-        <button class="ch-pill on" type="button">GTMB - Revenue</button>
+        <button class="ch-pill on" id="tabRevenue" type="button" onclick="setActiveTab('revenue')">GTMB - Revenue</button>
+        <button class="ch-pill" id="tabSales" type="button" onclick="setActiveTab('sales')">Sales</button>
     </div>
 
     <div class="loading-state" id="loadingState">
@@ -112,27 +215,12 @@
     </div>
 
     <div class="report-content">
+        <section class="tab-panel active" id="revenuePanel">
         <div class="filters">
-            <div class="campaign-picker" id="dealTypePicker">
-                <span class="cp-label">Deal Type</span>
-                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('dealType')" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="dealTypeTriggerText">All Deal Types</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-                </button>
-                <div class="campaign-menu" id="dealTypeMenu" role="listbox" aria-label="Deal Type options"></div>
-            </div>
-            <div class="campaign-picker" id="statusPicker">
-                <span class="cp-label">Status</span>
-                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('status')" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="statusTriggerText">All Statuses</span>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-                </button>
-                <div class="campaign-menu" id="statusMenu" role="listbox" aria-label="Status options"></div>
-            </div>
             <div class="campaign-picker" id="yearPicker">
                 <span class="cp-label">Year</span>
                 <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('year')" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="yearTriggerText">All Years</span>
+                    <span class="trigger-text" id="yearTriggerText">All Years</span>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
                 </button>
                 <div class="campaign-menu" id="yearMenu" role="listbox" aria-label="Year options"></div>
@@ -140,69 +228,331 @@
             <div class="campaign-picker" id="quarterPicker">
                 <span class="cp-label">Quarter</span>
                 <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('quarter')" aria-haspopup="listbox" aria-expanded="false">
-                    <span id="quarterTriggerText">All Quarters</span>
+                    <span class="trigger-text" id="quarterTriggerText">All Quarters</span>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
                 </button>
                 <div class="campaign-menu" id="quarterMenu" role="listbox" aria-label="Quarter options"></div>
+            </div>
+            <div class="campaign-picker" id="dealTypePicker">
+                <span class="cp-label">Deal Type</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('dealType')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="trigger-text" id="dealTypeTriggerText">All Deal Types</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="dealTypeMenu" role="listbox" aria-label="Deal Type options"></div>
+            </div>
+            <div class="campaign-picker" id="statusPicker">
+                <span class="cp-label">Status</span>
+                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('status')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="trigger-text" id="statusTriggerText">All Statuses</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
+                <div class="campaign-menu" id="statusMenu" role="listbox" aria-label="Status options"></div>
             </div>
         </div>
 
         <div class="scorecard-row" id="kpiGrid"></div>
 
-        <div class="card chart-card">
+        <div class="card chart-card revenue-trend-card">
             <div class="chart-head">
                 <div>
-                    <h3 id="trendChartTitle">Net ARR Trends (Yearly)</h3>
-                    <div class="card-sub">Interactive chart view based on current filters</div>
+                    <h3 id="trendChartTitle">Net ARR Trends</h3>
+                    <div class="card-sub">Use the view dropdown and the metric switch to see monthly, quarterly, and yearly trends.</div>
                 </div>
-                <div class="campaign-picker" id="trendViewPicker" style="min-width:210px">
-                    <span class="cp-label">View</span>
-                    <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('trendView')" aria-haspopup="listbox" aria-expanded="false">
-                        <span id="trendViewTriggerText">Yearly</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-                    </button>
-                    <div class="campaign-menu" id="trendViewMenu" role="listbox" aria-label="Trend view options"></div>
+                <div class="chart-controls">
+                    <div class="campaign-picker" id="trendViewPicker">
+                        <span class="cp-label">View</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('trendView')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="trendViewTriggerText">Yearly</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="trendViewMenu" role="listbox" aria-label="Trend view options"></div>
+                    </div>
+                    <div class="campaign-picker" id="trendBreakdownPicker">
+                        <span class="cp-label">Type</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('trendBreakdown')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="trendBreakdownTriggerText">All Types</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="trendBreakdownMenu" role="listbox" aria-label="Trend type options"></div>
+                    </div>
+                    <div class="chart-toggle" role="group" aria-label="Trend metric toggle">
+                        <label class="chart-toggle-option">
+                            <input type="radio" name="trendMetricView" value="amount" checked onchange="setTrendMetric(this.value)">
+                            <span>Amount</span>
+                        </label>
+                        <label class="chart-toggle-option">
+                            <input type="radio" name="trendMetricView" value="deals" onchange="setTrendMetric(this.value)">
+                            <span>Deals</span>
+                        </label>
+                    </div>
                 </div>
             </div>
-            <div class="chart tall" id="trendChart"></div>
+            <div class="chart tall revenue-trend-chart" id="trendChart"></div>
         </div>
 
-        <div class="data-row">
-            <div class="card">
-                <h3>Customers</h3>
-                <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="customersTbl"></tbody></table>
+        <div class="card revenue-table-card">
+            <div class="chart-head">
+                <div>
+                    <h3 id="revenueTableTitle">Customers</h3>
+                </div>
+                <div class="chart-toggle" role="group" aria-label="Revenue table view toggle">
+                    <label class="chart-toggle-option">
+                        <input type="radio" name="revenueTableView" value="customers" checked onchange="setRevenueTableView(this.value)">
+                        <span>Customers</span>
+                    </label>
+                    <label class="chart-toggle-option">
+                        <input type="radio" name="revenueTableView" value="churns" onchange="setRevenueTableView(this.value)">
+                        <span>Churns</span>
+                    </label>
+                </div>
             </div>
-            <div class="card">
-                <h3>Churns</h3>
-                <table class="tbl"><thead><tr><th>Company name</th><th>Total Revenue</th></tr></thead><tbody id="churnTbl"></tbody></table>
-            </div>
+            <table class="tbl">
+                <thead>
+                    <tr>
+                        <th>Count</th>
+                        <th>Company Name</th>
+                        <th>Close Date</th>
+                        <th>Total Revenue</th>
+                    </tr>
+                </thead>
+                <tbody id="revenueAccountsTbl"></tbody>
+            </table>
+            <div class="table-footer" id="revenueAccountsPager"></div>
         </div>
+        </section>
+
+        <section class="tab-panel" id="salesPanel">
+            <div class="sales-filter-layout">
+                <div class="sales-filter-column">
+                    <div class="campaign-picker" id="salesCreateYearPicker">
+                        <span class="cp-label">Create Year</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesCreateYear')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesCreateYearTriggerText">All Create Years</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesCreateYearMenu" role="listbox" aria-label="Create Year options"></div>
+                    </div>
+                    <div class="campaign-picker" id="salesCreateQuarterPicker">
+                        <span class="cp-label">Create Quarter</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesCreateQuarter')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesCreateQuarterTriggerText">All Create Quarters</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesCreateQuarterMenu" role="listbox" aria-label="Create Quarter options"></div>
+                    </div>
+                </div>
+                <div class="sales-filter-column">
+                    <div class="campaign-picker" id="salesDealTypePicker">
+                        <span class="cp-label">Deal Type</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesDealType')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesDealTypeTriggerText">All Deal Types</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesDealTypeMenu" role="listbox" aria-label="Sales deal type options"></div>
+                    </div>
+                    <div class="campaign-picker" id="salesSourcePicker">
+                        <span class="cp-label">Source</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesSource')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesSourceTriggerText">All Sources</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesSourceMenu" role="listbox" aria-label="Sales source options"></div>
+                    </div>
+                </div>
+                <div class="sales-filter-column">
+                    <div class="campaign-picker" id="salesDealOwnerPicker">
+                        <span class="cp-label">Deal Owner</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesDealOwner')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesDealOwnerTriggerText">All Deal Owners</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesDealOwnerMenu" role="listbox" aria-label="Sales deal owner options"></div>
+                    </div>
+                    <div class="campaign-picker" id="salesDealStagePicker">
+                        <span class="cp-label">Deal Stage</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesDealStage')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="salesDealStageTriggerText">All Deal Stages</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="salesDealStageMenu" role="listbox" aria-label="Sales deal stage options"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sales-scorecards" id="salesKpiGrid"></div>
+
+            <div class="sales-trend-grid">
+                <div class="card chart-card sales-trend-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Deals Trends</h3>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="campaign-picker" id="salesTrendViewPicker">
+                                <span class="cp-label">View</span>
+                                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesTrendView')" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="trigger-text" id="salesTrendViewTriggerText">Yearly</span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                </button>
+                                <div class="campaign-menu" id="salesTrendViewMenu" role="listbox" aria-label="Sales trend view"></div>
+                            </div>
+                            <div class="campaign-picker" id="salesTrendSeriesPicker">
+                                <span class="cp-label">Series</span>
+                                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesTrendSeries')" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="trigger-text" id="salesTrendSeriesTriggerText">All Metrics</span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                </button>
+                                <div class="campaign-menu" id="salesTrendSeriesMenu" role="listbox" aria-label="Sales trend series options"></div>
+                            </div>
+                            <div class="chart-toggle" role="group" aria-label="Sales trend metric toggle">
+                                <label class="chart-toggle-option">
+                                    <input type="radio" name="salesTrendMetric" value="amount" onchange="setSalesChartMetric('salesTrend', this.value)">
+                                    <span>Amount</span>
+                                </label>
+                                <label class="chart-toggle-option">
+                                    <input type="radio" name="salesTrendMetric" value="deals" checked onchange="setSalesChartMetric('salesTrend', this.value)">
+                                    <span>Deals</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart medium sales-trend-chart" id="salesTrendChart"></div>
+                </div>
+            </div>
+
+            <div class="sales-pie-grid">
+                <div class="card sales-pie-card sales-distribution-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Deals Distribution</h3>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="campaign-picker" id="salesPieDimensionPicker">
+                                <span class="cp-label">View</span>
+                                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('salesPieDimension')" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="trigger-text" id="salesPieDimensionTriggerText">Source</span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                </button>
+                                <div class="campaign-menu" id="salesPieDimensionMenu" role="listbox" aria-label="Sales distribution view options"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sales-pie-layout">
+                        <div class="chart pie sales-distribution-chart" id="salesDistributionPie"></div>
+                        <div class="pie-legend" id="salesDistributionPieLegend"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <div class="footer">GTMD Revenue Dashboard | <span id="ts">Last refreshed: -</span></div>
+    <div class="footer">GTMB Dashboard | <span id="ts">Last refreshed: -</span></div>
 </div>
 
 <script>
-const SHEET_ID = '1PvgKWPJTfnZgtRyKTcUUteTWEoALBe_qBiSY0kLT-Lo';
-const SHEET_NAME = 'GTMDB-Deals';
-const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:8788' : '';
+const WORKBOOK_FILE = './%F0%9F%94%B4%20GTMDB-Data.xlsx';
+const WORKSHEET_NAME = 'GTMDB-Deals';
+const DEFAULT_DEAL_STAGE = 'S7a: Closed-Won / Start Onboarding';
+const REVENUE_FILTER_KEYS = ['dealType','status','year','quarter'];
+const SALES_FILTER_KEYS = ['salesCreateYear','salesCreateQuarter','salesDealType','salesSource','salesDealOwner','salesDealStage'];
+const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClosedLost'];
+const TABLE_PAGE_SIZE = 10;
 const STATE = {
     rows: [],
     filtered: [],
+    activeTab: 'revenue',
     theme: 'light',
+    trendMetric: 'amount',
     trendView: 'yearly',
+    trendBreakdown: [],
+    revenueTableView: 'customers',
+    tablePage: {
+        customers: 1,
+        churns: 1
+    },
     filters: {
-        year: 'all',
-        quarter: 'all',
-        status: 'all',
-        dealType: 'all'
+        year: [],
+        quarter: [],
+        status: [],
+        dealType: []
+    },
+    search: {
+        year: '',
+        quarter: '',
+        status: '',
+        dealType: '',
+        trendBreakdown: ''
     },
     filterOptions: {
         year: [],
         quarter: [],
         status: [],
         dealType: [],
+        trendBreakdown: ['New Logo','Upsell','Downsell','Churn'],
         trendView: ['Yearly','Quarterly','Monthly']
+    },
+    sales: {
+        filtered: [],
+        filters: {
+            salesCreateYear: [],
+            salesCreateQuarter: [],
+            salesDealType: [],
+            salesSource: [],
+            salesDealOwner: [],
+            salesDealStage: []
+        },
+        search: {
+            salesCreateYear: '',
+            salesCreateQuarter: '',
+            salesDealType: '',
+            salesSource: '',
+            salesDealOwner: '',
+            salesDealStage: '',
+            salesTrendSeries: ''
+        },
+        filterOptions: {
+            salesCreateYear: [],
+            salesCreateQuarter: [],
+            salesDealType: [],
+            salesSource: [],
+            salesDealOwner: [],
+            salesDealStage: []
+        },
+        trend: {
+            metric:'deals',
+            view:'yearly',
+            series:[...SALES_CHART_KEYS]
+        },
+        pieDimension:'source'
+    }
+};
+const SALES_PIE_OPTIONS = [
+    { key:'source', label:'Source', field:'__source' },
+    { key:'region', label:'Region', field:'__geo' },
+    { key:'totalHeadcount', label:'Total Headcount', field:'__employeeBand' },
+    { key:'salesHeadcount', label:'Sales Headcount', field:'__salesHeadcount' }
+];
+const SALES_CHART_CONFIG = {
+    salesCreated: {
+        label: 'Deals Created',
+        color: '#2563eb',
+        filterFn: (row) => hasDealId(row)
+    },
+    salesSao: {
+        label: 'SAO',
+        color: '#f59e0b',
+        filterFn: (row) => hasDealId(row) && isSaoRow(row)
+    },
+    salesClosedWon: {
+        label: 'Closed Won',
+        color: '#00c875',
+        filterFn: (row) => hasDealId(row) && isSalesClosedWonStage(row)
+    },
+    salesClosedLost: {
+        label: 'Closed Lost',
+        color: '#ef4444',
+        filterFn: (row) => hasDealId(row) && isSalesClosedLostStage(row)
     }
 };
 
@@ -212,6 +562,51 @@ function setTheme(t, el) {
     el.classList.add('active');
     STATE.theme = t;
     if (STATE.filtered.length) renderAll();
+    if (STATE.sales.filtered.length && STATE.activeTab === 'sales') renderSales();
+}
+
+function setActiveTab(tab) {
+    const active = tab === 'sales' ? 'sales' : 'revenue';
+    STATE.activeTab = active;
+    document.getElementById('revenuePanel')?.classList.toggle('active', active === 'revenue');
+    document.getElementById('salesPanel')?.classList.toggle('active', active === 'sales');
+    document.getElementById('tabRevenue')?.classList.toggle('on', active === 'revenue');
+    document.getElementById('tabSales')?.classList.toggle('on', active === 'sales');
+    setTimeout(() => {
+        if (active === 'sales' && STATE.sales.filtered.length) renderSales();
+        ['trendChart','salesTrendChart','salesDistributionPie']
+            .forEach((id) => {
+                const chart = document.getElementById(id);
+                if (chart && chart.data) Plotly.Plots.resize(chart);
+            });
+    }, 60);
+}
+
+function setTrendMetric(metric) {
+    const normalized = metric === 'amount' ? 'amount' : 'deals';
+    STATE.trendMetric = normalized;
+    document.querySelectorAll('input[name="trendMetricView"]').forEach((input) => {
+        input.checked = input.value === normalized;
+    });
+    if (STATE.filtered.length) renderAll();
+}
+
+function setSalesChartMetric(chartKey, metric) {
+    if (chartKey !== 'salesTrend') return;
+    STATE.sales.trend.metric = metric === 'amount' ? 'amount' : 'deals';
+    renderSales();
+}
+
+function setRevenueTableView(view) {
+    STATE.revenueTableView = view === 'churns' ? 'churns' : 'customers';
+    renderTables(STATE.filtered);
+}
+
+function changeTablePage(tableKey, delta) {
+    const current = STATE.tablePage[tableKey] || 1;
+    const next = Math.max(1, current + Number(delta || 0));
+    STATE.tablePage[tableKey] = next;
+    renderTables(STATE.filtered);
 }
 
 function closeFilterMenu(key) {
@@ -238,21 +633,251 @@ function toggleFilterMenu(key) {
 }
 
 function setFilterValue(key, value) {
+    const normalized = String(value || '').trim();
     if (key === 'trendView') {
-        STATE.trendView = String(value || 'yearly').toLowerCase();
+        STATE.trendView = (STATE.filters.year || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
         closeFilterMenu(key);
         renderFilterOptions();
         renderAll();
         return;
     }
-    STATE.filters[key] = value;
-    closeFilterMenu(key);
-    renderFilterOptions();
-    applyFilters();
+    if (key === 'trendBreakdown') {
+        const current = new Set(STATE.trendBreakdown || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.trendBreakdown = [...current];
+        renderFilterOptions();
+        renderAll();
+        return;
+    }
+    if (REVENUE_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.filters[key] = [...current];
+        if ((STATE.filters.year || []).length) {
+            STATE.trendView = 'monthly';
+        }
+        renderFilterOptions();
+        applyFilters();
+        return;
+    }
+    if (SALES_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.sales.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.sales.filters[key] = [...current];
+        if ((STATE.sales.filters.salesCreateYear || []).length) {
+            STATE.sales.trend.view = 'monthly';
+        }
+        renderSalesFilterOptions();
+        applySalesFilters();
+        return;
+    }
+    if (key === 'salesTrendView') {
+        STATE.sales.trend.view = (STATE.sales.filters.salesCreateYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        closeFilterMenu(key);
+        renderSalesFilterOptions();
+        renderSales();
+        return;
+    }
+    if (key === 'salesTrendSeries') {
+        const current = new Set(STATE.sales.trend.series || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.sales.trend.series = [...current];
+        renderSalesFilterOptions();
+        renderSales();
+        return;
+    }
+    if (key === 'salesPieDimension') {
+        STATE.sales.pieDimension = normalized || 'source';
+        closeFilterMenu(key);
+        renderSalesFilterOptions();
+        renderSales();
+    }
+}
+
+function setFilterSearch(key, value) {
+    if (Object.prototype.hasOwnProperty.call(STATE.search, key)) {
+        STATE.search[key] = String(value || '');
+        renderFilterOptions();
+        return;
+    }
+    if (Object.prototype.hasOwnProperty.call(STATE.sales.search, key)) {
+        STATE.sales.search[key] = String(value || '');
+        renderSalesFilterOptions();
+    }
+}
+
+function syncFilterStates() {
+    REVENUE_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.filters[key] || []).length > 0);
+    });
+    const trendBreakdownPicker = document.getElementById('trendBreakdownPicker');
+    if (trendBreakdownPicker) {
+        trendBreakdownPicker.classList.toggle('is-active', (STATE.trendBreakdown || []).length > 0);
+    }
+}
+
+function syncSalesFilterStates() {
+    SALES_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.sales.filters[key] || []).length > 0);
+    });
+    const seriesPicker = document.getElementById('salesTrendSeriesPicker');
+    if (seriesPicker) {
+        seriesPicker.classList.toggle('is-active', (STATE.sales.trend.series || []).length !== SALES_CHART_KEYS.length);
+    }
+}
+
+function isFilterActive(key, value) {
+    if (key === 'trendBreakdown') return (STATE.trendBreakdown || []).includes(value);
+    return (STATE.filters[key] || []).includes(value);
+}
+
+function isSalesFilterActive(key, value) {
+    if (SALES_FILTER_KEYS.includes(key)) return (STATE.sales.filters[key] || []).includes(value);
+    if (key === 'salesTrendSeries') return (STATE.sales.trend.series || []).includes(value);
+    return false;
+}
+
+function formatSelectionLabel(selected, options, fallback) {
+    if (!selected.length) return fallback;
+    const ordered = (options || []).filter((value) => selected.includes(value));
+    const extras = selected.filter((value) => !ordered.includes(value));
+    return [...ordered, ...extras].join(', ');
+}
+
+function getTriggerLabel(key, fallback) {
+    const selected = key === 'trendBreakdown' ? (STATE.trendBreakdown || []) : (STATE.filters[key] || []);
+    return formatSelectionLabel(selected, STATE.filterOptions[key] || [], fallback);
+}
+
+function getSalesTriggerLabel(key, fallback) {
+    if (!SALES_FILTER_KEYS.includes(key)) return fallback;
+    return formatSelectionLabel(STATE.sales.filters[key] || [], STATE.sales.filterOptions[key] || [], fallback);
+}
+
+function formatOptionAmount(value) {
+    const n = Number(value || 0);
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(1).replace('.0','')}M`;
+    if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(1).replace('.0','')}K`;
+    return `${sign}$${Math.round(abs)}`;
+}
+
+function getScopedRows() {
+    return STATE.rows.filter(r => r.__dealStage === DEFAULT_DEAL_STAGE);
+}
+
+function getSalesBaseRows() {
+    return STATE.rows.filter((row) => hasDealId(row));
+}
+
+function getSalesFilterRowValue(row, key) {
+    if (key === 'salesCreateYear') return row.__createYear;
+    if (key === 'salesCreateQuarter') return row.__createQuarter;
+    if (key === 'salesDealType') return row.__salesDealType;
+    if (key === 'salesSource') return row.__source;
+    if (key === 'salesDealOwner') return row.__dealOwner;
+    if (key === 'salesDealStage') return row.__dealStage;
+    return '';
+}
+
+function getOptionAmountMap(key) {
+    const scopedRows = getScopedRows().filter((row) => {
+        return REVENUE_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = STATE.filters[filterKey] || [];
+            if (!selected.length) return true;
+            const rowValue = filterKey === 'dealType' ? row.__dealType : filterKey === 'status' ? row.__status : filterKey === 'year' ? row.__year : row.__quarter;
+            return selected.includes(rowValue);
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = key === 'trendBreakdown'
+            ? getTrendBreakdownCategory(row)
+            : key === 'dealType'
+                ? row.__dealType
+                : key === 'status'
+                    ? row.__status
+                    : key === 'year'
+                        ? row.__year
+                        : row.__quarter;
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__amount);
+    });
+    return map;
+}
+
+function getSalesOptionAmountMap(key) {
+    const scopedRows = getSalesBaseRows().filter((row) => {
+        return SALES_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = STATE.sales.filters[filterKey] || [];
+            if (!selected.length) return true;
+            return selected.includes(getSalesFilterRowValue(row, filterKey));
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = getSalesFilterRowValue(row, key);
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__amount);
+    });
+    return map;
+}
+
+function getSalesTrendSeriesLabel() {
+    const selected = STATE.sales.trend.series || [];
+    if (!selected.length) return 'No Metrics';
+    if (selected.length === SALES_CHART_KEYS.length) return 'All Metrics';
+    return selected.map((key) => SALES_CHART_CONFIG[key]?.label || key).join(', ');
+}
+
+function getSalesTrendSeriesCountMap(rows) {
+    const map = new Map();
+    SALES_CHART_KEYS.forEach((chartKey) => {
+        map.set(chartKey, rows.filter(SALES_CHART_CONFIG[chartKey].filterFn).length);
+    });
+    return map;
 }
 
 function money(v){ return '$' + Number(v || 0).toLocaleString(); }
 function shortMoney(v){ const n = Number(v || 0); if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(0) + 'K'; return String(Math.round(n)); }
+function compactMoneyLabel(v){ const n = Number(v || 0); return `${n < 0 ? '-' : ''}$${shortMoney(Math.abs(n))}`; }
+function formatRevenueCloseDate(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '-';
+    const month = date.toLocaleString('en-US', { month:'short' }).toUpperCase();
+    return `${month} ${date.getDate()}, ${date.getFullYear()}`;
+}
+function getNiceTicks(values, segments = 4){
+    const min = Math.min(...values, 0);
+    const max = Math.max(...values, 0);
+    if (min === max) {
+        const bound = Math.max(Math.abs(max), 1);
+        return { start: Math.min(0, min), end: bound, tickvals: [Math.min(0, min), bound] };
+    }
+    const span = Math.max(max - min, 1);
+    const roughStep = span / segments;
+    const magnitude = 10 ** Math.floor(Math.log10(roughStep));
+    const normalized = roughStep / magnitude;
+    const niceFactor = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+    const step = niceFactor * magnitude;
+    const start = Math.floor(min / step) * step;
+    const end = Math.ceil(max / step) * step;
+    const tickvals = [];
+    for (let value = start; value <= end + step / 2; value += step) {
+        tickvals.push(Number(value.toFixed(10)));
+    }
+    return { start, end, tickvals };
+}
 function num(v){ return parseFloat(String(v || '').replace(/[$,%\s,]/g,'')) || 0; }
 
 function parseSheetDate(value) {
@@ -311,18 +936,21 @@ function findHeaderRow(rows) {
     });
 }
 
+function normalizeRows(rows) {
+    return rows
+        .map((row) => row.map((cell) => String(cell ?? '').trim()))
+        .filter((row) => row.some((cell) => cell));
+}
+
 async function fetchSheet() {
-    const proxyUrl = `${API_BASE}/api/sheet?sheetId=${encodeURIComponent(SHEET_ID)}&sheet=${encodeURIComponent(SHEET_NAME)}&format=csv&_t=${Date.now()}`;
-    const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}&_t=${Date.now()}`;
-    let resp = await fetch(proxyUrl, { cache: 'no-store' });
-    let text = await resp.text();
-    const looksLikeHtml = (text || '').trim().toLowerCase().startsWith('<!doctype html') || (text || '').trim().toLowerCase().startsWith('<html');
-    if ((!resp.ok || looksLikeHtml) && window.location.protocol !== 'file:') {
-        resp = await fetch(directUrl, { cache: 'no-store' });
-        text = await resp.text();
-    }
-    if (!resp.ok) throw new Error('Failed to fetch deals sheet');
-    return parseCsv(text);
+    const resp = await fetch(`${WORKBOOK_FILE}?_t=${Date.now()}`, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Failed to fetch local workbook');
+    const buffer = await resp.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
+    const sheet = workbook.Sheets[WORKSHEET_NAME];
+    if (!sheet) throw new Error(`Worksheet "${WORKSHEET_NAME}" not found in local workbook`);
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+    return normalizeRows(rows);
 }
 
 function rowsToObjects(rows){
@@ -336,14 +964,29 @@ function rowsToObjects(rows){
     return rows.slice(headerIndex + 1).filter(r => r.some(c => c)).map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = r[i] ?? '');
-        const closeDate = parseSheetDate(obj['Close Date'] || obj['Create Date'] || '');
-        obj.__date = closeDate;
+        const createDate = parseSheetDate(obj['Create Date'] || '');
+        const closeDate = parseSheetDate(obj['Close Date'] || '');
+        obj.__createDate = createDate;
+        obj.__closeDate = closeDate;
+        obj.__date = closeDate || createDate;
         obj.__amount = num(obj['Amount']);
         obj.__dealType = canonicalDealType(obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || '');
         obj.__status = canonicalStatus(obj['#Status'] || obj['#status'] || obj['Deal Stage'] || '');
-        obj.__year = obj.__date ? String(obj.__date.getFullYear()) : 'Unknown';
-        obj.__quarter = obj.__date ? `Q${Math.floor(obj.__date.getMonth()/3)+1} ${obj.__date.getFullYear()}` : 'Unknown';
-        obj.__month = obj.__date ? `${obj.__date.toLocaleString('en-US',{month:'short'})} ${obj.__date.getFullYear()}` : 'Unknown';
+        obj.__salesDealType = String(obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || '').trim() || 'Unknown';
+        obj.__dealStage = String(obj['Deal Stage'] || '').trim();
+        obj.__dealOwner = String(obj['Deal Owner First Name'] || '').trim() || 'Unknown';
+        obj.__source = String(obj['Campaign Source'] || '').trim() || 'Unknown';
+        obj.__geo = String(obj['Geo'] || '').trim() || 'Unknown';
+        obj.__employeeBand = String(obj['#Number of Employees'] || obj['Number of Employees'] || '').trim() || 'Unknown';
+        obj.__salesHeadcount = String(obj['#Size of Sales Team'] || obj['Size of Sales Team'] || '').trim() || 'Unknown';
+        obj.__sao = String(obj['SAO (S2-S6)'] || '').trim();
+        obj.__year = obj.__closeDate ? String(obj.__closeDate.getFullYear()) : 'Unknown';
+        obj.__quarter = obj.__closeDate ? `Q${Math.floor(obj.__closeDate.getMonth()/3)+1} ${obj.__closeDate.getFullYear()}` : 'Unknown';
+        obj.__month = obj.__closeDate ? `${obj.__closeDate.toLocaleString('en-US',{month:'short'})} ${obj.__closeDate.getFullYear()}` : 'Unknown';
+        obj.__createYear = obj.__createDate ? String(obj.__createDate.getFullYear()) : 'Unknown';
+        obj.__createQuarter = obj.__createDate ? `Q${Math.floor(obj.__createDate.getMonth()/3)+1} ${obj.__createDate.getFullYear()}` : 'Unknown';
+        obj.__createMonthKey = obj.__createDate ? `${obj.__createDate.getFullYear()}-${String(obj.__createDate.getMonth()+1).padStart(2,'0')}` : 'Unknown';
+        obj.__createMonth = obj.__createDate ? `${obj.__createDate.toLocaleString('en-US',{month:'short'})} ${obj.__createDate.getFullYear()}` : 'Unknown';
         return obj;
     });
 }
@@ -354,8 +997,56 @@ function quarterLabelFromDate(date) {
     return `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`;
 }
 
+function sortQuarterLabels(labels) {
+    return [...labels].sort((a, b) => {
+        const [qa, ya] = String(a || '').replace('Q', '').split(' ').map(Number);
+        const [qb, yb] = String(b || '').replace('Q', '').split(' ').map(Number);
+        return ya === yb ? qa - qb : ya - yb;
+    });
+}
+
+function sortByPreferredValues(values, preferredOrder, fallbackFn) {
+    const preferredMap = new Map(preferredOrder.map((value, index) => [String(value || '').toLowerCase(), index]));
+    const uniqueValues = [...new Set(values || [])];
+    return uniqueValues.sort((a, b) => {
+        const aKey = String(a || '').toLowerCase();
+        const bKey = String(b || '').toLowerCase();
+        const aRank = preferredMap.has(aKey) ? preferredMap.get(aKey) : Number.POSITIVE_INFINITY;
+        const bRank = preferredMap.has(bKey) ? preferredMap.get(bKey) : Number.POSITIVE_INFINITY;
+        if (aRank !== bRank) return aRank - bRank;
+        return fallbackFn ? fallbackFn(a, b) : String(a || '').localeCompare(String(b || ''));
+    });
+}
+
+function compareSalesStageValues(a, b) {
+    const aValue = String(a || '').trim();
+    const bValue = String(b || '').trim();
+    const aLower = aValue.toLowerCase();
+    const bLower = bValue.toLowerCase();
+
+    const aIsNurture = aLower.includes('nurture for later');
+    const bIsNurture = bLower.includes('nurture for later');
+    if (aIsNurture !== bIsNurture) return aIsNurture ? 1 : -1;
+
+    const aMatch = aLower.match(/\bs\s*([0-9]{1,2})([a-z])?/i);
+    const bMatch = bLower.match(/\bs\s*([0-9]{1,2})([a-z])?/i);
+    if (aMatch && bMatch) {
+        const aNum = Number(aMatch[1]);
+        const bNum = Number(bMatch[1]);
+        if (aNum !== bNum) return aNum - bNum;
+        const aSuffix = aMatch[2] || '';
+        const bSuffix = bMatch[2] || '';
+        if (aSuffix !== bSuffix) return aSuffix.localeCompare(bSuffix);
+    } else if (aMatch || bMatch) {
+        return aMatch ? -1 : 1;
+    }
+
+    return aValue.localeCompare(bValue);
+}
+
 function setupFilters() {
-    STATE.filterOptions.year = ['2021','2022','2023','2024','2025','2026'];
+    const scopedRows = getScopedRows();
+    STATE.filterOptions.year = ['2021','2022','2023','2024','2025','2026'].filter(year => scopedRows.some(r => r.__year === year));
     STATE.filterOptions.quarter = [
         'Q4 2021',
         'Q1 2022','Q2 2022','Q3 2022','Q4 2022',
@@ -363,12 +1054,43 @@ function setupFilters() {
         'Q1 2024','Q2 2024','Q3 2024','Q4 2024',
         'Q1 2025','Q2 2025','Q3 2025','Q4 2025',
         'Q1 2026','Q2 2026','Q3 2026','Q4 2026'
-    ];
-    STATE.filterOptions.status = [...new Set(STATE.rows.map(r => r.__status).filter(v => v && v !== 'Unknown'))].sort((a,b) => a.localeCompare(b));
+    ].filter(quarter => scopedRows.some(r => r.__quarter === quarter));
+    STATE.filterOptions.status = sortByPreferredValues(
+        scopedRows.map(r => r.__status).filter(v => v && v !== 'Unknown'),
+        ['Customer', 'Churn'],
+        (a, b) => String(a || '').localeCompare(String(b || ''))
+    );
     const preferredTypes = ['New Logo','Upsell','Downsell'];
-    const liveTypes = [...new Set(STATE.rows.map(r => r.__dealType).filter(v => v && v !== 'Unknown'))];
+    const liveTypes = [...new Set(scopedRows.map(r => r.__dealType).filter(v => v && v !== 'Unknown'))];
     STATE.filterOptions.dealType = preferredTypes.filter(v => liveTypes.includes(v)).concat(liveTypes.filter(v => !preferredTypes.includes(v)).sort((a,b) => a.localeCompare(b)));
+    REVENUE_FILTER_KEYS.forEach((key) => {
+        const current = STATE.filters[key] || [];
+        const allowed = new Set(STATE.filterOptions[key] || []);
+        STATE.filters[key] = current.filter((value) => allowed.has(value));
+    });
     renderFilterOptions();
+}
+
+function setupSalesFilters() {
+    const scopedRows = getSalesBaseRows();
+    STATE.sales.filterOptions.salesCreateYear = [...new Set(scopedRows.map(r => r.__createYear).filter(v => v && v !== 'Unknown'))].sort();
+    STATE.sales.filterOptions.salesCreateQuarter = sortQuarterLabels([...new Set(scopedRows.map(r => r.__createQuarter).filter(v => v && v !== 'Unknown'))]);
+    STATE.sales.filterOptions.salesDealType = sortByPreferredValues(
+        scopedRows.map(r => r.__salesDealType).filter(v => v && v !== 'Unknown'),
+        ['New Logo', 'Upsell', 'Downsell', 'Resell', 'Save'],
+        (a, b) => String(a || '').localeCompare(String(b || ''))
+    );
+    STATE.sales.filterOptions.salesSource = [...new Set(scopedRows.map(r => r.__source).filter(v => v && v !== 'Unknown'))].sort((a, b) => a.localeCompare(b));
+    STATE.sales.filterOptions.salesDealOwner = [...new Set(scopedRows.map(r => r.__dealOwner).filter(v => v && v !== 'Unknown'))].sort((a, b) => a.localeCompare(b));
+    STATE.sales.filterOptions.salesDealStage = [
+        ...new Set(scopedRows.map(r => r.__dealStage).filter(v => v && v !== 'Unknown'))
+    ].sort(compareSalesStageValues);
+    SALES_FILTER_KEYS.forEach((key) => {
+        const current = STATE.sales.filters[key] || [];
+        const allowed = new Set(STATE.sales.filterOptions[key] || []);
+        STATE.sales.filters[key] = current.filter((value) => allowed.has(value));
+    });
+    renderSalesFilterOptions();
 }
 
 function renderFilterOptions() {
@@ -377,36 +1099,159 @@ function renderFilterOptions() {
         status: { label: 'All Statuses', trigger: 'statusTriggerText', menu: 'statusMenu' },
         year: { label: 'All Years', trigger: 'yearTriggerText', menu: 'yearMenu' },
         quarter: { label: 'All Quarters', trigger: 'quarterTriggerText', menu: 'quarterMenu' },
+        trendBreakdown: { label: 'All Types', trigger: 'trendBreakdownTriggerText', menu: 'trendBreakdownMenu' },
         trendView: { label: 'Yearly', trigger: 'trendViewTriggerText', menu: 'trendViewMenu' }
     };
     Object.entries(defs).forEach(([key, def]) => {
         const current = key === 'trendView'
             ? `${STATE.trendView.charAt(0).toUpperCase()}${STATE.trendView.slice(1)}`
-            : STATE.filters[key];
+            : key === 'trendBreakdown'
+                ? STATE.trendBreakdown
+                : STATE.filters[key];
         const options = STATE.filterOptions[key] || [];
         const trigger = document.getElementById(def.trigger);
         const menu = document.getElementById(def.menu);
-        if (trigger) trigger.textContent = current === 'all' ? def.label : current;
+        if (trigger) trigger.textContent = key === 'trendView' ? current : getTriggerLabel(key, def.label);
         if (!menu) return;
         if (key === 'trendView') {
-            menu.innerHTML = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" onclick="setFilterValue('trendView', ${JSON.stringify(value)})">${escapeHtml(value)}</button>`).join('');
+            menu.innerHTML = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>`).join('');
             return;
         }
-        const allButton = `<button class="campaign-option ${current === 'all' ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === 'all'}" onclick="setFilterValue('${key}','all')">${def.label}</button>`;
-        const optionButtons = options.map(value => `<button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" onclick="setFilterValue('${key}', ${JSON.stringify(value)})">${escapeHtml(value)}</button>`).join('');
-        menu.innerHTML = allButton + optionButtons;
+        const amountMap = getOptionAmountMap(key);
+        const searchValue = STATE.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map(value => `
+                <button class="multi-option ${isFilterActive(key, value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${isFilterActive(key, value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(formatOptionAmount(amountMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
     });
+}
+
+function renderSalesFilterOptions() {
+    const defs = {
+        salesCreateYear: { label: 'All Create Years', trigger: 'salesCreateYearTriggerText', menu: 'salesCreateYearMenu' },
+        salesCreateQuarter: { label: 'All Create Quarters', trigger: 'salesCreateQuarterTriggerText', menu: 'salesCreateQuarterMenu' },
+        salesDealType: { label: 'All Deal Types', trigger: 'salesDealTypeTriggerText', menu: 'salesDealTypeMenu' },
+        salesSource: { label: 'All Sources', trigger: 'salesSourceTriggerText', menu: 'salesSourceMenu' },
+        salesDealOwner: { label: 'All Deal Owners', trigger: 'salesDealOwnerTriggerText', menu: 'salesDealOwnerMenu' },
+        salesDealStage: { label: 'All Deal Stages', trigger: 'salesDealStageTriggerText', menu: 'salesDealStageMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const options = STATE.sales.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) trigger.textContent = getSalesTriggerLabel(key, def.label);
+        if (!menu) return;
+        const amountMap = getSalesOptionAmountMap(key);
+        const searchValue = STATE.sales.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map(value => `
+                <button class="multi-option ${isSalesFilterActive(key, value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${isSalesFilterActive(key, value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(formatOptionAmount(amountMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
+    });
+
+    const trendViewTrigger = document.getElementById('salesTrendViewTriggerText');
+    const trendViewMenu = document.getElementById('salesTrendViewMenu');
+    const trendSeriesTrigger = document.getElementById('salesTrendSeriesTriggerText');
+    const trendSeriesMenu = document.getElementById('salesTrendSeriesMenu');
+    if (trendViewTrigger) trendViewTrigger.textContent = `${STATE.sales.trend.view.charAt(0).toUpperCase()}${STATE.sales.trend.view.slice(1)}`;
+    if (trendViewMenu) {
+        trendViewMenu.innerHTML = (STATE.filterOptions.trendView || []).map((value) => `
+            <button class="campaign-option ${STATE.sales.trend.view === value.toLowerCase() ? 'is-active' : ''}" type="button" role="option" aria-selected="${STATE.sales.trend.view === value.toLowerCase()}" data-filter-key="salesTrendView" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
+        `).join('');
+    }
+    if (trendSeriesTrigger) trendSeriesTrigger.textContent = getSalesTrendSeriesLabel();
+    if (trendSeriesMenu) {
+        const searchValue = STATE.sales.search.salesTrendSeries || '';
+        const countMap = getSalesTrendSeriesCountMap(STATE.sales.filtered || []);
+        const filteredSeries = SALES_CHART_KEYS.filter((key) => {
+            const label = SALES_CHART_CONFIG[key]?.label || key;
+            return label.toLowerCase().includes(searchValue.toLowerCase());
+        });
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="salesTrendSeries" />
+            </div>
+        `;
+        const optionButtons = filteredSeries.length
+            ? filteredSeries.map((key) => `
+                <button class="multi-option ${isSalesFilterActive('salesTrendSeries', key) ? 'is-active' : ''}" type="button" role="option" aria-selected="${isSalesFilterActive('salesTrendSeries', key)}" data-filter-key="salesTrendSeries" data-filter-value="${escapeHtml(key)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(SALES_CHART_CONFIG[key]?.label || key)}</span>
+                    <span class="multi-amount">${countMap.get(key) || 0}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        trendSeriesMenu.innerHTML = searchHtml + optionButtons;
+    }
+    const pieTrigger = document.getElementById('salesPieDimensionTriggerText');
+    const pieMenu = document.getElementById('salesPieDimensionMenu');
+    const pieOption = SALES_PIE_OPTIONS.find((option) => option.key === STATE.sales.pieDimension) || SALES_PIE_OPTIONS[0];
+    if (pieTrigger) pieTrigger.textContent = pieOption.label;
+    if (pieMenu) {
+        pieMenu.innerHTML = SALES_PIE_OPTIONS.map((option) => `
+            <button class="campaign-option ${option.key === pieOption.key ? 'is-active' : ''}" type="button" role="option" aria-selected="${option.key === pieOption.key}" data-filter-key="salesPieDimension" data-filter-value="${escapeHtml(option.key)}">${escapeHtml(option.label)}</button>
+        `).join('');
+    }
 }
 
 function applyFilters(){
     const { dealType, status, year, quarter } = STATE.filters;
+    if ((year || []).length) {
+        STATE.trendView = 'monthly';
+    }
     STATE.filtered = STATE.rows.filter(r =>
-        (dealType === 'all' || r.__dealType === dealType) &&
-        (status === 'all' || r.__status === status) &&
-        (year === 'all' || r.__year === year) &&
-        (quarter === 'all' || r.__quarter === quarter)
+        r.__dealStage === DEFAULT_DEAL_STAGE &&
+        (!dealType.length || dealType.includes(r.__dealType)) &&
+        (!status.length || status.includes(r.__status)) &&
+        (!year.length || year.includes(r.__year)) &&
+        (!quarter.length || quarter.includes(r.__quarter))
     );
+    STATE.tablePage.customers = 1;
+    STATE.tablePage.churns = 1;
     renderAll();
+}
+
+function applySalesFilters() {
+    const { salesCreateYear, salesCreateQuarter, salesDealType, salesSource, salesDealOwner, salesDealStage } = STATE.sales.filters;
+    if ((salesCreateYear || []).length) {
+        STATE.sales.trend.view = 'monthly';
+    }
+    STATE.sales.filtered = getSalesBaseRows().filter((row) =>
+        (!salesCreateYear.length || salesCreateYear.includes(row.__createYear)) &&
+        (!salesCreateQuarter.length || salesCreateQuarter.includes(row.__createQuarter)) &&
+        (!salesDealType.length || salesDealType.includes(row.__salesDealType)) &&
+        (!salesSource.length || salesSource.includes(row.__source)) &&
+        (!salesDealOwner.length || salesDealOwner.includes(row.__dealOwner)) &&
+        (!salesDealStage.length || salesDealStage.includes(row.__dealStage))
+    );
+    if (STATE.activeTab === 'sales') renderSales();
 }
 
 function stageBucket(row){
@@ -417,16 +1262,80 @@ function stageBucket(row){
     if (s.includes('closed-lost') || s.includes('rejected') || s.includes('derailed')) return 'churn';
     return lowerDealType(row.__dealType);
 }
+function getTrendBreakdownCategory(row) {
+    if (isStatus(row, 'Churn')) return 'Churn';
+    if (isDealType(row, 'New Logo')) return 'New Logo';
+    if (isDealType(row, 'Upsell')) return 'Upsell';
+    if (isDealType(row, 'Downsell')) return 'Downsell';
+    return '';
+}
 function lowerDealType(v){ return String(v || '').trim().toLowerCase(); }
+function lowerStatus(v){ return String(v || '').trim().toLowerCase(); }
+function lowerStage(v){ return String(v || '').trim().toLowerCase(); }
+
+function hasDealId(row) {
+    return Boolean(String(row['Deal ID'] || '').trim());
+}
+
+function isSaoRow(row) {
+    return String(row.__sao || '').trim().toLowerCase() === 'yes';
+}
+
+function isClosedWonStage(row) {
+    return lowerStage(row.__dealStage) === lowerStage(DEFAULT_DEAL_STAGE);
+}
+
+function isSalesClosedWonStage(row) {
+    const stage = lowerStage(row.__dealStage);
+    return stage.includes('s7a') || stage.includes('onboarding');
+}
+
+function isSalesClosedLostStage(row) {
+    const stage = lowerStage(row.__dealStage);
+    return stage.includes('s7b') || stage.includes('closed-lost');
+}
+
+function isSalesActiveStage(row) {
+    return /^s[1-6](?:\b|:)/i.test(String(row.__dealStage || '').trim());
+}
+
+function isDealType(row, expected) {
+    return lowerDealType(row.__dealType) === lowerDealType(expected);
+}
+
+function isStatus(row, expected) {
+    return lowerStatus(row.__status) === lowerStatus(expected);
+}
 
 function getMetrics(rows){
-    const newArr = rows.filter(r => lowerDealType(r.__dealType).includes('new') || lowerDealType(r.__dealType).includes('logo') || lowerDealType(r.__dealType).includes('standard') || lowerDealType(r.__dealType).includes('key')).reduce((a,r)=>a+r.__amount,0);
-    const upsell = rows.filter(r => lowerDealType(r.__dealType) === 'upsell').reduce((a,r)=>a+r.__amount,0);
-    const downsell = rows.filter(r => lowerDealType(r.__dealType) === 'downsell').reduce((a,r)=>a+r.__amount,0);
-    const churn = rows.filter(r => /closed-lost|rejected|derailed/i.test(r.__status)).reduce((a,r)=>a+r.__amount,0);
-    const net = newArr + upsell - Math.abs(downsell) - churn;
-    const gross = newArr + upsell + downsell;
+    const gross = rows
+        .filter((row) => isClosedWonStage(row) && !isDealType(row, 'Downsell'))
+        .reduce((sum, row) => sum + row.__amount, 0);
+    const newArr = rows
+        .filter((row) => isClosedWonStage(row) && isDealType(row, 'New Logo'))
+        .reduce((sum, row) => sum + row.__amount, 0);
+    const upsell = rows
+        .filter((row) => isClosedWonStage(row) && isDealType(row, 'Upsell'))
+        .reduce((sum, row) => sum + row.__amount, 0);
+    const downsell = rows
+        .filter((row) => isClosedWonStage(row) && isDealType(row, 'Downsell'))
+        .reduce((sum, row) => sum + row.__amount, 0);
+    const churn = rows
+        .filter((row) => isClosedWonStage(row) && isStatus(row, 'Churn'))
+        .reduce((sum, row) => sum + row.__amount, 0);
+    const net = rows
+        .filter((row) => isStatus(row, 'Customer'))
+        .reduce((sum, row) => sum + row.__amount, 0);
     return { newArr, upsell, downsell, churn, net, gross };
+}
+
+function getSalesMetrics(rows) {
+    const dealsCreated = rows.filter((row) => hasDealId(row)).length;
+    const sao = rows.filter((row) => hasDealId(row) && isSaoRow(row)).length;
+    const closedWon = rows.filter((row) => hasDealId(row) && isSalesClosedWonStage(row)).length;
+    const closedLost = rows.filter((row) => hasDealId(row) && isSalesClosedLostStage(row)).length;
+    const activeDeals = rows.filter((row) => hasDealId(row) && isSalesActiveStage(row)).length;
+    return { dealsCreated, sao, closedWon, closedLost, activeDeals };
 }
 
 function aggregateBy(rows, keyFn){
@@ -441,73 +1350,712 @@ function aggregateBy(rows, keyFn){
     return groups;
 }
 
+function aggregateByDateField(rows, dateField, keyFn) {
+    const groups = {};
+    rows.forEach((row) => {
+        const date = row[dateField];
+        if (!date) return;
+        const key = keyFn(date, row);
+        groups[key] ||= { deals: 0, amount: 0 };
+        groups[key].deals += 1;
+        groups[key].amount += row.__amount;
+    });
+    return groups;
+}
+
+function buildTrendView(rows, dateField, view) {
+    if (view === 'quarterly') {
+        const groups = aggregateByDateField(rows, dateField, (date) => `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`);
+        return {
+            groups,
+            orderedKeys: sortQuarterLabels(Object.keys(groups)),
+            xAxisTitle: 'Quarter'
+        };
+    }
+    if (view === 'monthly') {
+        const groups = aggregateByDateField(rows, dateField, (date) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`);
+        const orderedKeys = Object.keys(groups).sort();
+        const labelMap = {};
+        const labels = orderedKeys.map((key) => {
+            const [year, month] = key.split('-').map(Number);
+            const label = new Date(year, month - 1, 1).toLocaleString('en-US', { month:'short', year:'numeric' });
+            labelMap[label] = groups[key];
+            return label;
+        });
+        return {
+            groups: labelMap,
+            orderedKeys: labels,
+            xAxisTitle: 'Month'
+        };
+    }
+    const groups = aggregateByDateField(rows, dateField, (date) => String(date.getFullYear()));
+    return {
+        groups,
+        orderedKeys: Object.keys(groups).sort(),
+        xAxisTitle: 'Year'
+    };
+}
+
 function renderKpis(metrics){
-    const items = [
-        ['Gross ARR', metrics.gross, 'Total deal amount'],
-        ['New ARR', metrics.newArr, 'Standard + key logo'],
-        ['Upsell', metrics.upsell, 'Expansion revenue'],
-        ['Downsell', metrics.downsell, 'Contraction revenue'],
-        ['Churn', metrics.churn, 'Lost / rejected / derailed'],
-        ['Net ARR', metrics.net, 'After churn + downsell']
-    ];
-    document.getElementById('kpiGrid').innerHTML = items.map(([label,value,sub]) => `
-        <div class="kpi">
+    const renderCard = (label, value, sub, tone) => `
+        <div class="kpi is-${tone}">
             <div class="kpi-label">${escapeHtml(label)}</div>
             <div class="kpi-value">${money(value)}</div>
             <div class="kpi-sub">${escapeHtml(sub)}</div>
         </div>
+    `;
+    document.getElementById('kpiGrid').innerHTML = `
+        <div class="metric-group is-yellow two-card">
+            ${renderCard('New ARR', metrics.newArr, 'Closed-won new logo', 'yellow')}
+            ${renderCard('Upsell', metrics.upsell, 'Closed-won expansion', 'yellow')}
+        </div>
+        <div class="scorecard-symbol" aria-hidden="true">-</div>
+        <div class="metric-group is-red two-card">
+            ${renderCard('Downsell', Math.abs(metrics.downsell), 'Closed-won contraction', 'red')}
+            ${renderCard('Churn', metrics.churn, 'Closed-won churn status', 'red')}
+        </div>
+        <div class="scorecard-symbol" aria-hidden="true">=</div>
+        <div class="metric-group is-green">
+            ${renderCard('Net ARR', metrics.net, 'Customer status total', 'green')}
+        </div>
+    `;
+}
+
+function renderSalesKpis(metrics) {
+    const cards = [
+        { label:'Deals Created', value:metrics.dealsCreated, tone:'blue' },
+        { label:'SAO', value:metrics.sao, tone:'purple' },
+        { label:'Closed Won', value:metrics.closedWon, tone:'green' },
+        { label:'Closed Lost', value:metrics.closedLost, tone:'red' },
+        { label:'Active Deals', value:metrics.activeDeals, tone:'yellow' }
+    ];
+    document.getElementById('salesKpiGrid').innerHTML = cards.map((card) => `
+        <div class="kpi is-${card.tone}">
+            <div class="kpi-label">${escapeHtml(card.label)}</div>
+            <div class="kpi-value">${Number(card.value || 0).toLocaleString()}</div>
+        </div>
     `).join('');
 }
 
-function plotTrend(elId, title, groups, orderedKeys){
+function plotTrend(elId, groups, orderedKeys, xAxisTitle, metric = STATE.trendMetric){
     const target = document.getElementById(elId);
     if (!target) return;
     const dealCounts = orderedKeys.map(k => groups[k]?.deals || 0);
     const amounts = orderedKeys.map(k => groups[k]?.amount || 0);
+    if (!orderedKeys.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
     const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
     const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
     const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
     const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
-    Plotly.react(elId, [
-        { x: orderedKeys, y: dealCounts, type:'bar', name:'Deals', marker:{ color:'#0d0d12', line:{ color:'#0d0d12', width:0 }, opacity:.95 }, hovertemplate:'%{x}<br>Deals: %{y}<extra></extra>' },
-        { x: orderedKeys, y: amounts, type:'scatter', mode:'lines+markers', name:'Amount', yaxis:'y2', line:{ color:'#00c875', width:3, shape:'spline', smoothing:0.55 }, marker:{ size:7, color:'#00c875', line:{ color:'#ffffff', width:1.5 } }, hovertemplate:'%{x}<br>Amount: $%{y:,.0f}<extra></extra>' }
-    ], {
-        margin:{ l:56, r:72, t:18, b:48 },
+    const isDeals = metric === 'deals';
+    const chartName = isDeals ? 'Deals' : 'Amount';
+    const series = isDeals ? dealCounts : amounts;
+    const amountTicks = getNiceTicks(amounts);
+    const lineColor = isDeals ? '#7c3aed' : '#10b981';
+    const fillColor = isDeals ? 'rgba(124, 58, 237, 0.28)' : 'rgba(16, 185, 129, 0.24)';
+    const trace = {
+        x: orderedKeys,
+        y: series,
+        type:'scatter',
+        mode:'lines+markers',
+        fill:'tozeroy',
+        fillcolor:fillColor,
+        name:chartName,
+        line:{ color:lineColor, width:3 },
+        marker:{ size:7, color:lineColor, line:{ color:'#ffffff', width:1.6 } },
+        hovertemplate:isDeals
+            ? '<b>%{x}</b><br>Deals: %{y}<extra></extra>'
+            : '<b>%{x}</b><br>Amount: $%{y:,.0f}<extra></extra>'
+    };
+    const layout = {
+        margin:{ t:0, b:0, l:0, r:0 },
         paper_bgcolor:'transparent',
         plot_bgcolor:surface,
         font:{ family:'Inter, sans-serif', color:textColor, size:12 },
-        xaxis:{ domain:[0.03,0.9], tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, tickangle: orderedKeys.length > 10 ? -35 : 0, automargin:true },
-        yaxis:{ title:'Deals', tickfont:{ color:axisColor }, gridcolor:gridColor, zeroline:false, automargin:true },
-        yaxis2:{ title:'Amount', overlaying:'y', side:'right', anchor:'free', position:0.94, tickfont:{ color:axisColor }, tickprefix:'$', separatethousands:true, showgrid:false, automargin:true },
-        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' },
-        barmode:'group'
-    }, { displayModeBar:false, responsive:true });
+        hovermode:'x unified',
+        xaxis:{
+            title:xAxisTitle,
+            type:'category',
+            categoryorder:'array',
+            categoryarray:orderedKeys,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            tickangle: orderedKeys.length > 10 ? -35 : 0,
+            automargin:true,
+            fixedrange:true
+        },
+        yaxis:{
+            title:isDeals ? 'Deals' : 'Amount',
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            automargin:true,
+            fixedrange:true,
+            tickformat:isDeals ? '' : undefined,
+            tickmode:isDeals ? 'auto' : 'array',
+            tickvals:isDeals ? undefined : amountTicks.tickvals,
+            ticktext:isDeals ? undefined : amountTicks.tickvals.map(compactMoneyLabel),
+            range:isDeals ? undefined : [amountTicks.start, amountTicks.end]
+        },
+        legend:{ orientation:'h', y:1.1, x:0, bgcolor:'rgba(0,0,0,0)' }
+    };
+    const config = {
+        displayModeBar:false,
+        responsive:true,
+        scrollZoom:false,
+        doubleClick:false,
+        staticPlot:false
+    };
+    Plotly.newPlot(elId, [trace], layout, config);
     requestAnimationFrame(() => Plotly.Plots.resize(target));
 }
 
+function plotSalesMultiTrend(elId, rows) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const selectedSeries = (STATE.sales.trend.series || []).filter((key) => SALES_CHART_CONFIG[key]);
+    if (!rows.length || !selectedSeries.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+
+    const view = STATE.sales.trend.view || 'yearly';
+    const metric = STATE.sales.trend.metric || 'amount';
+    const baseTrend = buildTrendView(rows, '__createDate', view);
+    const orderedKeys = baseTrend.orderedKeys || [];
+    if (!orderedKeys.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    const isDeals = metric === 'deals';
+    const traces = [];
+    const allValues = [];
+
+    selectedSeries.forEach((seriesKey) => {
+        const config = SALES_CHART_CONFIG[seriesKey];
+        const scopedRows = rows.filter(config.filterFn);
+        const seriesTrend = buildTrendView(scopedRows, '__createDate', view);
+        const values = orderedKeys.map((key) => seriesTrend.groups[key]?.[metric] || 0);
+        if (!values.some((value) => value > 0)) return;
+        allValues.push(...values);
+        traces.push({
+            x: orderedKeys,
+            y: values,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: config.label,
+            line: { color: config.color, width: 3 },
+            fill: 'tozeroy',
+            fillcolor: hexToRgba(config.color, 0.14),
+            marker: { size: 7, color: config.color, line: { color: '#ffffff', width: 1.4 } },
+            hoveron: 'points+fills',
+            hovertemplate: isDeals
+                ? `<b>%{x}</b><br>${config.label}: %{y}<extra></extra>`
+                : `<b>%{x}</b><br>${config.label}: $%{y:,.0f}<extra></extra>`
+        });
+    });
+
+    if (!traces.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected series.</div>';
+        return;
+    }
+
+    const amountTicks = getNiceTicks(allValues.length ? allValues : [0]);
+    const layout = {
+        margin:{ t:0, b:0, l:0, r:0 },
+        paper_bgcolor:'transparent',
+        plot_bgcolor:surface,
+        font:{ family:'Inter, sans-serif', color:textColor, size:12 },
+        hovermode:'x unified',
+        xaxis:{
+            title: baseTrend.xAxisTitle,
+            type:'category',
+            categoryorder:'array',
+            categoryarray:orderedKeys,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            tickangle: orderedKeys.length > 10 ? -35 : 0,
+            automargin:true,
+            fixedrange:true
+        },
+        yaxis:{
+            title:isDeals ? 'Deals' : 'Amount',
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            automargin:true,
+            fixedrange:true,
+            tickmode:isDeals ? 'auto' : 'array',
+            tickvals:isDeals ? undefined : amountTicks.tickvals,
+            ticktext:isDeals ? undefined : amountTicks.tickvals.map(compactMoneyLabel),
+            range:isDeals ? undefined : [amountTicks.start, amountTicks.end]
+        },
+        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' }
+    };
+    const config = {
+        displayModeBar:false,
+        responsive:true,
+        scrollZoom:false,
+        doubleClick:false,
+        staticPlot:false
+    };
+    Plotly.newPlot(elId, traces, layout, config);
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function darkenHex(hex, factor = 0.72) {
+    const normalized = String(hex || '#00c875').replace('#', '').trim();
+    const expanded = normalized.length === 3
+        ? normalized.split('').map((char) => char + char).join('')
+        : normalized.padEnd(6, '0').slice(0, 6);
+    const toChannel = (offset) => Math.max(0, Math.min(255, Math.round(parseInt(expanded.slice(offset, offset + 2), 16) * factor)));
+    const r = toChannel(0).toString(16).padStart(2, '0');
+    const g = toChannel(2).toString(16).padStart(2, '0');
+    const b = toChannel(4).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+}
+
+function hexToRgba(hex, alpha = 1) {
+    const normalized = String(hex || '#00c875').replace('#', '').trim();
+    const expanded = normalized.length === 3
+        ? normalized.split('').map((char) => char + char).join('')
+        : normalized.padEnd(6, '0').slice(0, 6);
+    const r = parseInt(expanded.slice(0, 2), 16);
+    const g = parseInt(expanded.slice(2, 4), 16);
+    const b = parseInt(expanded.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function normalizePieEntries(entries, maxSlices = 6) {
+    const cleaned = (entries || [])
+        .map(([label, value]) => [String(label || 'Unknown').trim(), Number(value || 0)])
+        .filter(([, value]) => value > 0)
+        .sort((a, b) => b[1] - a[1]);
+
+    if (cleaned.length <= maxSlices) return cleaned;
+
+    const visible = cleaned.slice(0, maxSlices - 1);
+    const otherTotal = cleaned.slice(maxSlices - 1).reduce((sum, [, value]) => sum + value, 0);
+    if (otherTotal > 0) visible.push(['Other', otherTotal]);
+    return visible;
+}
+
+function formatPiePercent(value, total) {
+    const percent = total ? (Number(value || 0) / total) * 100 : 0;
+    if (!Number.isFinite(percent) || percent <= 0) return '0%';
+    const rounded = percent >= 10 ? percent.toFixed(0) : percent.toFixed(1).replace('.0', '');
+    return `${rounded}%`;
+}
+
+function ellipsePoint(cx, cy, rx, ry, angle, offsetY = 0) {
+    return {
+        x: cx + rx * Math.cos(angle),
+        y: cy + ry * Math.sin(angle) + offsetY
+    };
+}
+
+function describePieTopSlice(cx, cy, rx, ry, startAngle, endAngle) {
+    const start = ellipsePoint(cx, cy, rx, ry, startAngle);
+    const end = ellipsePoint(cx, cy, rx, ry, endAngle);
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+    return [
+        `M ${cx.toFixed(2)} ${cy.toFixed(2)}`,
+        `L ${start.x.toFixed(2)} ${start.y.toFixed(2)}`,
+        `A ${rx.toFixed(2)} ${ry.toFixed(2)} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`,
+        'Z'
+    ].join(' ');
+}
+
+function describeDonutTopSlice(cx, cy, rx, ry, innerRx, innerRy, startAngle, endAngle) {
+    const outerStart = ellipsePoint(cx, cy, rx, ry, startAngle);
+    const outerEnd = ellipsePoint(cx, cy, rx, ry, endAngle);
+    const innerEnd = ellipsePoint(cx, cy, innerRx, innerRy, endAngle);
+    const innerStart = ellipsePoint(cx, cy, innerRx, innerRy, startAngle);
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+    return [
+        `M ${outerStart.x.toFixed(2)} ${outerStart.y.toFixed(2)}`,
+        `A ${rx.toFixed(2)} ${ry.toFixed(2)} 0 ${largeArc} 1 ${outerEnd.x.toFixed(2)} ${outerEnd.y.toFixed(2)}`,
+        `L ${innerEnd.x.toFixed(2)} ${innerEnd.y.toFixed(2)}`,
+        `A ${innerRx.toFixed(2)} ${innerRy.toFixed(2)} 0 ${largeArc} 0 ${innerStart.x.toFixed(2)} ${innerStart.y.toFixed(2)}`,
+        'Z'
+    ].join(' ');
+}
+
+function getFrontIntervals(startAngle, endAngle) {
+    const intervals = [];
+    for (let base = -Math.PI * 4; base <= Math.PI * 4; base += Math.PI * 2) {
+        const visibleStart = base;
+        const visibleEnd = base + Math.PI;
+        const start = Math.max(startAngle, visibleStart);
+        const end = Math.min(endAngle, visibleEnd);
+        if (end - start > 0.0001) intervals.push([start, end]);
+    }
+    return intervals;
+}
+
+function describePieSideSlice(cx, cy, rx, ry, depth, startAngle, endAngle) {
+    const topStart = ellipsePoint(cx, cy, rx, ry, startAngle);
+    const topEnd = ellipsePoint(cx, cy, rx, ry, endAngle);
+    const bottomStart = ellipsePoint(cx, cy, rx, ry, startAngle, depth);
+    const bottomEnd = ellipsePoint(cx, cy, rx, ry, endAngle, depth);
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+    return [
+        `M ${topStart.x.toFixed(2)} ${topStart.y.toFixed(2)}`,
+        `A ${rx.toFixed(2)} ${ry.toFixed(2)} 0 ${largeArc} 1 ${topEnd.x.toFixed(2)} ${topEnd.y.toFixed(2)}`,
+        `L ${bottomEnd.x.toFixed(2)} ${bottomEnd.y.toFixed(2)}`,
+        `A ${rx.toFixed(2)} ${ry.toFixed(2)} 0 ${largeArc} 0 ${bottomStart.x.toFixed(2)} ${bottomStart.y.toFixed(2)}`,
+        'Z'
+    ].join(' ');
+}
+
+function distributePieCallouts(items, minY, maxY, minSpacing, edgePadding = 0) {
+    if (!items.length) return [];
+    const ordered = [...items].sort((a, b) => a.preferredY - b.preferredY);
+    let cursor = minY + edgePadding;
+    ordered.forEach((item) => {
+        item.targetY = Math.max(item.preferredY, cursor);
+        cursor = item.targetY + minSpacing;
+    });
+
+    const last = ordered[ordered.length - 1];
+    const cappedMax = maxY - edgePadding;
+    if (last.targetY > cappedMax) {
+        last.targetY = cappedMax;
+        for (let index = ordered.length - 2; index >= 0; index -= 1) {
+            ordered[index].targetY = Math.min(ordered[index].targetY, ordered[index + 1].targetY - minSpacing);
+        }
+        const cappedMin = minY + edgePadding;
+        if (ordered[0].targetY < cappedMin) {
+            const shift = cappedMin - ordered[0].targetY;
+            ordered.forEach((item) => { item.targetY += shift; });
+        }
+    }
+
+    return ordered;
+}
+
+function renderPieLegend(legendId, entries, colors) {
+    const target = document.getElementById(legendId);
+    if (!target) return;
+    const total = entries.reduce((sum, [, value]) => sum + Number(value || 0), 0);
+    if (!entries.length || !total) {
+        target.innerHTML = '<div class="pie-legend-empty">No legend data</div>';
+        return;
+    }
+
+    const items = entries.map(([label, value], index) => {
+        const fill = colors[index] || colors[colors.length - 1] || '#00c875';
+        const side = darkenHex(fill);
+        const count = Number(value || 0);
+        return `
+            <li class="pie-legend-item">
+                <span class="pie-legend-swatch" style="--swatch-color:${fill};--swatch-side:${side}"></span>
+                <div class="pie-legend-text">
+                    <div class="pie-legend-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+                    <div class="pie-legend-metrics">${count.toLocaleString()} deals / ${formatPiePercent(count, total)}</div>
+                </div>
+            </li>
+        `;
+    }).join('');
+
+    target.innerHTML = `<ul class="pie-legend-list" aria-label="Distribution legend">${items}</ul>`;
+}
+
+function plotPieChart(elId, legendId, entries) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+
+    const normalizedEntries = normalizePieEntries(entries, 6);
+    if (typeof Plotly !== 'undefined') {
+        try { Plotly.purge(target); } catch (error) {}
+    }
+
+    if (!normalizedEntries.length) {
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        renderPieLegend(legendId, [], []);
+        return;
+    }
+
+    const headingEl = document.querySelector('#salesPanel .sales-distribution-card h3');
+    const headingStyle = headingEl ? getComputedStyle(headingEl) : null;
+    const headingFontSize = headingStyle ? parseFloat(headingStyle.fontSize) : 16;
+    const headingFontWeight = headingStyle ? headingStyle.fontWeight : '800';
+    const headingFontFamily = headingStyle ? headingStyle.fontFamily : 'Inter, sans-serif';
+    const calloutFontWeight = '600';
+    const exactHeadingFontSize = `${Math.max(12, Math.round(headingFontSize))}px`;
+    const width = Math.max(target.clientWidth || 640, 420);
+    const height = Math.max(target.clientHeight || 360, 280);
+    const total = normalizedEntries.reduce((sum, [, value]) => sum + Number(value || 0), 0);
+    const palette = ['#13c776','#25a2da','#f9a602','#6f3fe8','#f44336','#cfcfcf'];
+    const colors = normalizedEntries.map(([label], index) => label === 'Other' ? '#c9c9c9' : palette[index % palette.length]);
+    const sideColors = colors.map((color) => darkenHex(color, 0.78));
+
+    const cx = width * 0.49;
+    const rx = Math.min(width * 0.34, 278);
+    const ry = Math.min(rx * 0.82, height * 0.34);
+    const innerRx = rx * 0.30;
+    const innerRy = ry * 0.30;
+    const depth = Math.max(8, Math.min(12, ry * 0.13));
+    const cy = Math.max(ry + 20, (height - depth) * 0.52);
+    const percentFontSize = exactHeadingFontSize;
+    const calloutFontSize = exactHeadingFontSize;
+
+    let currentAngle = -Math.PI / 2;
+    const sidePaths = [];
+    const topPaths = [];
+    const labels = [];
+    const callouts = [];
+    const leftCallouts = [];
+    const rightCallouts = [];
+
+    normalizedEntries.forEach(([label, rawValue], index) => {
+        const value = Number(rawValue || 0);
+        const sliceAngle = total ? (value / total) * Math.PI * 2 : 0;
+        const nextAngle = currentAngle + sliceAngle;
+        const percentLabel = formatPiePercent(value, total);
+        const percentValue = total ? (value / total) * 100 : 0;
+        const title = `${escapeHtml(label)}: ${value.toLocaleString()} deals (${percentLabel})`;
+
+        getFrontIntervals(currentAngle, nextAngle).forEach(([start, end]) => {
+            sidePaths.push(`
+                <path d="${describePieSideSlice(cx, cy, rx, ry, depth, start, end)}" fill="${sideColors[index]}" stroke="rgba(255,255,255,.22)" stroke-width="0.7">
+                    <title>${title}</title>
+                </path>
+            `);
+        });
+
+        topPaths.push(`
+            <path d="${describeDonutTopSlice(cx, cy, rx, ry, innerRx, innerRy, currentAngle, nextAngle)}" fill="${colors[index]}" stroke="rgba(255,255,255,.98)" stroke-width="1">
+                <title>${title}</title>
+            </path>
+        `);
+
+        const midAngle = currentAngle + sliceAngle / 2;
+        const labelRadiusX = innerRx + (rx - innerRx) * 0.56;
+        const labelRadiusY = innerRy + (ry - innerRy) * 0.56;
+        const labelX = cx + labelRadiusX * Math.cos(midAngle);
+        const labelY = cy + labelRadiusY * Math.sin(midAngle) + 4;
+        if (percentValue >= 4) {
+            labels.push(`
+                <text class="pie-percent" x="${labelX.toFixed(2)}" y="${labelY.toFixed(2)}" text-anchor="middle" font-family="${headingFontFamily}" font-size="${percentFontSize}" font-weight="${headingFontWeight}">
+                    ${percentLabel}
+                </text>
+            `);
+        }
+
+        const lineStart = ellipsePoint(cx, cy, rx * 1.02, ry * 1.02, midAngle);
+        const lineElbow = ellipsePoint(cx, cy, rx * 1.16, ry * 1.16, midAngle);
+        const isRightSide = Math.cos(midAngle) >= 0;
+        const calloutLabel = `${escapeHtml(label)} (${value.toLocaleString()})`;
+        const item = {
+            lineStart,
+            lineElbow,
+            color: sideColors[index],
+            label: calloutLabel,
+            preferredY: lineElbow.y
+        };
+        if (isRightSide) rightCallouts.push(item);
+        else leftCallouts.push(item);
+
+        currentAngle = nextAngle;
+    });
+
+    const calloutTop = cy - ry - 18;
+    const calloutBottom = cy + ry + depth + 10;
+    const calloutSpacing = Math.max(34, Math.round(headingFontSize * 2.15));
+    const calloutEdgePadding = Math.max(10, Math.round(headingFontSize * 0.85));
+    const leftLaneX = Math.max(124, width * 0.13);
+    const rightLaneX = Math.min(width - 124, width * 0.87);
+
+    distributePieCallouts(leftCallouts, calloutTop, calloutBottom, calloutSpacing, calloutEdgePadding).forEach((item, index) => {
+        const bridgeX = leftLaneX + 56 + (index % 2 ? 10 : 0);
+        const textX = leftLaneX - 10;
+        callouts.push(`
+            <g>
+                <path d="M ${item.lineStart.x.toFixed(2)} ${item.lineStart.y.toFixed(2)} L ${bridgeX.toFixed(2)} ${item.lineElbow.y.toFixed(2)} L ${leftLaneX.toFixed(2)} ${item.targetY.toFixed(2)}" fill="none" stroke="${item.color}" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="${leftLaneX.toFixed(2)}" cy="${item.targetY.toFixed(2)}" r="2.2" fill="${item.color}"></circle>
+                <text class="pie-callout" x="${textX.toFixed(2)}" y="${(item.targetY + 4).toFixed(2)}" text-anchor="end" font-family="${headingFontFamily}" font-size="${calloutFontSize}" font-weight="${calloutFontWeight}">${item.label}</text>
+            </g>
+        `);
+    });
+
+    distributePieCallouts(rightCallouts, calloutTop, calloutBottom, calloutSpacing, calloutEdgePadding).forEach((item, index) => {
+        const bridgeX = rightLaneX - 56 - (index % 2 ? 10 : 0);
+        const textX = rightLaneX + 10;
+        callouts.push(`
+            <g>
+                <path d="M ${item.lineStart.x.toFixed(2)} ${item.lineStart.y.toFixed(2)} L ${bridgeX.toFixed(2)} ${item.lineElbow.y.toFixed(2)} L ${rightLaneX.toFixed(2)} ${item.targetY.toFixed(2)}" fill="none" stroke="${item.color}" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="${rightLaneX.toFixed(2)}" cy="${item.targetY.toFixed(2)}" r="2.2" fill="${item.color}"></circle>
+                <text class="pie-callout" x="${textX.toFixed(2)}" y="${(item.targetY + 4).toFixed(2)}" text-anchor="start" font-family="${headingFontFamily}" font-size="${calloutFontSize}" font-weight="${calloutFontWeight}">${item.label}</text>
+            </g>
+        `);
+    });
+
+    const svg = `
+        <svg class="sales-distribution-svg" viewBox="0 0 ${width} ${height}" aria-label="3D sales distribution pie chart">
+            ${sidePaths.join('')}
+            ${topPaths.join('')}
+            <ellipse cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" rx="${innerRx.toFixed(2)}" ry="${innerRy.toFixed(2)}" fill="${getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#ffffff'}"></ellipse>
+            ${labels.join('')}
+            ${callouts.join('')}
+        </svg>
+    `;
+
+    target.innerHTML = svg;
+    renderPieLegend(legendId, normalizedEntries, colors);
+}
+
+function renderSales() {
+    const rows = STATE.sales.filtered;
+    renderSalesFilterOptions();
+    syncSalesFilterStates();
+    renderSalesKpis(getSalesMetrics(rows));
+    document.querySelectorAll('input[name="salesTrendMetric"]').forEach((input) => {
+        input.checked = input.value === STATE.sales.trend.metric;
+    });
+    plotSalesMultiTrend('salesTrendChart', rows);
+
+    const distributionPairs = (list, field) => {
+        const counts = new Map();
+        list.forEach((row) => {
+            const value = row[field];
+            if (!value || value === 'Unknown') return;
+            counts.set(value, (counts.get(value) || 0) + 1);
+        });
+        return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    };
+    const pieOption = SALES_PIE_OPTIONS.find((option) => option.key === STATE.sales.pieDimension) || SALES_PIE_OPTIONS[0];
+    plotPieChart('salesDistributionPie', 'salesDistributionPieLegend', distributionPairs(rows, pieOption.field));
+}
+
 function renderTables(rows){
-    const customers = [...rows].filter(r => num(r['Total Revenue']) > 0).sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue'])).slice(0,10);
-    const churns = [...rows].filter(r => /closed-lost|rejected|derailed/i.test(r.__status)).sort((a,b) => num(b['Total Revenue'] || b.__amount) - num(a['Total Revenue'] || a.__amount)).slice(0,10);
-    document.getElementById('customersTbl').innerHTML = customers.map((r,i)=>`<tr><td>${i+1}. ${escapeHtml(r['Company name'] || '-')}</td><td class="num">${money(num(r['Total Revenue']))}</td></tr>`).join('');
-    document.getElementById('churnTbl').innerHTML = churns.map((r,i)=>`<tr><td>${i+1}. ${escapeHtml(r['Company name'] || '-')}</td><td class="num">${money(num(r['Total Revenue'] || r.__amount))}</td></tr>`).join('');
+    const { year, quarter } = STATE.filters;
+    const scopedRows = STATE.rows.filter((row) =>
+        isClosedWonStage(row) &&
+        (!year.length || year.includes(row.__year)) &&
+        (!quarter.length || quarter.includes(row.__quarter))
+    );
+
+    const customers = [...scopedRows]
+        .filter((row) => isDealType(row, 'New Logo') && isStatus(row, 'Customer'))
+        .sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue']));
+
+    const churns = [...scopedRows]
+        .filter((row) => isDealType(row, 'New Logo') && isStatus(row, 'Churn'))
+        .sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue']));
+
+    const renderRows = (tableRows, emptyLabel, tableKey) => {
+        const totalRows = tableRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
+        const currentPage = Math.min(STATE.tablePage[tableKey] || 1, totalPages);
+        STATE.tablePage[tableKey] = currentPage;
+        const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
+        const visibleRows = tableRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+        const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
+
+        if (!tableRows.length) {
+            return {
+                body: `<tr><td colspan="4">${escapeHtml(emptyLabel)}</td></tr>`,
+                footer: `
+                    <div class="table-footer-text">Showing 0 to 0 of 0 rows</div>
+                    <div class="table-pager">
+                        <button class="table-page-btn" type="button" disabled aria-label="Previous page">◀</button>
+                        <div class="table-page-badge">Page 1 of 1</div>
+                        <button class="table-page-btn" type="button" disabled aria-label="Next page">▶</button>
+                    </div>
+                `
+            };
+        }
+
+        return {
+            body: visibleRows.map((row, index) => `
+            <tr>
+                <td class="num">${startIndex + index + 1}</td>
+                <td>${escapeHtml(row['Company name'] || '-')}</td>
+                <td>${escapeHtml(formatRevenueCloseDate(row.__closeDate))}</td>
+                <td class="num">${money(num(row['Total Revenue']))}</td>
+            </tr>
+            `).join(''),
+            footer: `
+                <div class="table-footer-text">Showing ${startIndex + 1} to ${endIndex} of ${totalRows} rows</div>
+                <div class="table-pager">
+                    <button class="table-page-btn" type="button" onclick="changeTablePage('${tableKey}', -1)" ${currentPage <= 1 ? 'disabled' : ''} aria-label="Previous page">◀</button>
+                    <div class="table-page-badge">Page ${currentPage} of ${totalPages}</div>
+                    <button class="table-page-btn" type="button" onclick="changeTablePage('${tableKey}', 1)" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">▶</button>
+                </div>
+            `
+        };
+    };
+
+    const activeView = STATE.revenueTableView === 'churns' ? 'churns' : 'customers';
+    const activeConfig = activeView === 'churns'
+        ? {
+            title:'Churns',
+            emptyLabel:'No churn rows match the current filters.',
+            tableKey:'churns',
+            rows: churns
+        }
+        : {
+            title:'Customers',
+            emptyLabel:'No customer rows match the current filters.',
+            tableKey:'customers',
+            rows: customers
+        };
+    const activeTable = renderRows(activeConfig.rows, activeConfig.emptyLabel, activeConfig.tableKey);
+
+    document.getElementById('revenueTableTitle').textContent = activeConfig.title;
+    document.querySelectorAll('input[name="revenueTableView"]').forEach((input) => {
+        input.checked = input.value === activeView;
+    });
+    document.getElementById('revenueAccountsTbl').innerHTML = activeTable.body;
+    document.getElementById('revenueAccountsPager').innerHTML = activeTable.footer;
 }
 
 function renderAll(){
     const rows = STATE.filtered;
     const metrics = getMetrics(rows);
     renderKpis(metrics);
+    syncFilterStates();
 
-    const yearly = aggregateBy(rows, r => String(r.__date.getFullYear()));
+    document.querySelectorAll('input[name="trendMetricView"]').forEach((input) => {
+        input.checked = input.value === STATE.trendMetric;
+    });
+
+    const trendRows = (STATE.trendBreakdown || []).length
+        ? rows.filter((row) => STATE.trendBreakdown.includes(getTrendBreakdownCategory(row)))
+        : rows;
+
+    const yearly = aggregateBy(trendRows, r => String(r.__date.getFullYear()));
     const yearlyKeys = Object.keys(yearly).sort();
 
-    const quarterly = aggregateBy(rows, r => `Q${Math.floor(r.__date.getMonth()/3)+1}, ${r.__date.getFullYear()}`);
+    const quarterly = aggregateBy(trendRows, r => `Q${Math.floor(r.__date.getMonth()/3)+1}, ${r.__date.getFullYear()}`);
     const quarterlyKeys = Object.keys(quarterly).sort((a,b) => {
-        const [qa, ya] = a.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
-        const [qb, yb] = b.replace('Q','').split(', ').map((x,i)=> i===0?Number(x):Number(x));
+        const [qa, ya] = a.replace('Q','').split(', ').map((x,i)=> i===0 ? Number(x) : Number(x));
+        const [qb, yb] = b.replace('Q','').split(', ').map((x,i)=> i===0 ? Number(x) : Number(x));
         return ya === yb ? qa - qb : ya - yb;
     });
 
-    const monthly = aggregateBy(rows, r => `${r.__date.getFullYear()}-${String(r.__date.getMonth()+1).padStart(2,'0')}`);
+    const monthly = aggregateBy(trendRows, r => `${r.__date.getFullYear()}-${String(r.__date.getMonth()+1).padStart(2,'0')}`);
     const monthlyKeys = Object.keys(monthly).sort();
     const monthLabels = monthlyKeys.map(k => {
         const [y,m] = k.split('-').map(Number);
@@ -517,29 +2065,31 @@ function renderAll(){
     monthlyKeys.forEach((k,i) => monthlyLabelMap[monthLabels[i]] = monthly[k]);
 
     const trendTitle = document.getElementById('trendChartTitle');
+    if (trendTitle) trendTitle.textContent = 'Net ARR Trends';
     if (STATE.trendView === 'yearly') {
-        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Yearly)';
-        plotTrend('trendChart', 'Net ARR Trends (Yearly)', yearly, yearlyKeys);
+        plotTrend('trendChart', yearly, yearlyKeys, 'Year');
     } else if (STATE.trendView === 'quarterly') {
-        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Quarterly)';
-        plotTrend('trendChart', 'Net ARR Trends (Quarterly)', quarterly, quarterlyKeys);
+        plotTrend('trendChart', quarterly, quarterlyKeys, 'Quarter');
     } else {
-        if (trendTitle) trendTitle.textContent = 'Net ARR Trends (Monthly)';
-        plotTrend('trendChart', 'Net ARR Trends (Monthly)', monthlyLabelMap, monthLabels);
+        plotTrend('trendChart', monthlyLabelMap, monthLabels, 'Month');
     }
     renderTables(rows);
 }
 
 async function manualRefresh(){
     const btn = document.getElementById('refreshBtn');
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.body.classList.add('is-refreshing');
     btn.classList.add('is-loading');
     try{
         const rows = await fetchSheet();
         STATE.rows = rowsToObjects(rows);
         setupFilters();
+        setupSalesFilters();
         document.body.classList.remove('is-refreshing');
         applyFilters();
+        applySalesFilters();
+        setActiveTab(STATE.activeTab);
         document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toLocaleString();
     } finally {
         btn.classList.remove('is-loading');
@@ -547,6 +2097,16 @@ async function manualRefresh(){
 }
 
 document.addEventListener('click', (e) => {
+    const singleOption = e.target.closest('.campaign-option[data-filter-key]');
+    if (singleOption) {
+        setFilterValue(singleOption.getAttribute('data-filter-key'), singleOption.getAttribute('data-filter-value'));
+        return;
+    }
+    const multiOption = e.target.closest('.multi-option[data-filter-key]');
+    if (multiOption) {
+        setFilterValue(multiOption.getAttribute('data-filter-key'), multiOption.getAttribute('data-filter-value'));
+        return;
+    }
     document.querySelectorAll('.campaign-picker').forEach((picker) => {
         if (!picker.contains(e.target)) {
             picker.classList.remove('open');
@@ -556,9 +2116,25 @@ document.addEventListener('click', (e) => {
     });
 });
 
+document.addEventListener('input', (e) => {
+    if (e.target.matches('[data-filter-search]')) {
+        setFilterSearch(e.target.getAttribute('data-filter-search'), e.target.value);
+    }
+});
+
 window.addEventListener('resize', () => {
-    const chart = document.getElementById('trendChart');
-    if (chart && chart.data) Plotly.Plots.resize(chart);
+    ['trendChart','salesTrendChart','salesDistributionPie']
+        .forEach((id) => {
+            const chart = document.getElementById(id);
+            if (chart && chart.data) Plotly.Plots.resize(chart);
+        });
+    if (STATE.activeTab === 'sales' && STATE.sales.filtered.length) {
+        renderSales();
+    }
+});
+
+window.addEventListener('load', () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 });
 
 manualRefresh();
