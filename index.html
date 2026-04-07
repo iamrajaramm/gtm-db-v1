@@ -75,6 +75,58 @@
         .ch-label{font-size:.72em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:4px}
         .ch-pill{padding:8px 20px;border-radius:100px;font-size:.82em;font-weight:600;border:1.5px solid var(--card-border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
         .ch-pill.on{background:var(--pill-active-bg);color:var(--pill-active-text);border-color:var(--pill-active-bg)}
+        .marketing-tab-wrap{position:relative}
+        .marketing-tab-btn{display:inline-flex;align-items:center;gap:8px}
+        .marketing-tab-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .16s ease}
+        .marketing-tab-wrap.open .marketing-tab-btn svg{transform:rotate(180deg)}
+        .marketing-tab-menu{position:absolute;top:calc(100% + 10px);left:0;min-width:200px;background:var(--surface);border:1px solid var(--card-border);border-radius:14px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.16);display:none;z-index:40}
+        .marketing-tab-wrap.open .marketing-tab-menu{display:block}
+        .marketing-tab-option{width:100%;border:0;background:transparent;color:var(--text);font:600 .9em 'Inter',sans-serif;text-align:left;padding:12px 14px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+        .marketing-tab-option:hover{background:var(--hover-bg)}
+        .marketing-tab-option.is-active{background:var(--pill-active-bg);color:var(--pill-active-text)}
+        .marketing-subpanel{display:none}
+        .marketing-subpanel.active{display:block}
+        .marketing-subtab-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+        .marketing-subtab-title h2{font-size:1.15em;font-weight:800;color:var(--text)}
+        .marketing-subtab-copy{font-size:.78em;color:var(--dim);margin-top:4px}
+        .marketing-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .marketing-line-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}
+        .marketing-chart-card{margin-bottom:18px}
+        .marketing-placeholder{min-height:260px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--dim);font-weight:700}
+        .marketing-table-card{margin-bottom:18px}
+        .chart.marketing-funnel-chart{height:360px}
+        .chart.marketing-mini-chart{height:320px}
+        .chart.marketing-combo-chart{height:360px}
+        .linkedin-ads-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .linkedin-ads-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}
+        .chart.linkedin-ring-chart{height:220px}
+        .chart.linkedin-chart{height:320px}
+        .marketing-funnel-chart{display:flex;align-items:center;justify-content:center}
+        .marketing-funnel-shell{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:8px 0}
+        .marketing-funnel-stack{width:100%;display:flex;flex-direction:column;align-items:center;gap:0}
+        .marketing-funnel-layer{display:flex;align-items:center;justify-content:center;border-radius:8px;position:relative;overflow:hidden;transition:transform .16s ease,box-shadow .16s ease;box-shadow:inset 0 -4px 12px rgba(0,0,0,.18),inset 0 4px 8px rgba(255,255,255,.12)}
+        .marketing-funnel-layer:hover{transform:scale(1.03)}
+        .marketing-funnel-layer::after{content:'';position:absolute;inset:0 auto 0 50%;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);transform:translateX(-50%);pointer-events:none}
+        .marketing-funnel-main{position:relative;z-index:1;display:flex;align-items:center;gap:10px;white-space:nowrap}
+        .marketing-funnel-value{font-size:1em;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+        .marketing-funnel-label{font-size:.8em;font-weight:700;color:rgba(255,255,255,.92)}
+        .marketing-funnel-share{font-size:.7em;font-weight:700;color:rgba(255,255,255,.62)}
+        .marketing-funnel-droprow{display:flex;align-items:center;gap:8px}
+        .marketing-funnel-droprow .marketing-funnel-line{flex:1;height:1px;background:var(--card-border)}
+        .marketing-funnel-dropchip{font-size:.66em;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--card-border);white-space:nowrap}
+        .linkedin-ring-flow{height:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:6px 4px}
+        .linkedin-ring-stage{display:flex;align-items:center;justify-content:flex-start;gap:18px;flex:1;min-width:0}
+        .linkedin-ring-step{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-width:0;flex:0 0 auto}
+        .linkedin-ring-node{display:flex;align-items:center;justify-content:center;min-width:0}
+        .linkedin-ring-circle{width:var(--ring-width,160px);height:var(--ring-height,116px);border-radius:999px / 58%;border:var(--ring-stroke,12px) solid var(--ring-color);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.98),rgba(255,255,255,.82) 60%,rgba(247,250,252,.76));box-shadow:inset 0 0 0 4px rgba(255,255,255,.45),0 14px 28px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;transition:transform .16s ease, box-shadow .16s ease}
+        .linkedin-ring-circle:hover{transform:translateY(-3px) scale(1.02);box-shadow:inset 0 0 0 4px rgba(255,255,255,.45),0 18px 32px rgba(0,0,0,.11)}
+        .linkedin-ring-inner{display:flex;flex-direction:column;align-items:center;gap:4px}
+        .linkedin-ring-value{font-size:1.25em;font-weight:900;line-height:1;letter-spacing:-.5px;color:var(--text)}
+        .linkedin-ring-label{font-size:.78em;font-weight:800;letter-spacing:1.05px;text-transform:uppercase;color:var(--dim);text-align:center}
+        .linkedin-ring-caption{font-size:.82em;font-weight:800;letter-spacing:.2px;color:var(--text);text-align:center}
+        .linkedin-ring-arrow{display:flex;align-items:center;justify-content:center;flex:1 1 auto;min-width:40px;color:var(--dim)}
+        .linkedin-ring-arrow svg{width:44px;height:18px;display:block}
+        .linkedin-ring-arrow path{fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
         .filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
         .filters.sales-filters{grid-template-columns:repeat(3,minmax(0,1fr))}
         .sales-filter-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:18px;align-items:start;width:100%}
@@ -164,6 +216,10 @@
         .tbl tbody tr:last-child td{border-bottom:none}
         .tbl a{color:var(--text);font-weight:700;text-decoration:none}
         .tbl a:hover{text-decoration:underline}
+        .tbl-sort-btn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:inherit;font:inherit;text-transform:inherit;letter-spacing:inherit;cursor:pointer;padding:0}
+        .tbl-sort-btn:hover,.tbl-sort-btn.is-active{color:var(--text)}
+        .tbl-sort-icon{font-size:12px;line-height:1;color:var(--dim);letter-spacing:0}
+        .tbl-sort-btn.is-active .tbl-sort-icon{color:var(--green)}
         .num{font-weight:800;font-variant-numeric:tabular-nums}
         .table-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--card-border);flex-wrap:wrap}
         .table-footer-text{font-size:.82em;font-weight:600;color:var(--dim)}
@@ -179,8 +235,8 @@
         .loading-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
         .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
         @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        @media(max-width:1200px){.scorecard-row{display:grid;grid-template-columns:1fr}.scorecard-symbol{display:none}.metric-group,.metric-group.two-card,.metric-group.is-green{width:100%}.data-row,.sales-trend-grid,.sales-pie-grid,.sales-pie-layout{grid-template-columns:1fr}.sales-scorecards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:900px){.filters,.filters.sales-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}}
+        @media(max-width:1200px){.scorecard-row{display:grid;grid-template-columns:1fr}.scorecard-symbol{display:none}.metric-group,.metric-group.two-card,.metric-group.is-green{width:100%}.data-row,.sales-trend-grid,.sales-pie-grid,.sales-pie-layout,.marketing-line-grid,.linkedin-ads-chart-grid{grid-template-columns:1fr}.sales-scorecards{grid-template-columns:repeat(2,minmax(0,1fr))}.linkedin-ring-flow{flex-wrap:wrap;justify-content:center}.linkedin-ring-stage{flex:0 0 calc(50% - 12px);justify-content:center}.linkedin-ring-arrow{display:none}}
+        @media(max-width:900px){.filters,.filters.sales-filters,.marketing-filters,.linkedin-ads-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head,.marketing-subtab-title{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}.linkedin-ring-flow{flex-direction:column;align-items:center}.linkedin-ring-stage{flex:0 0 auto}}
     </style>
 </head>
 <body class="is-refreshing">
@@ -207,6 +263,17 @@
         <span class="ch-label">Tab</span>
         <button class="ch-pill on" id="tabRevenue" type="button" onclick="setActiveTab('revenue')">GTMB - Revenue</button>
         <button class="ch-pill" id="tabSales" type="button" onclick="setActiveTab('sales')">Sales</button>
+        <div class="marketing-tab-wrap" id="marketingTabWrap">
+            <button class="ch-pill marketing-tab-btn" id="tabMarketing" type="button" onclick="toggleMarketingTabMenu()" aria-haspopup="menu" aria-expanded="false">
+                <span>Marketing</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <div class="marketing-tab-menu" id="marketingTabMenu" role="menu" aria-label="Marketing sections">
+                <button class="marketing-tab-option is-active" id="marketingSubtabWebsiteFormFills" type="button" role="menuitem" onclick="setMarketingSubtab('websiteFormFills')">Website Form Fills</button>
+                <button class="marketing-tab-option" id="marketingSubtabLinkedInAds" type="button" role="menuitem" onclick="setMarketingSubtab('linkedInAds')">LinkedIn Ads</button>
+                <button class="marketing-tab-option" id="marketingSubtabGoogleAds" type="button" role="menuitem" onclick="setMarketingSubtab('googleAds')">Google Ads</button>
+            </div>
+        </div>
     </div>
 
     <div class="loading-state" id="loadingState">
@@ -309,13 +376,13 @@
                     </label>
                 </div>
             </div>
-            <table class="tbl">
+            <table class="tbl" id="revenueTable">
                 <thead>
                     <tr>
-                        <th>Count</th>
-                        <th>Company Name</th>
-                        <th>Close Date</th>
-                        <th>Total Revenue</th>
+                        <th><button class="tbl-sort-btn" id="revenueSortCountBtn" type="button" onclick="setRevenueTableSort('count')">Count <span class="tbl-sort-icon" id="revenueSortCountIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="revenueSortCompanyBtn" type="button" onclick="setRevenueTableSort('companyName')">Company Name <span class="tbl-sort-icon" id="revenueSortCompanyIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="revenueSortDateBtn" type="button" onclick="setRevenueTableSort('closeDate')">Close Date <span class="tbl-sort-icon" id="revenueSortDateIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="revenueSortRevenueBtn" type="button" onclick="setRevenueTableSort('totalRevenue')">Total Revenue <span class="tbl-sort-icon" id="revenueSortRevenueIcon">↕</span></button></th>
                     </tr>
                 </thead>
                 <tbody id="revenueAccountsTbl"></tbody>
@@ -453,19 +520,395 @@
                         <h3>Deals</h3>
                     </div>
                 </div>
-                <table class="tbl">
-                    <thead>
-                        <tr>
-                            <th>Count</th>
-                            <th>Deal Name</th>
-                            <th>Deal Amount</th>
-                            <th>Deal Stage</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salesDealsTbl"></tbody>
-                </table>
-                <div class="table-footer" id="salesDealsPager"></div>
+            <table class="tbl" id="salesTable">
+                <thead>
+                    <tr>
+                        <th><button class="tbl-sort-btn" id="salesSortCountBtn" type="button" onclick="setSalesTableSort('count')">Count <span class="tbl-sort-icon" id="salesSortCountIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="salesSortDealBtn" type="button" onclick="setSalesTableSort('dealName')">Deal Name <span class="tbl-sort-icon" id="salesSortDealIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="salesSortCompanyBtn" type="button" onclick="setSalesTableSort('companyName')">Company Name <span class="tbl-sort-icon" id="salesSortCompanyIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="salesSortAmountBtn" type="button" onclick="setSalesTableSort('dealAmount')">Deal Amount <span class="tbl-sort-icon" id="salesSortAmountIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="salesSortStageBtn" type="button" onclick="setSalesTableSort('dealStage')">Deal Stage <span class="tbl-sort-icon" id="salesSortStageIcon">↕</span></button></th>
+                        <th><button class="tbl-sort-btn" id="salesSortSourceBtn" type="button" onclick="setSalesTableSort('source')">Source <span class="tbl-sort-icon" id="salesSortSourceIcon">↕</span></button></th>
+                    </tr>
+                </thead>
+                <tbody id="salesDealsTbl"></tbody>
+            </table>
+            <div class="table-footer" id="salesDealsPager"></div>
+            </div>
+        </section>
+
+        <section class="tab-panel" id="marketingPanel">
+            <div class="marketing-subpanel active" id="marketingWebsiteFormFillsPanel">
+                <div class="marketing-subtab-title">
+                    <div>
+                        <h2>Website Form Fills</h2>
+                    </div>
+                </div>
+
+                <div class="marketing-filters">
+                    <div class="campaign-picker" id="marketingYearPicker">
+                        <span class="cp-label">Form Fill Year</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('marketingYear')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="marketingYearTriggerText">All Years</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="marketingYearMenu" role="listbox" aria-label="Form Fill Year options"></div>
+                    </div>
+                    <div class="campaign-picker" id="marketingQuarterPicker">
+                        <span class="cp-label">Form Fill Quarter</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('marketingQuarter')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="marketingQuarterTriggerText">All Quarters</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="marketingQuarterMenu" role="listbox" aria-label="Form Fill Quarter options"></div>
+                    </div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Website Form Fill Funnel</h3>
+                        </div>
+                        <div class="chart-toggle" role="group" aria-label="Marketing funnel metric toggle">
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="marketingFunnelMetric" value="deals" checked onchange="setMarketingFunnelMetric(this.value)">
+                                <span>Count</span>
+                            </label>
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="marketingFunnelMetric" value="amount" onchange="setMarketingFunnelMetric(this.value)">
+                                <span>Amount</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="chart marketing-funnel-chart" id="marketingFunnelChart"></div>
+                </div>
+
+                <div class="marketing-line-grid">
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Form Fills &amp; MQL Trends</h3>
+                            </div>
+                            <div class="chart-controls">
+                                <div class="campaign-picker" id="marketingAcquisitionViewPicker">
+                                    <span class="cp-label">View</span>
+                                    <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('marketingAcquisitionView')" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="trigger-text" id="marketingAcquisitionViewTriggerText">Yearly</span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </button>
+                                    <div class="campaign-menu" id="marketingAcquisitionViewMenu" role="listbox" aria-label="Form fill acquisition trend view"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart marketing-mini-chart" id="marketingAcquisitionChart"></div>
+                    </div>
+
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Meetings Trends</h3>
+                            </div>
+                            <div class="chart-controls">
+                                <div class="campaign-picker" id="marketingMeetingViewPicker">
+                                    <span class="cp-label">View</span>
+                                    <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('marketingMeetingView')" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="trigger-text" id="marketingMeetingViewTriggerText">Yearly</span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </button>
+                                    <div class="campaign-menu" id="marketingMeetingViewMenu" role="listbox" aria-label="Meetings trend view"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart marketing-mini-chart" id="marketingMeetingChart"></div>
+                    </div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>SAO, Closed Won &amp; Closed Lost Trends</h3>
+                        </div>
+                        <div class="chart-controls">
+                            <div class="campaign-picker" id="marketingOutcomeViewPicker">
+                                <span class="cp-label">View</span>
+                                <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('marketingOutcomeView')" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="trigger-text" id="marketingOutcomeViewTriggerText">Yearly</span>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                </button>
+                                <div class="campaign-menu" id="marketingOutcomeViewMenu" role="listbox" aria-label="Outcome trend view"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart marketing-combo-chart" id="marketingOutcomeChart"></div>
+                </div>
+
+                <div class="card marketing-table-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Website Form Fills</h3>
+                        </div>
+                    </div>
+                    <table class="tbl" id="marketingTable">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Email</th>
+                                <th>Form Fill Date</th>
+                                <th>Deal Name</th>
+                                <th>Deal Stage</th>
+                                <th>Deal Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marketingContactsTbl"></tbody>
+                    </table>
+                    <div class="table-footer" id="marketingContactsPager"></div>
+                </div>
+            </div>
+
+            <div class="marketing-subpanel" id="marketingLinkedInAdsPanel">
+                <div class="marketing-subtab-title">
+                    <div>
+                        <h2>LinkedIn Ads</h2>
+                    </div>
+                </div>
+
+                <div class="linkedin-ads-filters">
+                    <div class="campaign-picker" id="linkedInAdsYearPicker">
+                        <span class="cp-label">Date Range Year</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('linkedInAdsYear')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="linkedInAdsYearTriggerText">All Years</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="linkedInAdsYearMenu" role="listbox" aria-label="LinkedIn ads year options"></div>
+                    </div>
+                    <div class="campaign-picker" id="linkedInAdsQuarterPicker">
+                        <span class="cp-label">Date Range Year Quarter</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('linkedInAdsQuarter')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="linkedInAdsQuarterTriggerText">All Quarters</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="linkedInAdsQuarterMenu" role="listbox" aria-label="LinkedIn ads quarter options"></div>
+                    </div>
+                    <div class="campaign-picker" id="linkedInAdsCampaignPicker">
+                        <span class="cp-label">Campaign</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('linkedInAdsCampaign')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="linkedInAdsCampaignTriggerText">All Campaigns</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="linkedInAdsCampaignMenu" role="listbox" aria-label="LinkedIn ads campaign options"></div>
+                    </div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>LinkedIn Ads Funnel</h3>
+                        </div>
+                    </div>
+                    <div class="chart linkedin-ring-chart" id="linkedInAdsRingChart"></div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>LinkedIn Leads Funnel</h3>
+                        </div>
+                        <div class="chart-toggle" role="group" aria-label="LinkedIn leads funnel metric toggle">
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="linkedInContactsFunnelMetric" value="deals" checked onchange="setLinkedInContactsFunnelMetric(this.value)">
+                                <span>Count</span>
+                            </label>
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="linkedInContactsFunnelMetric" value="amount" onchange="setLinkedInContactsFunnelMetric(this.value)">
+                                <span>Amount</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="chart marketing-funnel-chart" id="linkedInContactsFunnelChart"></div>
+                </div>
+
+                <div class="linkedin-ads-chart-grid">
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Cost in USD &amp; CPM</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="linkedInCostCpmChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Impressions &amp; CTR</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="linkedInImpressionsCtrChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Clicks &amp; CPC</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="linkedInClicksCpcChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Leads &amp; Cost per Conversion</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="linkedInLeadsCpcvChart"></div>
+                    </div>
+                </div>
+
+                <div class="card marketing-table-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>LinkedIn Ads Performance</h3>
+                        </div>
+                    </div>
+                    <table class="tbl" id="linkedInAdsTable">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Campaign Name</th>
+                                <th>Cost in USD</th>
+                                <th>Impressions</th>
+                                <th>Clicks</th>
+                                <th>Leads</th>
+                                <th>CTR Percentage</th>
+                                <th>CPC</th>
+                                <th>Cost per Conversion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="linkedInAdsTbl"></tbody>
+                    </table>
+                    <div class="table-footer" id="linkedInAdsPager"></div>
+                </div>
+            </div>
+
+            <div class="marketing-subpanel" id="marketingGoogleAdsPanel">
+                <div class="marketing-subtab-title">
+                    <div>
+                        <h2>Google Ads</h2>
+                    </div>
+                </div>
+
+                <div class="linkedin-ads-filters">
+                    <div class="campaign-picker" id="googleAdsYearPicker">
+                        <span class="cp-label">Date Range Year</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('googleAdsYear')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="googleAdsYearTriggerText">All Years</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="googleAdsYearMenu" role="listbox" aria-label="Google ads year options"></div>
+                    </div>
+                    <div class="campaign-picker" id="googleAdsQuarterPicker">
+                        <span class="cp-label">Date Range Year Quarter</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('googleAdsQuarter')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="googleAdsQuarterTriggerText">All Quarters</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="googleAdsQuarterMenu" role="listbox" aria-label="Google ads quarter options"></div>
+                    </div>
+                    <div class="campaign-picker" id="googleAdsCampaignPicker">
+                        <span class="cp-label">Campaign</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('googleAdsCampaign')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="googleAdsCampaignTriggerText">All Campaigns</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="googleAdsCampaignMenu" role="listbox" aria-label="Google ads campaign options"></div>
+                    </div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Google Ads Funnel</h3>
+                        </div>
+                    </div>
+                    <div class="chart linkedin-ring-chart" id="googleAdsRingChart"></div>
+                </div>
+
+                <div class="card chart-card marketing-chart-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Google Ads Leads Funnel</h3>
+                        </div>
+                        <div class="chart-toggle" role="group" aria-label="Google ads leads funnel metric toggle">
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="googleAdsLeadsFunnelMetric" value="deals" checked onchange="setGoogleAdsLeadsFunnelMetric(this.value)">
+                                <span>Count</span>
+                            </label>
+                            <label class="chart-toggle-option">
+                                <input type="radio" name="googleAdsLeadsFunnelMetric" value="amount" onchange="setGoogleAdsLeadsFunnelMetric(this.value)">
+                                <span>Amount</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="chart marketing-funnel-chart" id="googleAdsLeadsFunnelChart"></div>
+                </div>
+
+                <div class="linkedin-ads-chart-grid">
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Cost in USD &amp; CPM</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="googleAdsCostCpmChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Impressions &amp; CTR</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="googleAdsImpressionsCtrChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Clicks &amp; CPC</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="googleAdsClicksCpcChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Leads &amp; Cost per Conversion</h3>
+                            </div>
+                        </div>
+                        <div class="chart linkedin-chart" id="googleAdsLeadsCpcvChart"></div>
+                    </div>
+                </div>
+
+                <div class="card marketing-table-card">
+                    <div class="chart-head">
+                        <div>
+                            <h3>Google Ads Performance</h3>
+                        </div>
+                    </div>
+                    <table class="tbl" id="googleAdsTable">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Campaign Name</th>
+                                <th>Cost in USD</th>
+                                <th>Impressions</th>
+                                <th>Clicks</th>
+                                <th>Leads</th>
+                                <th>CTR Percentage</th>
+                                <th>CPC</th>
+                                <th>Cost per Conversion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="googleAdsTbl"></tbody>
+                    </table>
+                    <div class="table-footer" id="googleAdsPager"></div>
+                </div>
             </div>
         </section>
     </div>
@@ -475,11 +918,20 @@
 
 <script>
 const WORKBOOK_FILE = './%F0%9F%94%B4%20GTMDB-Data.xlsx';
-const WORKSHEET_NAME = 'GTMDB-Deals';
+const DEALS_WORKSHEET_NAME = 'GTMDB-Deals';
+const INBOUND_WORKSHEET_NAME = 'GTMDB-Contacts-Inbound';
+const LINKEDIN_ADS_WORKSHEET_NAME = 'GTMDB-LinkedIn-Ads';
+const LINKEDIN_CONTACTS_WORKSHEET_NAME = 'GTMDB-Contacts-Linkedin';
+const GOOGLE_ADS_WORKSHEET_NAME = 'GTMDB-Google-Ads';
 const DEFAULT_DEAL_STAGE = 'S7a: Closed-Won / Start Onboarding';
 const REVENUE_FILTER_KEYS = ['dealType','status','year','quarter'];
 const SALES_FILTER_KEYS = ['salesCreateYear','salesCreateQuarter','salesDealType','salesSource','salesDealOwner','salesDealStage'];
+const MARKETING_FILTER_KEYS = ['marketingYear','marketingQuarter'];
+const LINKEDIN_ADS_FILTER_KEYS = ['linkedInAdsYear','linkedInAdsQuarter','linkedInAdsCampaign'];
+const GOOGLE_ADS_FILTER_KEYS = ['googleAdsYear','googleAdsQuarter','googleAdsCampaign'];
 const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClosedLost'];
+const MARKETING_TREND_VIEW_OPTIONS = ['Yearly','Quarterly','Monthly'];
+const MARKETING_SUBTABS = ['websiteFormFills', 'linkedInAds', 'googleAds'];
 const TABLE_PAGE_SIZE = 10;
 const STATE = {
     rows: [],
@@ -493,7 +945,16 @@ const STATE = {
     tablePage: {
         customers: 1,
         churns: 1,
-        salesDeals: 1
+        salesDeals: 1,
+        marketingContacts: 1,
+        linkedInAdsTable: 1,
+        googleAdsTable: 1
+    },
+    tableSort: {
+        customers: { key:'totalRevenue', dir:'desc' },
+        churns: { key:'totalRevenue', dir:'desc' },
+        salesDeals: { key:'dealAmount', dir:'desc' },
+        marketingContacts: { key:'formFillDate', dir:'desc' }
     },
     filters: {
         year: [],
@@ -549,6 +1010,69 @@ const STATE = {
             series:[...SALES_CHART_KEYS]
         },
         pieDimension:'source'
+    },
+    marketing: {
+        rows: [],
+        filtered: [],
+        activeSubtab: 'websiteFormFills',
+        filters: {
+            marketingYear: [],
+            marketingQuarter: []
+        },
+        search: {
+            marketingYear: '',
+            marketingQuarter: ''
+        },
+        filterOptions: {
+            marketingYear: [],
+            marketingQuarter: []
+        },
+        funnelMetric: 'deals',
+        acquisitionView: 'yearly',
+        meetingView: 'yearly',
+        outcomeView: 'yearly',
+        linkedInAds: {
+            rows: [],
+            filtered: [],
+            contactsRows: [],
+            filteredContacts: [],
+            filters: {
+                linkedInAdsYear: [],
+                linkedInAdsQuarter: [],
+                linkedInAdsCampaign: []
+            },
+            search: {
+                linkedInAdsYear: '',
+                linkedInAdsQuarter: '',
+                linkedInAdsCampaign: ''
+            },
+            filterOptions: {
+                linkedInAdsYear: [],
+                linkedInAdsQuarter: [],
+                linkedInAdsCampaign: []
+            },
+            contactsFunnelMetric: 'deals'
+        },
+        googleAds: {
+            rows: [],
+            filtered: [],
+            filters: {
+                googleAdsYear: [],
+                googleAdsQuarter: [],
+                googleAdsCampaign: []
+            },
+            search: {
+                googleAdsYear: '',
+                googleAdsQuarter: '',
+                googleAdsCampaign: ''
+            },
+            filterOptions: {
+                googleAdsYear: [],
+                googleAdsQuarter: [],
+                googleAdsCampaign: []
+            },
+            leadsFunnelMetric: 'deals'
+        }
     }
 };
 const SALES_PIE_OPTIONS = [
@@ -579,6 +1103,52 @@ const SALES_CHART_CONFIG = {
         filterFn: (row) => hasDealId(row) && isSalesClosedLostStage(row)
     }
 };
+const MARKETING_STAGE_CONFIG = [
+    {
+        key:'formFills',
+        label:'Form Fills',
+        color:'#2563eb',
+        predicate:(row) => Boolean(row.__formFillDate)
+    },
+    {
+        key:'mql',
+        label:'MQL',
+        color:'#7c3aed',
+        predicate:(row) => hasMarketingMql(row)
+    },
+    {
+        key:'meetingBooked',
+        label:'Meeting Booked',
+        color:'#f59e0b',
+        predicate:(row) => hasMarketingMeetingBooked(row)
+    },
+    {
+        key:'meetingHappened',
+        label:'Meeting Happened',
+        color:'#06b6d4',
+        predicate:(row) => hasMarketingMeetingHappened(row)
+    },
+    {
+        key:'sao',
+        label:'SAO',
+        color:'#14b8a6',
+        predicate:(row) => row.__marketingSao
+    },
+    {
+        key:'closedWon',
+        label:'Closed Won',
+        color:'#00c875',
+        predicate:(row) => row.__marketingClosedWon
+    }
+];
+const LINKEDIN_CONTACT_FUNNEL_CONFIG = [
+    { key:'lead', label:'Leads', color:'#2563eb', predicate:(row) => Boolean(String(row['Contact ID'] || '').trim()) },
+    { key:'mql', label:'MQL', color:'#7c3aed', predicate:(row) => Boolean(String(row['MQL Date'] || '').trim()) },
+    { key:'meetingBooked', label:'Meeting Booked', color:'#f59e0b', predicate:(row) => Boolean(String(row['Meeting Scheduled Date'] || '').trim()) },
+    { key:'meetingHappened', label:'Meeting Happened', color:'#06b6d4', predicate:(row) => Boolean(String(row['Meeting Happened Date'] || '').trim()) },
+    { key:'sao', label:'SAO', color:'#14b8a6', predicate:(row) => row.__marketingSao },
+    { key:'won', label:'Won', color:'#00c875', predicate:(row) => row.__marketingClosedWon }
+];
 
 function setTheme(t, el) {
     document.documentElement.setAttribute('data-theme', t);
@@ -587,18 +1157,53 @@ function setTheme(t, el) {
     STATE.theme = t;
     if (STATE.filtered.length) renderAll();
     if (STATE.sales.filtered.length && STATE.activeTab === 'sales') renderSales();
+    if ((STATE.marketing.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length) && STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function toggleMarketingTabMenu() {
+    const wrap = document.getElementById('marketingTabWrap');
+    const button = document.getElementById('tabMarketing');
+    if (!wrap || !button) return;
+    const shouldOpen = !wrap.classList.contains('open');
+    setActiveTab('marketing');
+    wrap.classList.toggle('open', shouldOpen);
+    button.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+}
+
+function closeMarketingTabMenu() {
+    const wrap = document.getElementById('marketingTabWrap');
+    const button = document.getElementById('tabMarketing');
+    if (wrap) wrap.classList.remove('open');
+    if (button) button.setAttribute('aria-expanded', 'false');
+}
+
+function setMarketingSubtab(subtab) {
+    const next = MARKETING_SUBTABS.includes(subtab) ? subtab : 'websiteFormFills';
+    STATE.marketing.activeSubtab = next;
+    document.getElementById('marketingWebsiteFormFillsPanel')?.classList.toggle('active', next === 'websiteFormFills');
+    document.getElementById('marketingLinkedInAdsPanel')?.classList.toggle('active', next === 'linkedInAds');
+    document.getElementById('marketingGoogleAdsPanel')?.classList.toggle('active', next === 'googleAds');
+    document.getElementById('marketingSubtabWebsiteFormFills')?.classList.toggle('is-active', next === 'websiteFormFills');
+    document.getElementById('marketingSubtabLinkedInAds')?.classList.toggle('is-active', next === 'linkedInAds');
+    document.getElementById('marketingSubtabGoogleAds')?.classList.toggle('is-active', next === 'googleAds');
+    setActiveTab('marketing');
+    closeMarketingTabMenu();
 }
 
 function setActiveTab(tab) {
-    const active = tab === 'sales' ? 'sales' : 'revenue';
+    const active = tab === 'sales' ? 'sales' : tab === 'marketing' ? 'marketing' : 'revenue';
     STATE.activeTab = active;
+    if (active !== 'marketing') closeMarketingTabMenu();
     document.getElementById('revenuePanel')?.classList.toggle('active', active === 'revenue');
     document.getElementById('salesPanel')?.classList.toggle('active', active === 'sales');
+    document.getElementById('marketingPanel')?.classList.toggle('active', active === 'marketing');
     document.getElementById('tabRevenue')?.classList.toggle('on', active === 'revenue');
     document.getElementById('tabSales')?.classList.toggle('on', active === 'sales');
+    document.getElementById('tabMarketing')?.classList.toggle('on', active === 'marketing');
     setTimeout(() => {
         if (active === 'sales' && STATE.sales.filtered.length) renderSales();
-        ['trendChart','salesTrendChart','salesDistributionPie']
+        if (active === 'marketing' && (STATE.marketing.rows.length || STATE.marketing.linkedInAds.rows.length || STATE.marketing.googleAds.rows.length)) renderMarketing();
+        ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
             .forEach((id) => {
                 const chart = document.getElementById(id);
                 if (chart && chart.data) Plotly.Plots.resize(chart);
@@ -630,7 +1235,95 @@ function changeTablePage(tableKey, delta) {
     const current = STATE.tablePage[tableKey] || 1;
     const next = Math.max(1, current + Number(delta || 0));
     STATE.tablePage[tableKey] = next;
+    if (tableKey === 'salesDeals') {
+        renderSalesTable(STATE.sales.filtered);
+        return;
+    }
+    if (tableKey === 'marketingContacts') {
+        renderMarketingTable(STATE.marketing.filtered);
+        return;
+    }
+    if (tableKey === 'linkedInAdsTable') {
+        renderLinkedInAdsTable(STATE.marketing.linkedInAds.filtered);
+        return;
+    }
+    if (tableKey === 'googleAdsTable') {
+        renderGoogleAdsTable(STATE.marketing.googleAds.filtered);
+        return;
+    }
     renderTables(STATE.filtered);
+}
+
+function getTableSortState(tableKey) {
+    return STATE.tableSort[tableKey] || { key:'count', dir:'asc' };
+}
+
+function setTableSort(tableKey, columnKey) {
+    const current = getTableSortState(tableKey);
+    STATE.tableSort[tableKey] = current.key === columnKey
+        ? { key: columnKey, dir: current.dir === 'asc' ? 'desc' : 'asc' }
+        : { key: columnKey, dir: 'asc' };
+    STATE.tablePage[tableKey] = 1;
+}
+
+function setRevenueTableSort(columnKey) {
+    const tableKey = STATE.revenueTableView === 'churns' ? 'churns' : 'customers';
+    setTableSort(tableKey, columnKey);
+    renderTables(STATE.filtered);
+}
+
+function setSalesTableSort(columnKey) {
+    setTableSort('salesDeals', columnKey);
+    renderSalesTable(STATE.sales.filtered);
+}
+
+function compareTableValues(a, b) {
+    const aEmpty = a === null || a === undefined || a === '';
+    const bEmpty = b === null || b === undefined || b === '';
+    if (aEmpty && bEmpty) return 0;
+    if (aEmpty) return 1;
+    if (bEmpty) return -1;
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    if (a instanceof Date && b instanceof Date) return a.getTime() - b.getTime();
+    return String(a).localeCompare(String(b), undefined, { numeric:true, sensitivity:'base' });
+}
+
+function sortTableRows(tableRows, tableKey, getValue) {
+    const sortState = getTableSortState(tableKey);
+    const direction = sortState.dir === 'desc' ? -1 : 1;
+    return [...tableRows]
+        .map((row, index) => ({ row, index }))
+        .sort((a, b) => {
+            const aValue = sortState.key === 'count' ? a.index + 1 : getValue(a.row, sortState.key);
+            const bValue = sortState.key === 'count' ? b.index + 1 : getValue(b.row, sortState.key);
+            const comparison = compareTableValues(aValue, bValue);
+            return comparison * direction;
+        });
+}
+
+function updateSortButton(buttonId, iconId, isActive, dir) {
+    const button = document.getElementById(buttonId);
+    const icon = document.getElementById(iconId);
+    if (button) button.classList.toggle('is-active', isActive);
+    if (icon) icon.textContent = isActive ? (dir === 'asc' ? '↑' : '↓') : '↕';
+}
+
+function syncRevenueTableSortHeaders(tableKey) {
+    const sortState = getTableSortState(tableKey);
+    updateSortButton('revenueSortCountBtn', 'revenueSortCountIcon', sortState.key === 'count', sortState.dir);
+    updateSortButton('revenueSortCompanyBtn', 'revenueSortCompanyIcon', sortState.key === 'companyName', sortState.dir);
+    updateSortButton('revenueSortDateBtn', 'revenueSortDateIcon', sortState.key === 'closeDate', sortState.dir);
+    updateSortButton('revenueSortRevenueBtn', 'revenueSortRevenueIcon', sortState.key === 'totalRevenue', sortState.dir);
+}
+
+function syncSalesTableSortHeaders() {
+    const sortState = getTableSortState('salesDeals');
+    updateSortButton('salesSortCountBtn', 'salesSortCountIcon', sortState.key === 'count', sortState.dir);
+    updateSortButton('salesSortDealBtn', 'salesSortDealIcon', sortState.key === 'dealName', sortState.dir);
+    updateSortButton('salesSortCompanyBtn', 'salesSortCompanyIcon', sortState.key === 'companyName', sortState.dir);
+    updateSortButton('salesSortAmountBtn', 'salesSortAmountIcon', sortState.key === 'dealAmount', sortState.dir);
+    updateSortButton('salesSortStageBtn', 'salesSortStageIcon', sortState.key === 'dealStage', sortState.dir);
+    updateSortButton('salesSortSourceBtn', 'salesSortSourceIcon', sortState.key === 'source', sortState.dir);
 }
 
 function closeFilterMenu(key) {
@@ -682,7 +1375,6 @@ function setFilterValue(key, value) {
         if ((STATE.filters.year || []).length) {
             STATE.trendView = 'monthly';
         }
-        renderFilterOptions();
         applyFilters();
         return;
     }
@@ -694,8 +1386,36 @@ function setFilterValue(key, value) {
         if ((STATE.sales.filters.salesCreateYear || []).length) {
             STATE.sales.trend.view = 'monthly';
         }
-        renderSalesFilterOptions();
         applySalesFilters();
+        return;
+    }
+    if (MARKETING_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.marketing.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.marketing.filters[key] = [...current];
+        if ((STATE.marketing.filters.marketingYear || []).length) {
+            STATE.marketing.acquisitionView = 'monthly';
+            STATE.marketing.meetingView = 'monthly';
+            STATE.marketing.outcomeView = 'monthly';
+        }
+        applyMarketingFilters();
+        return;
+    }
+    if (LINKEDIN_ADS_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.marketing.linkedInAds.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.marketing.linkedInAds.filters[key] = [...current];
+        applyLinkedInAdsFilters();
+        return;
+    }
+    if (GOOGLE_ADS_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.marketing.googleAds.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.marketing.googleAds.filters[key] = [...current];
+        applyGoogleAdsFilters();
         return;
     }
     if (key === 'salesTrendView') {
@@ -719,6 +1439,32 @@ function setFilterValue(key, value) {
         closeFilterMenu(key);
         renderSalesFilterOptions();
         renderSales();
+        return;
+    }
+    if (key === 'marketingAcquisitionView') {
+        STATE.marketing.acquisitionView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        closeFilterMenu(key);
+        renderMarketingFilterOptions();
+        renderMarketing();
+        return;
+    }
+    if (key === 'marketingMeetingView') {
+        STATE.marketing.meetingView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        closeFilterMenu(key);
+        renderMarketingFilterOptions();
+        renderMarketing();
+        return;
+    }
+    if (key === 'marketingOutcomeView') {
+        STATE.marketing.outcomeView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        closeFilterMenu(key);
+        renderMarketingFilterOptions();
+        renderMarketing();
+        return;
+    }
+    if (key === 'linkedInContactsFunnelMetric') {
+        STATE.marketing.linkedInAds.contactsFunnelMetric = normalized === 'amount' ? 'amount' : 'deals';
+        renderMarketing();
     }
 }
 
@@ -731,6 +1477,21 @@ function setFilterSearch(key, value) {
     if (Object.prototype.hasOwnProperty.call(STATE.sales.search, key)) {
         STATE.sales.search[key] = String(value || '');
         renderSalesFilterOptions();
+        return;
+    }
+    if (Object.prototype.hasOwnProperty.call(STATE.marketing.search, key)) {
+        STATE.marketing.search[key] = String(value || '');
+        renderMarketingFilterOptions();
+        return;
+    }
+    if (Object.prototype.hasOwnProperty.call(STATE.marketing.linkedInAds.search, key)) {
+        STATE.marketing.linkedInAds.search[key] = String(value || '');
+        renderLinkedInAdsFilterOptions();
+        return;
+    }
+    if (Object.prototype.hasOwnProperty.call(STATE.marketing.googleAds.search, key)) {
+        STATE.marketing.googleAds.search[key] = String(value || '');
+        renderGoogleAdsFilterOptions();
     }
 }
 
@@ -756,6 +1517,30 @@ function syncSalesFilterStates() {
     if (seriesPicker) {
         seriesPicker.classList.toggle('is-active', (STATE.sales.trend.series || []).length !== SALES_CHART_KEYS.length);
     }
+}
+
+function syncMarketingFilterStates() {
+    MARKETING_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.marketing.filters[key] || []).length > 0);
+    });
+}
+
+function syncLinkedInAdsFilterStates() {
+    LINKEDIN_ADS_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.marketing.linkedInAds.filters[key] || []).length > 0);
+    });
+}
+
+function syncGoogleAdsFilterStates() {
+    GOOGLE_ADS_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.marketing.googleAds.filters[key] || []).length > 0);
+    });
 }
 
 function isFilterActive(key, value) {
@@ -803,6 +1588,41 @@ function getSalesBaseRows() {
     return STATE.rows.filter((row) => hasDealId(row));
 }
 
+function getMarketingBaseRows() {
+    return (STATE.marketing.rows || []).filter((row) => row.__formFillDate);
+}
+
+function getLinkedInAdsBaseRows() {
+    return (STATE.marketing.linkedInAds.rows || []).filter((row) => row.__adsDate);
+}
+
+function getGoogleAdsBaseRows() {
+    return (STATE.marketing.googleAds.rows || []).filter((row) => row.__adsDate);
+}
+
+function matchesCampaignSelection(value, selections) {
+    const normalizedValue = String(value || '').trim().toLowerCase();
+    if (!selections || !selections.length) return true;
+    if (!normalizedValue) return false;
+    return selections.some((selection) => {
+        const normalizedSelection = String(selection || '').trim().toLowerCase();
+        return normalizedValue.includes(normalizedSelection) || normalizedSelection.includes(normalizedValue);
+    });
+}
+
+function getGoogleAdsLeadBaseRows() {
+    const googleState = STATE.marketing.googleAds;
+    const { googleAdsYear, googleAdsQuarter, googleAdsCampaign } = googleState.filters;
+    return (STATE.marketing.rows || []).filter((row) => {
+        if (!row.__formFillDate) return false;
+        if (!String(row.__campaignInteracted || '').trim()) return false;
+        if (googleAdsYear.length && !googleAdsYear.includes(row.__formFillYear)) return false;
+        if (googleAdsQuarter.length && !googleAdsQuarter.includes(row.__formFillQuarter)) return false;
+        if (!matchesCampaignSelection(row.__campaignInteracted, googleAdsCampaign)) return false;
+        return true;
+    });
+}
+
 function getSalesFilterRowValue(row, key) {
     if (key === 'salesCreateYear') return row.__createYear;
     if (key === 'salesCreateQuarter') return row.__createQuarter;
@@ -811,6 +1631,49 @@ function getSalesFilterRowValue(row, key) {
     if (key === 'salesDealOwner') return row.__dealOwner;
     if (key === 'salesDealStage') return row.__dealStage;
     return '';
+}
+
+function getMarketingFilterRowValue(row, key) {
+    if (key === 'marketingYear') return row.__formFillYear;
+    if (key === 'marketingQuarter') return row.__formFillQuarter;
+    return '';
+}
+
+function getLinkedInAdsFilterRowValue(row, key) {
+    if (key === 'linkedInAdsYear') return row.__adsYear;
+    if (key === 'linkedInAdsQuarter') return row.__adsQuarter;
+    if (key === 'linkedInAdsCampaign') return row.__campaign;
+    return '';
+}
+
+function getGoogleAdsFilterRowValue(row, key) {
+    if (key === 'googleAdsYear') return row.__adsYear;
+    if (key === 'googleAdsQuarter') return row.__adsQuarter;
+    if (key === 'googleAdsCampaign') return row.__campaign;
+    return '';
+}
+
+function getRevenueFilterRowValue(row, key) {
+    if (key === 'dealType') return row.__dealType;
+    if (key === 'status') return row.__status;
+    if (key === 'year') return row.__year;
+    if (key === 'quarter') return row.__quarter;
+    return '';
+}
+
+function getScopedFilterRows(rows, filterKeys, filters, getRowValue, omitKey) {
+    return rows.filter((row) => filterKeys.every((filterKey) => {
+        if (filterKey === omitKey) return true;
+        const selected = filters[filterKey] || [];
+        if (!selected.length) return true;
+        return selected.includes(getRowValue(row, filterKey));
+    }));
+}
+
+function getDynamicFilterOptions(rows, filterKeys, filters, getRowValue, key, sortFn) {
+    const scopedRows = getScopedFilterRows(rows, filterKeys, filters, getRowValue, key);
+    const values = [...new Set(scopedRows.map((row) => getRowValue(row, key)).filter((value) => value && value !== 'Unknown'))];
+    return sortFn ? sortFn(values) : values.sort((a, b) => String(a || '').localeCompare(String(b || '')));
 }
 
 function getOptionAmountMap(key) {
@@ -854,6 +1717,60 @@ function getSalesOptionAmountMap(key) {
         const optionValue = getSalesFilterRowValue(row, key);
         if (!optionValue || optionValue === 'Unknown') return;
         map.set(optionValue, (map.get(optionValue) || 0) + row.__amount);
+    });
+    return map;
+}
+
+function getMarketingOptionAmountMap(key) {
+    const scopedRows = getMarketingBaseRows().filter((row) => {
+        return MARKETING_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = STATE.marketing.filters[filterKey] || [];
+            if (!selected.length) return true;
+            return selected.includes(getMarketingFilterRowValue(row, filterKey));
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = getMarketingFilterRowValue(row, key);
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__marketingAmount);
+    });
+    return map;
+}
+
+function getLinkedInAdsOptionAmountMap(key) {
+    const scopedRows = getLinkedInAdsBaseRows().filter((row) => {
+        return LINKEDIN_ADS_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = STATE.marketing.linkedInAds.filters[filterKey] || [];
+            if (!selected.length) return true;
+            return selected.includes(getLinkedInAdsFilterRowValue(row, filterKey));
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = getLinkedInAdsFilterRowValue(row, key);
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__cost);
+    });
+    return map;
+}
+
+function getGoogleAdsOptionAmountMap(key) {
+    const scopedRows = getGoogleAdsBaseRows().filter((row) => {
+        return GOOGLE_ADS_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = STATE.marketing.googleAds.filters[filterKey] || [];
+            if (!selected.length) return true;
+            return selected.includes(getGoogleAdsFilterRowValue(row, filterKey));
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = getGoogleAdsFilterRowValue(row, key);
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__cost);
     });
     return map;
 }
@@ -961,10 +1878,43 @@ function extractSheetHyperlink(cell) {
     return match ? String(match[1] || '').trim() : '';
 }
 
+function extractHyperlinkFromText(value) {
+    const match = String(value || '').match(/HYPERLINK\("([^"]+)"/i);
+    return match ? String(match[1] || '').trim() : '';
+}
+
+function getObjectValue(obj, keys, fallback = '') {
+    for (const key of keys) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const value = obj[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+                return value;
+            }
+        }
+    }
+    return fallback;
+}
+
+function findStructuredHeaderRow(rows, validator) {
+    const preferredIndex = 1;
+    if (rows[preferredIndex] && validator(rows[preferredIndex])) {
+        return preferredIndex;
+    }
+    const fallbackIndex = rows.findIndex((row, index) => index >= 1 && validator(row));
+    return fallbackIndex;
+}
+
 function findHeaderRow(rows) {
-    return rows.findIndex((row) => {
+    return findStructuredHeaderRow(rows, (row) => {
         const joined = row.join(' | ').toLowerCase();
         return joined.includes('deal name') && joined.includes('deal stage') && joined.includes('company name');
+    });
+}
+
+function findInboundHeaderRow(rows) {
+    return findStructuredHeaderRow(rows, (row) => {
+        const joined = row.join(' | ').toLowerCase();
+        return joined.includes('website demo request date') && joined.includes('meeting scheduled date') && joined.includes('company name');
     });
 }
 
@@ -979,19 +1929,58 @@ async function fetchSheet() {
     if (!resp.ok) throw new Error('Failed to fetch local workbook');
     const buffer = await resp.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
-    const sheet = workbook.Sheets[WORKSHEET_NAME];
-    if (!sheet) throw new Error(`Worksheet "${WORKSHEET_NAME}" not found in local workbook`);
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+    const dealsSheet = workbook.Sheets[DEALS_WORKSHEET_NAME];
+    if (!dealsSheet) throw new Error(`Worksheet "${DEALS_WORKSHEET_NAME}" not found in local workbook`);
+    const inboundSheet = workbook.Sheets[INBOUND_WORKSHEET_NAME];
+    if (!inboundSheet) throw new Error(`Worksheet "${INBOUND_WORKSHEET_NAME}" not found in local workbook`);
+    const linkedInAdsSheet = workbook.Sheets[LINKEDIN_ADS_WORKSHEET_NAME];
+    if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in local workbook`);
+    const linkedInContactsSheet = workbook.Sheets[LINKEDIN_CONTACTS_WORKSHEET_NAME];
+    if (!linkedInContactsSheet) throw new Error(`Worksheet "${LINKEDIN_CONTACTS_WORKSHEET_NAME}" not found in local workbook`);
+    const googleAdsSheet = workbook.Sheets[GOOGLE_ADS_WORKSHEET_NAME];
+    if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in local workbook`);
+    const rows = XLSX.utils.sheet_to_json(dealsSheet, { header: 1, raw: false, defval: '' });
+    const inboundRows = XLSX.utils.sheet_to_json(inboundSheet, { header: 1, raw: false, defval: '' });
+    const linkedInAdsRows = XLSX.utils.sheet_to_json(linkedInAdsSheet, { header: 1, raw: false, defval: '' });
+    const linkedInContactsRows = XLSX.utils.sheet_to_json(linkedInContactsSheet, { header: 1, raw: false, defval: '' });
+    const googleAdsRows = XLSX.utils.sheet_to_json(googleAdsSheet, { header: 1, raw: false, defval: '' });
     const linkMap = {};
-    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1:A1');
+    const range = XLSX.utils.decode_range(dealsSheet['!ref'] || 'A1:A1');
     for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex += 1) {
         const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
-        const link = extractSheetHyperlink(sheet[cellRef]);
+        const link = extractSheetHyperlink(dealsSheet[cellRef]);
         if (link) {
             linkMap[rowIndex + 1] = link;
         }
     }
-    return { rows: normalizeRows(rows), linkMap };
+    const inboundLinkMap = {};
+    const inboundRange = XLSX.utils.decode_range(inboundSheet['!ref'] || 'A1:A1');
+    for (let rowIndex = inboundRange.s.r; rowIndex <= inboundRange.e.r; rowIndex += 1) {
+        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
+        const link = extractSheetHyperlink(inboundSheet[cellRef]);
+        if (link) {
+            inboundLinkMap[rowIndex + 1] = link;
+        }
+    }
+    const linkedInContactsLinkMap = {};
+    const linkedInContactsRange = XLSX.utils.decode_range(linkedInContactsSheet['!ref'] || 'A1:A1');
+    for (let rowIndex = linkedInContactsRange.s.r; rowIndex <= linkedInContactsRange.e.r; rowIndex += 1) {
+        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
+        const link = extractSheetHyperlink(linkedInContactsSheet[cellRef]);
+        if (link) {
+            linkedInContactsLinkMap[rowIndex + 1] = link;
+        }
+    }
+    return {
+        rows: normalizeRows(rows),
+        inboundRows: normalizeRows(inboundRows),
+        linkedInAdsRows: normalizeRows(linkedInAdsRows),
+        linkedInContactsRows: normalizeRows(linkedInContactsRows),
+        googleAdsRows: normalizeRows(googleAdsRows),
+        linkMap,
+        inboundLinkMap
+        ,linkedInContactsLinkMap
+    };
 }
 
 function rowsToObjects(rows, linkMap = {}){
@@ -1031,6 +2020,93 @@ function rowsToObjects(rows, linkMap = {}){
         obj.__createMonth = obj.__createDate ? `${obj.__createDate.toLocaleString('en-US',{month:'short'})} ${obj.__createDate.getFullYear()}` : 'Unknown';
         return obj;
     });
+}
+
+function inboundRowsToObjects(rows, linkMap = {}) {
+    const headerIndex = findInboundHeaderRow(rows);
+    if (headerIndex < 0) throw new Error('Could not find GTMDB-Contacts-Inbound header row');
+    const headers = rows[headerIndex].map((header) => String(header || '').replace(/\s+/g, ' ').trim());
+    return rows.slice(headerIndex + 1)
+        .filter((row) => row.some((cell) => cell))
+        .map((row, rowOffset) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index] ?? '';
+            });
+            const formFillDate = parseSheetDate(obj['Website Demo Request Date'] || '');
+            const mqlDate = parseSheetDate(obj['MQL Date'] || '');
+            const meetingBookedDate = parseSheetDate(obj['Meeting Scheduled Date'] || '');
+            const meetingHappenedDate = parseSheetDate(obj['Meeting Happened Date'] || '');
+            obj.__formFillDate = formFillDate;
+            obj.__mqlDate = mqlDate;
+            obj.__meetingBookedDate = meetingBookedDate;
+            obj.__meetingHappenedDate = meetingHappenedDate;
+            obj.__referenceDate = formFillDate || mqlDate || meetingBookedDate || meetingHappenedDate || null;
+            obj.__formFillYear = formFillDate ? String(formFillDate.getFullYear()) : 'Unknown';
+            obj.__formFillQuarter = formFillDate ? quarterLabelFromDate(formFillDate) : 'Unknown';
+            obj.__formFillMonthKey = formFillDate ? `${formFillDate.getFullYear()}-${String(formFillDate.getMonth() + 1).padStart(2, '0')}` : 'Unknown';
+            obj.__formFillMonth = formFillDate ? formFillDate.toLocaleString('en-US', { month:'short', year:'numeric' }) : 'Unknown';
+            obj.__referenceYear = obj.__referenceDate ? String(obj.__referenceDate.getFullYear()) : 'Unknown';
+            obj.__referenceQuarter = obj.__referenceDate ? quarterLabelFromDate(obj.__referenceDate) : 'Unknown';
+            obj.__marketingAmount = num(obj['Amount']);
+            obj.__marketingSao = String(obj['SAO (S2-S6)'] || '').trim().toLowerCase() === 'true';
+            const stage = String(obj['Deal Stage'] || '').trim();
+            const stageLower = stage.toLowerCase();
+            obj.__marketingClosedWon = stageLower === lowerStage(DEFAULT_DEAL_STAGE);
+            obj.__marketingClosedLost = stageLower.includes('s7b') || stageLower.includes('closed-lost');
+            obj.__companyName = String(obj['Company name'] || '').trim() || '-';
+            obj.__email = String(obj['Email'] || '').trim() || '-';
+            obj.__campaignInteracted = String(obj['Ad Campaign Interacted'] || '').trim() || '';
+            obj.__contactLink = linkMap[headerIndex + 2 + rowOffset] || extractHyperlinkFromText(obj['Contact ID'] || '');
+            return obj;
+        });
+}
+
+function findAdsHeaderRow(rows) {
+    return findStructuredHeaderRow(rows, (row) => {
+        const joined = row.join(' | ').toLowerCase();
+        return joined.includes('impressions')
+            && joined.includes('clicks')
+            && (joined.includes('campaign') || joined.includes('campaign name'))
+            && (joined.includes('cost in usd') || joined.includes('cost micros') || joined.includes('cost'));
+    });
+}
+
+function adsRowsToObjects(rows, source = 'linkedin') {
+    const headerIndex = findAdsHeaderRow(rows);
+    if (headerIndex < 0) throw new Error(`Could not find ${source === 'google' ? GOOGLE_ADS_WORKSHEET_NAME : LINKEDIN_ADS_WORKSHEET_NAME} header row`);
+    const headers = rows[headerIndex].map((header) => String(header || '').replace(/\s+/g, ' ').trim());
+    return rows.slice(headerIndex + 1)
+        .filter((row) => row.some((cell) => cell))
+        .map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index] ?? '';
+            });
+            const adsDate = parseSheetDate(getObjectValue(obj, ['Date Range', 'Date']));
+            const ctrRaw = num(getObjectValue(obj, ['CTR (%)', 'CTR', 'Ctr']));
+            obj.__adsDate = adsDate;
+            obj.__adsYear = adsDate ? String(adsDate.getFullYear()) : 'Unknown';
+            obj.__adsQuarter = adsDate ? quarterLabelFromDate(adsDate) : 'Unknown';
+            obj.__campaign = String(getObjectValue(obj, ['Campaign', 'Campaign Name']) || '').trim() || 'Unknown';
+            obj.__impressions = num(getObjectValue(obj, ['Impressions']));
+            obj.__clicks = num(getObjectValue(obj, ['Clicks']));
+            obj.__cost = num(getObjectValue(obj, ['Cost in USD', 'Cost Micros']));
+            obj.__cpc = num(getObjectValue(obj, ['CPC', 'Average Cpc']));
+            obj.__cpm = num(getObjectValue(obj, ['CPM', 'Average Cpm']));
+            obj.__ctr = source === 'google' && ctrRaw <= 1 ? ctrRaw * 100 : ctrRaw;
+            obj.__costPerConversion = num(getObjectValue(obj, ['Cost Per Conversion', 'Cost per Conversion']));
+            obj.__leads = num(getObjectValue(obj, ['Leads', 'Conversions']));
+            return obj;
+        });
+}
+
+function linkedInAdsRowsToObjects(rows) {
+    return adsRowsToObjects(rows, 'linkedin');
+}
+
+function googleAdsRowsToObjects(rows) {
+    return adsRowsToObjects(rows, 'google');
 }
 
 function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1088,23 +2164,38 @@ function compareSalesStageValues(a, b) {
 
 function setupFilters() {
     const scopedRows = getScopedRows();
-    STATE.filterOptions.year = ['2021','2022','2023','2024','2025','2026'].filter(year => scopedRows.some(r => r.__year === year));
-    STATE.filterOptions.quarter = [
-        'Q4 2021',
-        'Q1 2022','Q2 2022','Q3 2022','Q4 2022',
-        'Q1 2023','Q2 2023','Q3 2023','Q4 2023',
-        'Q1 2024','Q2 2024','Q3 2024','Q4 2024',
-        'Q1 2025','Q2 2025','Q3 2025','Q4 2025',
-        'Q1 2026','Q2 2026','Q3 2026','Q4 2026'
-    ].filter(quarter => scopedRows.some(r => r.__quarter === quarter));
-    STATE.filterOptions.status = sortByPreferredValues(
-        scopedRows.map(r => r.__status).filter(v => v && v !== 'Unknown'),
-        ['Customer', 'Churn'],
-        (a, b) => String(a || '').localeCompare(String(b || ''))
+    STATE.filterOptions.year = getDynamicFilterOptions(
+        scopedRows,
+        REVENUE_FILTER_KEYS,
+        STATE.filters,
+        getRevenueFilterRowValue,
+        'year',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
     );
-    const preferredTypes = ['New Logo','Upsell','Downsell'];
-    const liveTypes = [...new Set(scopedRows.map(r => r.__dealType).filter(v => v && v !== 'Unknown'))];
-    STATE.filterOptions.dealType = preferredTypes.filter(v => liveTypes.includes(v)).concat(liveTypes.filter(v => !preferredTypes.includes(v)).sort((a,b) => a.localeCompare(b)));
+    STATE.filterOptions.quarter = getDynamicFilterOptions(
+        scopedRows,
+        REVENUE_FILTER_KEYS,
+        STATE.filters,
+        getRevenueFilterRowValue,
+        'quarter',
+        sortQuarterLabels
+    );
+    STATE.filterOptions.status = getDynamicFilterOptions(
+        scopedRows,
+        REVENUE_FILTER_KEYS,
+        STATE.filters,
+        getRevenueFilterRowValue,
+        'status',
+        (values) => sortByPreferredValues(values, ['Customer', 'Churn'], (a, b) => String(a || '').localeCompare(String(b || '')))
+    );
+    STATE.filterOptions.dealType = getDynamicFilterOptions(
+        scopedRows,
+        REVENUE_FILTER_KEYS,
+        STATE.filters,
+        getRevenueFilterRowValue,
+        'dealType',
+        (values) => sortByPreferredValues(values, ['New Logo','Upsell','Downsell'], (a, b) => String(a || '').localeCompare(String(b || '')))
+    );
     REVENUE_FILTER_KEYS.forEach((key) => {
         const current = STATE.filters[key] || [];
         const allowed = new Set(STATE.filterOptions[key] || []);
@@ -1115,24 +2206,156 @@ function setupFilters() {
 
 function setupSalesFilters() {
     const scopedRows = getSalesBaseRows();
-    STATE.sales.filterOptions.salesCreateYear = [...new Set(scopedRows.map(r => r.__createYear).filter(v => v && v !== 'Unknown'))].sort();
-    STATE.sales.filterOptions.salesCreateQuarter = sortQuarterLabels([...new Set(scopedRows.map(r => r.__createQuarter).filter(v => v && v !== 'Unknown'))]);
-    STATE.sales.filterOptions.salesDealType = sortByPreferredValues(
-        scopedRows.map(r => r.__salesDealType).filter(v => v && v !== 'Unknown'),
-        ['New Logo', 'Upsell', 'Downsell', 'Resell', 'Save'],
-        (a, b) => String(a || '').localeCompare(String(b || ''))
+    STATE.sales.filterOptions.salesCreateYear = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesCreateYear',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
     );
-    STATE.sales.filterOptions.salesSource = [...new Set(scopedRows.map(r => r.__source).filter(v => v && v !== 'Unknown'))].sort((a, b) => a.localeCompare(b));
-    STATE.sales.filterOptions.salesDealOwner = [...new Set(scopedRows.map(r => r.__dealOwner).filter(v => v && v !== 'Unknown'))].sort((a, b) => a.localeCompare(b));
-    STATE.sales.filterOptions.salesDealStage = [
-        ...new Set(scopedRows.map(r => r.__dealStage).filter(v => v && v !== 'Unknown'))
-    ].sort(compareSalesStageValues);
+    STATE.sales.filterOptions.salesCreateQuarter = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesCreateQuarter',
+        sortQuarterLabels
+    );
+    STATE.sales.filterOptions.salesDealType = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesDealType',
+        (values) => sortByPreferredValues(values, ['New Logo', 'Upsell', 'Downsell', 'Resell', 'Save'], (a, b) => String(a || '').localeCompare(String(b || '')))
+    );
+    STATE.sales.filterOptions.salesSource = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesSource',
+        (values) => values.sort((a, b) => a.localeCompare(b))
+    );
+    STATE.sales.filterOptions.salesDealOwner = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesDealOwner',
+        (values) => values.sort((a, b) => a.localeCompare(b))
+    );
+    STATE.sales.filterOptions.salesDealStage = getDynamicFilterOptions(
+        scopedRows,
+        SALES_FILTER_KEYS,
+        STATE.sales.filters,
+        getSalesFilterRowValue,
+        'salesDealStage',
+        (values) => values.sort(compareSalesStageValues)
+    );
     SALES_FILTER_KEYS.forEach((key) => {
         const current = STATE.sales.filters[key] || [];
         const allowed = new Set(STATE.sales.filterOptions[key] || []);
         STATE.sales.filters[key] = current.filter((value) => allowed.has(value));
     });
     renderSalesFilterOptions();
+}
+
+function setupMarketingFilters() {
+    const scopedRows = getMarketingBaseRows();
+    STATE.marketing.filterOptions.marketingYear = getDynamicFilterOptions(
+        scopedRows,
+        MARKETING_FILTER_KEYS,
+        STATE.marketing.filters,
+        getMarketingFilterRowValue,
+        'marketingYear',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
+    );
+    STATE.marketing.filterOptions.marketingQuarter = getDynamicFilterOptions(
+        scopedRows,
+        MARKETING_FILTER_KEYS,
+        STATE.marketing.filters,
+        getMarketingFilterRowValue,
+        'marketingQuarter',
+        sortQuarterLabels
+    );
+    MARKETING_FILTER_KEYS.forEach((key) => {
+        const current = STATE.marketing.filters[key] || [];
+        const allowed = new Set(STATE.marketing.filterOptions[key] || []);
+        STATE.marketing.filters[key] = current.filter((value) => allowed.has(value));
+    });
+    renderMarketingFilterOptions();
+}
+
+function setupLinkedInAdsFilters() {
+    const scopedRows = getLinkedInAdsBaseRows();
+    const linkedInState = STATE.marketing.linkedInAds;
+    linkedInState.filterOptions.linkedInAdsYear = getDynamicFilterOptions(
+        scopedRows,
+        LINKEDIN_ADS_FILTER_KEYS,
+        linkedInState.filters,
+        getLinkedInAdsFilterRowValue,
+        'linkedInAdsYear',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
+    );
+    linkedInState.filterOptions.linkedInAdsQuarter = getDynamicFilterOptions(
+        scopedRows,
+        LINKEDIN_ADS_FILTER_KEYS,
+        linkedInState.filters,
+        getLinkedInAdsFilterRowValue,
+        'linkedInAdsQuarter',
+        sortQuarterLabels
+    );
+    linkedInState.filterOptions.linkedInAdsCampaign = getDynamicFilterOptions(
+        scopedRows,
+        LINKEDIN_ADS_FILTER_KEYS,
+        linkedInState.filters,
+        getLinkedInAdsFilterRowValue,
+        'linkedInAdsCampaign',
+        (values) => values.sort((a, b) => a.localeCompare(b))
+    );
+    LINKEDIN_ADS_FILTER_KEYS.forEach((key) => {
+        const current = linkedInState.filters[key] || [];
+        const allowed = new Set(linkedInState.filterOptions[key] || []);
+        linkedInState.filters[key] = current.filter((value) => allowed.has(value));
+    });
+    renderLinkedInAdsFilterOptions();
+}
+
+function setupGoogleAdsFilters() {
+    const scopedRows = getGoogleAdsBaseRows();
+    const googleState = STATE.marketing.googleAds;
+    googleState.filterOptions.googleAdsYear = getDynamicFilterOptions(
+        scopedRows,
+        GOOGLE_ADS_FILTER_KEYS,
+        googleState.filters,
+        getGoogleAdsFilterRowValue,
+        'googleAdsYear',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
+    );
+    googleState.filterOptions.googleAdsQuarter = getDynamicFilterOptions(
+        scopedRows,
+        GOOGLE_ADS_FILTER_KEYS,
+        googleState.filters,
+        getGoogleAdsFilterRowValue,
+        'googleAdsQuarter',
+        sortQuarterLabels
+    );
+    googleState.filterOptions.googleAdsCampaign = getDynamicFilterOptions(
+        scopedRows,
+        GOOGLE_ADS_FILTER_KEYS,
+        googleState.filters,
+        getGoogleAdsFilterRowValue,
+        'googleAdsCampaign',
+        (values) => values.sort((a, b) => a.localeCompare(b))
+    );
+    GOOGLE_ADS_FILTER_KEYS.forEach((key) => {
+        const current = googleState.filters[key] || [];
+        const allowed = new Set(googleState.filterOptions[key] || []);
+        googleState.filters[key] = current.filter((value) => allowed.has(value));
+    });
+    renderGoogleAdsFilterOptions();
 }
 
 function renderFilterOptions() {
@@ -1263,11 +2486,138 @@ function renderSalesFilterOptions() {
     }
 }
 
+function renderMarketingFilterOptions() {
+    const defs = {
+        marketingYear: { label: 'All Years', trigger: 'marketingYearTriggerText', menu: 'marketingYearMenu' },
+        marketingQuarter: { label: 'All Quarters', trigger: 'marketingQuarterTriggerText', menu: 'marketingQuarterMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const options = STATE.marketing.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) {
+            trigger.textContent = formatSelectionLabel(STATE.marketing.filters[key] || [], options, def.label);
+        }
+        if (!menu) return;
+        const amountMap = getMarketingOptionAmountMap(key);
+        const searchValue = STATE.marketing.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map((value) => `
+                <button class="multi-option ${(STATE.marketing.filters[key] || []).includes(value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${(STATE.marketing.filters[key] || []).includes(value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(formatOptionAmount(amountMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
+    });
+
+    const viewDefs = {
+        marketingAcquisitionView: { trigger: 'marketingAcquisitionViewTriggerText', menu: 'marketingAcquisitionViewMenu', value: STATE.marketing.acquisitionView },
+        marketingMeetingView: { trigger: 'marketingMeetingViewTriggerText', menu: 'marketingMeetingViewMenu', value: STATE.marketing.meetingView },
+        marketingOutcomeView: { trigger: 'marketingOutcomeViewTriggerText', menu: 'marketingOutcomeViewMenu', value: STATE.marketing.outcomeView }
+    };
+    Object.entries(viewDefs).forEach(([key, def]) => {
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        const current = `${def.value.charAt(0).toUpperCase()}${def.value.slice(1)}`;
+        if (trigger) trigger.textContent = current;
+        if (menu) {
+            menu.innerHTML = MARKETING_TREND_VIEW_OPTIONS.map((value) => `
+                <button class="campaign-option ${current === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${current === value}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
+            `).join('');
+        }
+    });
+}
+
+function renderLinkedInAdsFilterOptions() {
+    const linkedInState = STATE.marketing.linkedInAds;
+    const defs = {
+        linkedInAdsYear: { label: 'All Years', trigger: 'linkedInAdsYearTriggerText', menu: 'linkedInAdsYearMenu' },
+        linkedInAdsQuarter: { label: 'All Quarters', trigger: 'linkedInAdsQuarterTriggerText', menu: 'linkedInAdsQuarterMenu' },
+        linkedInAdsCampaign: { label: 'All Campaigns', trigger: 'linkedInAdsCampaignTriggerText', menu: 'linkedInAdsCampaignMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const options = linkedInState.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) {
+            trigger.textContent = formatSelectionLabel(linkedInState.filters[key] || [], options, def.label);
+        }
+        if (!menu) return;
+        const amountMap = getLinkedInAdsOptionAmountMap(key);
+        const searchValue = linkedInState.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map((value) => `
+                <button class="multi-option ${(linkedInState.filters[key] || []).includes(value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${(linkedInState.filters[key] || []).includes(value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(formatOptionAmount(amountMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
+    });
+}
+
+function renderGoogleAdsFilterOptions() {
+    const googleState = STATE.marketing.googleAds;
+    const defs = {
+        googleAdsYear: { label: 'All Years', trigger: 'googleAdsYearTriggerText', menu: 'googleAdsYearMenu' },
+        googleAdsQuarter: { label: 'All Quarters', trigger: 'googleAdsQuarterTriggerText', menu: 'googleAdsQuarterMenu' },
+        googleAdsCampaign: { label: 'All Campaigns', trigger: 'googleAdsCampaignTriggerText', menu: 'googleAdsCampaignMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const options = googleState.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) {
+            trigger.textContent = formatSelectionLabel(googleState.filters[key] || [], options, def.label);
+        }
+        if (!menu) return;
+        const amountMap = getGoogleAdsOptionAmountMap(key);
+        const searchValue = googleState.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map((value) => `
+                <button class="multi-option ${(googleState.filters[key] || []).includes(value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${(googleState.filters[key] || []).includes(value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(formatOptionAmount(amountMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
+    });
+}
+
 function applyFilters(){
-    const { dealType, status, year, quarter } = STATE.filters;
-    if ((year || []).length) {
+    if ((STATE.filters.year || []).length) {
         STATE.trendView = 'monthly';
     }
+    setupFilters();
+    const { dealType, status, year, quarter } = STATE.filters;
     STATE.filtered = STATE.rows.filter(r =>
         r.__dealStage === DEFAULT_DEAL_STAGE &&
         (!dealType.length || dealType.includes(r.__dealType)) &&
@@ -1281,10 +2631,11 @@ function applyFilters(){
 }
 
 function applySalesFilters() {
-    const { salesCreateYear, salesCreateQuarter, salesDealType, salesSource, salesDealOwner, salesDealStage } = STATE.sales.filters;
-    if ((salesCreateYear || []).length) {
+    if ((STATE.sales.filters.salesCreateYear || []).length) {
         STATE.sales.trend.view = 'monthly';
     }
+    setupSalesFilters();
+    const { salesCreateYear, salesCreateQuarter, salesDealType, salesSource, salesDealOwner, salesDealStage } = STATE.sales.filters;
     STATE.sales.filtered = getSalesBaseRows().filter((row) =>
         (!salesCreateYear.length || salesCreateYear.includes(row.__createYear)) &&
         (!salesCreateQuarter.length || salesCreateQuarter.includes(row.__createQuarter)) &&
@@ -1295,6 +2646,95 @@ function applySalesFilters() {
     );
     STATE.tablePage.salesDeals = 1;
     if (STATE.activeTab === 'sales') renderSales();
+}
+
+function applyMarketingFilters() {
+    if ((STATE.marketing.filters.marketingYear || []).length) {
+        STATE.marketing.acquisitionView = 'monthly';
+        STATE.marketing.meetingView = 'monthly';
+        STATE.marketing.outcomeView = 'monthly';
+    }
+    setupMarketingFilters();
+    const { marketingYear, marketingQuarter } = STATE.marketing.filters;
+    STATE.marketing.filtered = getMarketingBaseRows().filter((row) =>
+        (!marketingYear.length || marketingYear.includes(row.__formFillYear)) &&
+        (!marketingQuarter.length || marketingQuarter.includes(row.__formFillQuarter))
+    );
+    STATE.tablePage.marketingContacts = 1;
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function applyLinkedInAdsFilters() {
+    const linkedInState = STATE.marketing.linkedInAds;
+    setupLinkedInAdsFilters();
+    const { linkedInAdsYear, linkedInAdsQuarter, linkedInAdsCampaign } = linkedInState.filters;
+    linkedInState.filtered = getLinkedInAdsBaseRows().filter((row) =>
+        (!linkedInAdsYear.length || linkedInAdsYear.includes(row.__adsYear)) &&
+        (!linkedInAdsQuarter.length || linkedInAdsQuarter.includes(row.__adsQuarter)) &&
+        (!linkedInAdsCampaign.length || linkedInAdsCampaign.includes(row.__campaign))
+    );
+    linkedInState.filteredContacts = (linkedInState.contactsRows || []).filter((row) => {
+        const matchYear = !linkedInAdsYear.length || linkedInAdsYear.includes(row.__referenceYear);
+        const matchQuarter = !linkedInAdsQuarter.length || linkedInAdsQuarter.includes(row.__referenceQuarter);
+        return matchYear && matchQuarter;
+    });
+    STATE.tablePage.linkedInAdsTable = 1;
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function applyGoogleAdsFilters() {
+    const googleState = STATE.marketing.googleAds;
+    setupGoogleAdsFilters();
+    const { googleAdsYear, googleAdsQuarter, googleAdsCampaign } = googleState.filters;
+    googleState.filtered = getGoogleAdsBaseRows().filter((row) =>
+        (!googleAdsYear.length || googleAdsYear.includes(row.__adsYear)) &&
+        (!googleAdsQuarter.length || googleAdsQuarter.includes(row.__adsQuarter)) &&
+        (!googleAdsCampaign.length || googleAdsCampaign.includes(row.__campaign))
+    );
+    STATE.tablePage.googleAdsTable = 1;
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function hasMarketingMql(row) {
+    return Boolean(String(row['MQL Date'] || '').trim());
+}
+
+function hasMarketingMeetingBooked(row) {
+    return Boolean(String(row['Meeting Scheduled Date'] || '').trim());
+}
+
+function hasMarketingMeetingHappened(row) {
+    return Boolean(String(row['Meeting Happened Date'] || '').trim());
+}
+
+function isMarketingClosedWon(row) {
+    return row.__marketingClosedWon;
+}
+
+function isMarketingClosedLost(row) {
+    return row.__marketingClosedLost;
+}
+
+function getMarketingFunnelStages(rows) {
+    return MARKETING_STAGE_CONFIG.map((stage) => {
+        const stageRows = rows.filter(stage.predicate);
+        return {
+            ...stage,
+            deals: stageRows.length,
+            amount: stageRows.reduce((sum, row) => sum + row.__marketingAmount, 0)
+        };
+    });
+}
+
+function getStageMetrics(rows, config, metricField = '__marketingAmount') {
+    return config.map((stage) => {
+        const stageRows = rows.filter(stage.predicate);
+        return {
+            ...stage,
+            deals: stageRows.length,
+            amount: stageRows.reduce((sum, row) => sum + Number(row[metricField] || 0), 0)
+        };
+    });
 }
 
 function stageBucket(row){
@@ -1666,6 +3106,578 @@ function plotSalesMultiTrend(elId, rows) {
     requestAnimationFrame(() => Plotly.Plots.resize(target));
 }
 
+function setMarketingFunnelMetric(metric) {
+    STATE.marketing.funnelMetric = metric === 'amount' ? 'amount' : 'deals';
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function plotMarketingFunnel(elId, rows) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    if (typeof Plotly !== 'undefined') {
+        try { Plotly.purge(target); } catch (error) {}
+    }
+    const stages = getMarketingFunnelStages(rows);
+    renderStageFunnel(elId, stages, STATE.marketing.funnelMetric === 'amount' ? 'amount' : 'deals');
+}
+
+function renderStageFunnel(elId, stages, metricKey = 'deals') {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const values = stages.map((stage) => stage[metricKey]);
+    if (!values.some((value) => value > 0)) {
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const maxVal = Math.max(values[0] || 0, 1);
+    const n = stages.length;
+    const targetHeight = Math.max(target.clientHeight || 320, 320);
+    const barH = Math.max(34, Math.floor((targetHeight * 0.62) / n));
+    const dropH = Math.max(14, Math.floor((targetHeight * 0.34) / Math.max(n - 1, 1)));
+    const dropGood = getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+    const dropWarn = getComputedStyle(document.documentElement).getPropertyValue('--amber').trim();
+    const dropBad = getComputedStyle(document.documentElement).getPropertyValue('--red').trim();
+
+    let html = '<div class="marketing-funnel-shell"><div class="marketing-funnel-stack">';
+    stages.forEach((stage, index) => {
+        const ratio = 1 - (index / n);
+        const width = 18 + (ratio * ratio * 78);
+        const currentValue = stage[metricKey];
+        const displayValue = metricKey === 'amount' ? compactMoneyLabel(currentValue) : Number(currentValue || 0).toLocaleString();
+        const share = `${((currentValue / maxVal) * 100).toFixed(1)}%`;
+        if (index > 0) {
+            const prev = Math.max(stages[index - 1][metricKey] || 0, 1);
+            const dropPctNum = Math.max(0, (1 - (currentValue / prev)) * 100);
+            const dropPct = `${dropPctNum.toFixed(0)}%`;
+            const dropColor = dropPctNum > 50 ? dropBad : dropPctNum > 20 ? dropWarn : dropGood;
+            html += `
+                <div class="marketing-funnel-droprow" style="width:${Math.min(100, width + 10)}%;padding:${Math.max(2, Math.floor(dropH / 2 - 8))}px 0">
+                    <div class="marketing-funnel-line"></div>
+                    <div class="marketing-funnel-dropchip" style="color:${dropColor}">drop ${dropPct}</div>
+                    <div class="marketing-funnel-line"></div>
+                </div>
+            `;
+        }
+        html += `
+            <div class="marketing-funnel-layer" style="width:${width}%;height:${barH}px;background:${stage.color}" title="${escapeHtml(stage.label)} | ${stage.deals.toLocaleString()} deals | ${compactMoneyLabel(stage.amount)}">
+                <div class="marketing-funnel-main">
+                    <span class="marketing-funnel-value">${escapeHtml(displayValue)}</span>
+                    <span class="marketing-funnel-label">${escapeHtml(stage.label)}</span>
+                    <span class="marketing-funnel-share">${escapeHtml(share)}</span>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div></div>';
+    target.innerHTML = html;
+}
+
+function setLinkedInContactsFunnelMetric(metric) {
+    STATE.marketing.linkedInAds.contactsFunnelMetric = metric === 'amount' ? 'amount' : 'deals';
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function setGoogleAdsLeadsFunnelMetric(metric) {
+    STATE.marketing.googleAds.leadsFunnelMetric = metric === 'amount' ? 'amount' : 'deals';
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function plotMarketingTrendChart(elId, rows, seriesDefs, view) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const baseTrend = buildTrendView(rows, '__formFillDate', view);
+    const orderedKeys = baseTrend.orderedKeys || [];
+    if (!orderedKeys.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+
+    const traces = seriesDefs.map((series) => {
+        const scopedRows = rows.filter(series.predicate);
+        const seriesTrend = buildTrendView(scopedRows, '__formFillDate', view);
+        const values = orderedKeys.map((key) => seriesTrend.groups[key]?.deals || 0);
+        return {
+            x: orderedKeys,
+            y: values,
+            type:'scatter',
+            mode:'lines+markers',
+            name: series.label,
+            line:{ color:series.color, width:3, shape:'spline', smoothing:0.8 },
+            marker:{ size:7, color:series.color, line:{ color:'#ffffff', width:1.3 } },
+            hovertemplate:`<b>%{x}</b><br>${series.label}: %{y}<extra></extra>`
+        };
+    }).filter((trace) => trace.y.some((value) => value > 0));
+
+    if (!traces.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+
+    const layout = {
+        margin:{ t:0, b:0, l:0, r:0 },
+        paper_bgcolor:'transparent',
+        plot_bgcolor:surface,
+        font:{ family:'Inter, sans-serif', color:textColor, size:12 },
+        hovermode:'x unified',
+        xaxis:{
+            title: baseTrend.xAxisTitle,
+            type:'category',
+            categoryorder:'array',
+            categoryarray:orderedKeys,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            tickangle: orderedKeys.length > 10 ? -35 : 0,
+            automargin:true,
+            fixedrange:true
+        },
+        yaxis:{
+            title:'Count',
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            automargin:true,
+            fixedrange:true
+        },
+        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' }
+    };
+    const config = {
+        displayModeBar:false,
+        responsive:true,
+        scrollZoom:false,
+        doubleClick:false,
+        staticPlot:false
+    };
+    Plotly.newPlot(elId, traces, layout, config);
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function plotMarketingOutcomeChart(elId, rows, view) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const baseTrend = buildTrendView(rows, '__formFillDate', view);
+    const orderedKeys = baseTrend.orderedKeys || [];
+    if (!orderedKeys.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+
+    const saoTrend = buildTrendView(rows.filter((row) => row.__marketingSao), '__formFillDate', view);
+    const wonTrend = buildTrendView(rows.filter((row) => row.__marketingClosedWon), '__formFillDate', view);
+    const lostTrend = buildTrendView(rows.filter((row) => row.__marketingClosedLost), '__formFillDate', view);
+
+    const saoValues = orderedKeys.map((key) => saoTrend.groups[key]?.deals || 0);
+    const wonValues = orderedKeys.map((key) => wonTrend.groups[key]?.deals || 0);
+    const lostValues = orderedKeys.map((key) => lostTrend.groups[key]?.deals || 0);
+
+    if (![...saoValues, ...wonValues, ...lostValues].some((value) => value > 0)) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+
+    const traces = [
+        {
+            x: orderedKeys,
+            y: saoValues,
+            type:'bar',
+            name:'SAO',
+            marker:{ color:'#14b8a6', line:{ color:'#ffffff', width:1 } },
+            hovertemplate:'<b>%{x}</b><br>SAO: %{y}<extra></extra>'
+        },
+        {
+            x: orderedKeys,
+            y: wonValues,
+            type:'scatter',
+            mode:'lines+markers',
+            name:'Closed Won',
+            line:{ color:'#00c875', width:3, shape:'spline', smoothing:0.8 },
+            marker:{ size:7, color:'#00c875', line:{ color:'#ffffff', width:1.3 } },
+            hovertemplate:'<b>%{x}</b><br>Closed Won: %{y}<extra></extra>'
+        },
+        {
+            x: orderedKeys,
+            y: lostValues,
+            type:'scatter',
+            mode:'lines+markers',
+            name:'Closed Lost',
+            line:{ color:'#ef4444', width:3, shape:'spline', smoothing:0.8 },
+            marker:{ size:7, color:'#ef4444', line:{ color:'#ffffff', width:1.3 } },
+            hovertemplate:'<b>%{x}</b><br>Closed Lost: %{y}<extra></extra>'
+        }
+    ];
+
+    const layout = {
+        margin:{ t:0, b:0, l:0, r:0 },
+        paper_bgcolor:'transparent',
+        plot_bgcolor:surface,
+        font:{ family:'Inter, sans-serif', color:textColor, size:12 },
+        hovermode:'x unified',
+        barmode:'group',
+        xaxis:{
+            title: baseTrend.xAxisTitle,
+            type:'category',
+            categoryorder:'array',
+            categoryarray:orderedKeys,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            tickangle: orderedKeys.length > 10 ? -35 : 0,
+            automargin:true,
+            fixedrange:true
+        },
+        yaxis:{
+            title:'Count',
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            automargin:true,
+            fixedrange:true
+        },
+        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' }
+    };
+    const config = {
+        displayModeBar:false,
+        responsive:true,
+        scrollZoom:false,
+        doubleClick:false,
+        staticPlot:false
+    };
+    Plotly.newPlot(elId, traces, layout, config);
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function getLinkedInAdsTrendView() {
+    const { linkedInAdsYear, linkedInAdsQuarter } = STATE.marketing.linkedInAds.filters;
+    if ((linkedInAdsQuarter || []).length) return 'monthly';
+    if ((linkedInAdsYear || []).length) return 'quarterly';
+    return 'yearly';
+}
+
+function getGoogleAdsTrendView() {
+    const { googleAdsYear, googleAdsQuarter } = STATE.marketing.googleAds.filters;
+    if ((googleAdsQuarter || []).length) return 'monthly';
+    if ((googleAdsYear || []).length) return 'quarterly';
+    return 'yearly';
+}
+
+function aggregateAdsRowsByCampaign(rows) {
+    const groups = new Map();
+    rows.forEach((row) => {
+        const key = String(row.__campaign || 'Unknown').trim() || 'Unknown';
+        if (!groups.has(key)) {
+            groups.set(key, {
+                __campaign: key,
+                __cost: 0,
+                __impressions: 0,
+                __clicks: 0,
+                __leads: 0
+            });
+        }
+        const group = groups.get(key);
+        group.__cost += Number(row.__cost || 0);
+        group.__impressions += Number(row.__impressions || 0);
+        group.__clicks += Number(row.__clicks || 0);
+        group.__leads += Number(row.__leads || 0);
+    });
+    return [...groups.values()].map((row) => ({
+        ...row,
+        __ctr: row.__impressions ? (row.__clicks / row.__impressions) * 100 : 0,
+        __cpc: row.__clicks ? row.__cost / row.__clicks : 0,
+        __costPerConversion: row.__leads ? row.__cost / row.__leads : 0
+    }));
+}
+
+function buildNumericTrendView(rows, dateField, view, valueGetter) {
+    const bucket = (date) => {
+        if (view === 'quarterly') return `Q${Math.floor(date.getMonth() / 3) + 1} ${date.getFullYear()}`;
+        if (view === 'monthly') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        return String(date.getFullYear());
+    };
+    const groups = {};
+    rows.forEach((row) => {
+        const date = row[dateField];
+        if (!date) return;
+        const key = bucket(date);
+        groups[key] = (groups[key] || 0) + Number(valueGetter(row) || 0);
+    });
+    if (view === 'quarterly') {
+        return { groups, orderedKeys: sortQuarterLabels(Object.keys(groups)), xAxisTitle:'Quarter' };
+    }
+    if (view === 'monthly') {
+        const orderedKeys = Object.keys(groups).sort();
+        const labelMap = {};
+        const labels = orderedKeys.map((key) => {
+            const [year, month] = key.split('-').map(Number);
+            const label = new Date(year, month - 1, 1).toLocaleString('en-US', { month:'short', year:'numeric' });
+            labelMap[label] = groups[key];
+            return label;
+        });
+        return { groups: labelMap, orderedKeys: labels, xAxisTitle:'Month' };
+    }
+    return { groups, orderedKeys: Object.keys(groups).sort(), xAxisTitle:'Year' };
+}
+
+function plotLinkedInComboChart(elId, rows, config) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const view = config.view || getLinkedInAdsTrendView();
+    const lineTrend = buildNumericTrendView(rows, '__adsDate', view, config.lineAccessor);
+    const barTrend = buildNumericTrendView(rows, '__adsDate', view, config.barAccessor);
+    const orderedKeys = [...new Set([...lineTrend.orderedKeys, ...barTrend.orderedKeys])];
+    if (!orderedKeys.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+
+    const lineValues = orderedKeys.map((key) => lineTrend.groups[key] || 0);
+    const barValues = orderedKeys.map((key) => barTrend.groups[key] || 0);
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    const lineTicks = getNiceTicks(lineValues.length ? lineValues : [0]);
+    const barTicks = getNiceTicks(barValues.length ? barValues : [0]);
+
+    const formatHover = (value, format) => {
+        if (format === 'money') return `$${Number(value || 0).toLocaleString()}`;
+        if (format === 'percent') return `${Number(value || 0).toFixed(2).replace(/\.00$/, '')}%`;
+        return Number(value || 0).toLocaleString();
+    };
+    const formatTick = (value, format) => {
+        if (format === 'money') return compactMoneyLabel(value);
+        if (format === 'percent') return `${Number(value || 0).toFixed(0)}%`;
+        return Number(value || 0).toLocaleString();
+    };
+
+    const traces = [
+        {
+            x: orderedKeys,
+            y: lineValues,
+            type:'scatter',
+            mode:'lines+markers',
+            name:config.lineLabel,
+            line:{ color:config.lineColor, width:3, shape:'spline', smoothing:0.8 },
+            marker:{ size:7, color:config.lineColor, line:{ color:'#ffffff', width:1.2 } },
+            hovertemplate:`<b>%{x}</b><br>${config.lineLabel}: %{customdata}<extra></extra>`,
+            customdata: lineValues.map((value) => formatHover(value, config.lineFormat))
+        },
+        {
+            x: orderedKeys,
+            y: barValues,
+            type:'bar',
+            name:config.barLabel,
+            marker:{ color:config.barColor, line:{ color:'#ffffff', width:1 } },
+            opacity:0.85,
+            yaxis:'y2',
+            hovertemplate:`<b>%{x}</b><br>${config.barLabel}: %{customdata}<extra></extra>`,
+            customdata: barValues.map((value) => formatHover(value, config.barFormat))
+        }
+    ];
+
+    const layout = {
+        margin:{ t:0, b:0, l:0, r:0 },
+        paper_bgcolor:'transparent',
+        plot_bgcolor:surface,
+        font:{ family:'Inter, sans-serif', color:textColor, size:12 },
+        hovermode:'x unified',
+        barmode:'group',
+        xaxis:{
+            title: lineTrend.xAxisTitle,
+            type:'category',
+            categoryorder:'array',
+            categoryarray: orderedKeys,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            tickangle: orderedKeys.length > 10 ? -35 : 0,
+            automargin:true,
+            fixedrange:true
+        },
+        yaxis:{
+            title: config.lineLabel,
+            showgrid:true,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            gridcolor:gridColor,
+            zeroline:false,
+            automargin:true,
+            fixedrange:true,
+            tickmode:'array',
+            tickvals: lineTicks.tickvals,
+            ticktext: lineTicks.tickvals.map((value) => formatTick(value, config.lineFormat)),
+            range:[lineTicks.start, lineTicks.end]
+        },
+        yaxis2:{
+            title: config.barLabel,
+            overlaying:'y',
+            side:'right',
+            showgrid:false,
+            tickfont:{ color:axisColor },
+            titlefont:{ color:axisColor },
+            zeroline:false,
+            automargin:true,
+            fixedrange:true,
+            tickmode:'array',
+            tickvals: barTicks.tickvals,
+            ticktext: barTicks.tickvals.map((value) => formatTick(value, config.barFormat)),
+            range:[barTicks.start, barTicks.end]
+        },
+        legend:{ orientation:'h', y:1.12, x:0, bgcolor:'rgba(0,0,0,0)' }
+    };
+    const plotConfig = {
+        displayModeBar:false,
+        responsive:true,
+        scrollZoom:false,
+        doubleClick:false,
+        staticPlot:false
+    };
+    Plotly.newPlot(elId, traces, layout, plotConfig);
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function renderAdsRingFunnel(elId, rows) {
+    const target = document.getElementById(elId);
+    if (!target) return;
+    const metrics = [
+        { label:'Spend', value: rows.reduce((sum, row) => sum + row.__cost, 0), color:'#2563eb', format:'money' },
+        { label:'Impressions', value: rows.reduce((sum, row) => sum + row.__impressions, 0), color:'#7c3aed', format:'number' },
+        { label:'Clicks', value: rows.reduce((sum, row) => sum + row.__clicks, 0), color:'#f59e0b', format:'number' },
+        { label:'Leads', value: rows.reduce((sum, row) => sum + row.__leads, 0), color:'#00c875', format:'number' }
+    ];
+    if (!metrics.some((metric) => metric.value > 0)) {
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const sizes = [
+        { width: 188, height: 136, stroke: 14 },
+        { width: 166, height: 122, stroke: 13 },
+        { width: 144, height: 108, stroke: 12 },
+        { width: 118, height: 92, stroke: 11 }
+    ];
+    const formatValue = (metric) => metric.format === 'money' ? compactMoneyLabel(metric.value) : Number(metric.value || 0).toLocaleString();
+    target.innerHTML = `
+        <div class="linkedin-ring-flow">
+            ${metrics.map((metric, index) => `
+                <div class="linkedin-ring-stage">
+                    <div class="linkedin-ring-step">
+                        <div class="linkedin-ring-node">
+                            <div class="linkedin-ring-circle" style="--ring-color:${metric.color};--ring-width:${sizes[index].width}px;--ring-height:${sizes[index].height}px;--ring-stroke:${sizes[index].stroke}px" title="${metric.label}: ${formatValue(metric)}">
+                                <div class="linkedin-ring-inner">
+                                    <div class="linkedin-ring-value">${escapeHtml(formatValue(metric))}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="linkedin-ring-caption">${escapeHtml(metric.label)}</div>
+                    </div>
+                    ${index < metrics.length - 1 ? `
+                        <div class="linkedin-ring-arrow" aria-hidden="true">
+                            <svg viewBox="0 0 44 18" focusable="false">
+                                <path d="M2 9h34"></path>
+                                <path d="M28 3l8 6-8 6"></path>
+                            </svg>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function plotLinkedInContactsFunnel(rows) {
+    const stages = getStageMetrics(rows, LINKEDIN_CONTACT_FUNNEL_CONFIG);
+    renderStageFunnel('linkedInContactsFunnelChart', stages, STATE.marketing.linkedInAds.contactsFunnelMetric);
+}
+
+function plotGoogleAdsLeadsFunnel(rows) {
+    const stages = getStageMetrics(rows, MARKETING_STAGE_CONFIG);
+    renderStageFunnel('googleAdsLeadsFunnelChart', stages, STATE.marketing.googleAds.leadsFunnelMetric);
+}
+
+function renderAdsPerformanceTable(rows, config) {
+    const rankedRows = aggregateAdsRowsByCampaign(rows).sort((a, b) => b.__cost - a.__cost);
+    const totalRows = rankedRows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
+    const currentPage = Math.min(STATE.tablePage[config.tablePageKey] || 1, totalPages);
+    STATE.tablePage[config.tablePageKey] = currentPage;
+    const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
+    const visibleRows = rankedRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+    const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
+
+    if (!totalRows) {
+        document.getElementById(config.tbodyId).innerHTML = `<tr><td colspan="9">No ${config.emptyLabel} rows match the current filters.</td></tr>`;
+        document.getElementById(config.pagerId).innerHTML = `
+            <div class="table-footer-text">Showing 0 to 0 of 0 rows</div>
+            <div class="table-pager">
+                <button class="table-page-btn" type="button" disabled aria-label="Previous page">&#9664;</button>
+                <div class="table-page-badge">Page 1 of 1</div>
+                <button class="table-page-btn" type="button" disabled aria-label="Next page">&#9654;</button>
+            </div>
+        `;
+        return;
+    }
+
+    document.getElementById(config.tbodyId).innerHTML = visibleRows.map((row, visibleIndex) => `
+        <tr>
+            <td class="num">${startIndex + visibleIndex + 1}</td>
+            <td>${escapeHtml(row.__campaign)}</td>
+            <td class="num">${money(row.__cost)}</td>
+            <td class="num">${Number(row.__impressions || 0).toLocaleString()}</td>
+            <td class="num">${Number(row.__clicks || 0).toLocaleString()}</td>
+            <td class="num">${Number(row.__leads || 0).toLocaleString()}</td>
+            <td class="num">${Number(row.__ctr || 0).toFixed(2).replace(/\.00$/, '')}%</td>
+            <td class="num">${row.__cpc ? money(row.__cpc) : '-'}</td>
+            <td class="num">${row.__costPerConversion ? money(row.__costPerConversion) : '-'}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById(config.pagerId).innerHTML = `
+        <div class="table-footer-text">Showing ${startIndex + 1} to ${endIndex} of ${totalRows} rows</div>
+        <div class="table-pager">
+            <button class="table-page-btn" type="button" onclick="changeTablePage('${config.tablePageKey}', -1)" ${currentPage <= 1 ? 'disabled' : ''} aria-label="Previous page">&#9664;</button>
+            <div class="table-page-badge">Page ${currentPage} of ${totalPages}</div>
+            <button class="table-page-btn" type="button" onclick="changeTablePage('${config.tablePageKey}', 1)" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">&#9654;</button>
+        </div>
+    `;
+}
+
+function renderLinkedInAdsTable(rows) {
+    renderAdsPerformanceTable(rows, {
+        tablePageKey: 'linkedInAdsTable',
+        tbodyId: 'linkedInAdsTbl',
+        pagerId: 'linkedInAdsPager',
+        emptyLabel: 'LinkedIn Ads'
+    });
+}
+
+function renderGoogleAdsTable(rows) {
+    renderAdsPerformanceTable(rows, {
+        tablePageKey: 'googleAdsTable',
+        tbodyId: 'googleAdsTbl',
+        pagerId: 'googleAdsPager',
+        emptyLabel: 'Google Ads'
+    });
+}
+
 function darkenHex(hex, factor = 0.72) {
     const normalized = String(hex || '#00c875').replace('#', '').trim();
     const expanded = normalized.length === 3
@@ -1992,18 +4004,212 @@ function renderSales() {
     renderSalesTable(rows);
 }
 
+function renderMarketingTable(rows) {
+    const rankedRows = [...rows].sort((a, b) => {
+        const aTime = a.__formFillDate instanceof Date ? a.__formFillDate.getTime() : 0;
+        const bTime = b.__formFillDate instanceof Date ? b.__formFillDate.getTime() : 0;
+        return bTime - aTime;
+    });
+    const totalRows = rankedRows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
+    const currentPage = Math.min(STATE.tablePage.marketingContacts || 1, totalPages);
+    STATE.tablePage.marketingContacts = currentPage;
+    const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
+    const visibleRows = rankedRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+    const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
+
+    if (!totalRows) {
+        document.getElementById('marketingContactsTbl').innerHTML = `<tr><td colspan="6">No form fill rows match the current filters.</td></tr>`;
+        document.getElementById('marketingContactsPager').innerHTML = `
+            <div class="table-footer-text">Showing 0 to 0 of 0 rows</div>
+            <div class="table-pager">
+                <button class="table-page-btn" type="button" disabled aria-label="Previous page">&#9664;</button>
+                <div class="table-page-badge">Page 1 of 1</div>
+                <button class="table-page-btn" type="button" disabled aria-label="Next page">&#9654;</button>
+            </div>
+        `;
+        return;
+    }
+
+    document.getElementById('marketingContactsTbl').innerHTML = visibleRows.map((row) => `
+        <tr>
+            <td>${escapeHtml(row.__companyName)}</td>
+            <td>${row.__contactLink ? `<a href="${escapeHtml(row.__contactLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.__email)}</a>` : escapeHtml(row.__email)}</td>
+            <td>${escapeHtml(formatRevenueCloseDate(row.__formFillDate))}</td>
+            <td>${escapeHtml(String(row['Deal Name'] || '').trim() || '-')}</td>
+            <td>${escapeHtml(String(row['Deal Stage'] || '').trim() || '-')}</td>
+            <td class="num">${money(num(row['Amount']))}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById('marketingContactsPager').innerHTML = `
+        <div class="table-footer-text">Showing ${startIndex + 1} to ${endIndex} of ${totalRows} rows</div>
+        <div class="table-pager">
+            <button class="table-page-btn" type="button" onclick="changeTablePage('marketingContacts', -1)" ${currentPage <= 1 ? 'disabled' : ''} aria-label="Previous page">&#9664;</button>
+            <div class="table-page-badge">Page ${currentPage} of ${totalPages}</div>
+            <button class="table-page-btn" type="button" onclick="changeTablePage('marketingContacts', 1)" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">&#9654;</button>
+        </div>
+    `;
+}
+
+function renderMarketing() {
+    if (STATE.marketing.activeSubtab === 'websiteFormFills') {
+        renderMarketingFilterOptions();
+        syncMarketingFilterStates();
+        const rows = STATE.marketing.filtered;
+        document.querySelectorAll('input[name="marketingFunnelMetric"]').forEach((input) => {
+            input.checked = input.value === STATE.marketing.funnelMetric;
+        });
+        plotMarketingFunnel('marketingFunnelChart', rows);
+        plotMarketingTrendChart('marketingAcquisitionChart', rows, [
+            { label:'Form Fills', color:'#2563eb', predicate:(row) => Boolean(row.__formFillDate) },
+            { label:'MQL', color:'#f59e0b', predicate:(row) => hasMarketingMql(row) }
+        ], STATE.marketing.acquisitionView);
+        plotMarketingTrendChart('marketingMeetingChart', rows, [
+            { label:'Meeting Booked', color:'#f59e0b', predicate:(row) => hasMarketingMeetingBooked(row) },
+            { label:'Meeting Happened', color:'#06b6d4', predicate:(row) => hasMarketingMeetingHappened(row) }
+        ], STATE.marketing.meetingView);
+        plotMarketingOutcomeChart('marketingOutcomeChart', rows, STATE.marketing.outcomeView);
+        renderMarketingTable(rows);
+        return;
+    }
+    if (STATE.marketing.activeSubtab === 'linkedInAds') {
+        renderLinkedInAds();
+        return;
+    }
+    if (STATE.marketing.activeSubtab === 'googleAds') {
+        renderGoogleAds();
+    }
+}
+
+function renderLinkedInAds() {
+    const linkedInState = STATE.marketing.linkedInAds;
+    renderLinkedInAdsFilterOptions();
+    syncLinkedInAdsFilterStates();
+    document.querySelectorAll('input[name="linkedInContactsFunnelMetric"]').forEach((input) => {
+        input.checked = input.value === linkedInState.contactsFunnelMetric;
+    });
+    renderAdsRingFunnel('linkedInAdsRingChart', linkedInState.filtered);
+    plotLinkedInContactsFunnel(linkedInState.filteredContacts);
+    plotLinkedInComboChart('linkedInCostCpmChart', linkedInState.filtered, {
+        lineLabel:'Cost in USD',
+        lineAccessor:(row) => row.__cost,
+        lineColor:'#2563eb',
+        lineFormat:'money',
+        barLabel:'CPM',
+        barAccessor:(row) => row.__cpm,
+        barColor:'#7c3aed',
+        barFormat:'money'
+    });
+    plotLinkedInComboChart('linkedInImpressionsCtrChart', linkedInState.filtered, {
+        lineLabel:'Impressions',
+        lineAccessor:(row) => row.__impressions,
+        lineColor:'#00c875',
+        lineFormat:'number',
+        barLabel:'CTR',
+        barAccessor:(row) => row.__ctr,
+        barColor:'#f59e0b',
+        barFormat:'percent'
+    });
+    plotLinkedInComboChart('linkedInClicksCpcChart', linkedInState.filtered, {
+        lineLabel:'Clicks',
+        lineAccessor:(row) => row.__clicks,
+        lineColor:'#06b6d4',
+        lineFormat:'number',
+        barLabel:'CPC',
+        barAccessor:(row) => row.__cpc,
+        barColor:'#7c3aed',
+        barFormat:'money'
+    });
+    plotLinkedInComboChart('linkedInLeadsCpcvChart', linkedInState.filtered, {
+        lineLabel:'Leads',
+        lineAccessor:(row) => row.__leads,
+        lineColor:'#00c875',
+        lineFormat:'number',
+        barLabel:'Cost per Conversion',
+        barAccessor:(row) => row.__costPerConversion,
+        barColor:'#ef4444',
+        barFormat:'money'
+    });
+    renderLinkedInAdsTable(linkedInState.filtered);
+}
+
+function renderGoogleAds() {
+    const googleState = STATE.marketing.googleAds;
+    const view = getGoogleAdsTrendView();
+    renderGoogleAdsFilterOptions();
+    syncGoogleAdsFilterStates();
+    document.querySelectorAll('input[name="googleAdsLeadsFunnelMetric"]').forEach((input) => {
+        input.checked = input.value === googleState.leadsFunnelMetric;
+    });
+    renderAdsRingFunnel('googleAdsRingChart', googleState.filtered);
+    plotGoogleAdsLeadsFunnel(getGoogleAdsLeadBaseRows());
+    plotLinkedInComboChart('googleAdsCostCpmChart', googleState.filtered, {
+        view,
+        lineLabel:'Cost in USD',
+        lineAccessor:(row) => row.__cost,
+        lineColor:'#2563eb',
+        lineFormat:'money',
+        barLabel:'CPM',
+        barAccessor:(row) => row.__cpm,
+        barColor:'#7c3aed',
+        barFormat:'money'
+    });
+    plotLinkedInComboChart('googleAdsImpressionsCtrChart', googleState.filtered, {
+        view,
+        lineLabel:'Impressions',
+        lineAccessor:(row) => row.__impressions,
+        lineColor:'#00c875',
+        lineFormat:'number',
+        barLabel:'CTR',
+        barAccessor:(row) => row.__ctr,
+        barColor:'#f59e0b',
+        barFormat:'percent'
+    });
+    plotLinkedInComboChart('googleAdsClicksCpcChart', googleState.filtered, {
+        view,
+        lineLabel:'Clicks',
+        lineAccessor:(row) => row.__clicks,
+        lineColor:'#06b6d4',
+        lineFormat:'number',
+        barLabel:'CPC',
+        barAccessor:(row) => row.__cpc,
+        barColor:'#7c3aed',
+        barFormat:'money'
+    });
+    plotLinkedInComboChart('googleAdsLeadsCpcvChart', googleState.filtered, {
+        view,
+        lineLabel:'Leads',
+        lineAccessor:(row) => row.__leads,
+        lineColor:'#00c875',
+        lineFormat:'number',
+        barLabel:'Cost per Conversion',
+        barAccessor:(row) => row.__costPerConversion,
+        barColor:'#ef4444',
+        barFormat:'money'
+    });
+    renderGoogleAdsTable(googleState.filtered);
+}
+
 function renderSalesTable(rows) {
-    const tableRows = [...rows].sort((a, b) => num(b['Amount']) - num(a['Amount']));
-    const totalRows = tableRows.length;
+    const rankedRows = sortTableRows(rows, 'salesDeals', (row, key) => {
+        if (key === 'dealName') return row['Deal Name'] || '';
+        if (key === 'companyName') return row['Company name'] || '';
+        if (key === 'dealAmount') return num(row['Amount']);
+        if (key === 'dealStage') return row['Deal Stage'] || '';
+        if (key === 'source') return row['Campaign Source'] || '';
+        return '';
+    });
+    const totalRows = rankedRows.length;
     const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
     const currentPage = Math.min(STATE.tablePage.salesDeals || 1, totalPages);
     STATE.tablePage.salesDeals = currentPage;
     const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
-    const visibleRows = tableRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+    const visibleRows = rankedRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
     const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
 
     if (!totalRows) {
-        document.getElementById('salesDealsTbl').innerHTML = `<tr><td colspan="5">No deals match the current Sales filters.</td></tr>`;
+        document.getElementById('salesDealsTbl').innerHTML = `<tr><td colspan="6">No deals match the current Sales filters.</td></tr>`;
         document.getElementById('salesDealsPager').innerHTML = `
             <div class="table-footer-text">Showing 0 to 0 of 0 rows</div>
             <div class="table-pager">
@@ -2012,18 +4218,22 @@ function renderSalesTable(rows) {
                 <button class="table-page-btn" type="button" disabled aria-label="Next page">▶</button>
             </div>
         `;
+        syncSalesTableSortHeaders();
         return;
     }
 
-    document.getElementById('salesDealsTbl').innerHTML = visibleRows.map((row, index) => {
+    document.getElementById('salesDealsTbl').innerHTML = visibleRows.map((entry, visibleIndex) => {
+        const { row } = entry;
         const dealName = escapeHtml(row['Deal Name'] || '-');
+        const companyName = escapeHtml(row['Company name'] || '-');
         const dealNameHtml = row.__dealLink
             ? `<a href="${escapeHtml(row.__dealLink)}" target="_blank" rel="noopener noreferrer">${dealName}</a>`
             : dealName;
         return `
             <tr>
-                <td class="num">${startIndex + index + 1}</td>
+                <td class="num">${startIndex + visibleIndex + 1}</td>
                 <td>${dealNameHtml}</td>
+                <td>${companyName}</td>
                 <td class="num">${money(num(row['Amount']))}</td>
                 <td>${escapeHtml(row['Deal Stage'] || '-')}</td>
                 <td>${escapeHtml(row['Campaign Source'] || '-')}</td>
@@ -2039,6 +4249,7 @@ function renderSalesTable(rows) {
             <button class="table-page-btn" type="button" onclick="changeTablePage('salesDeals', 1)" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">▶</button>
         </div>
     `;
+    syncSalesTableSortHeaders();
 }
 
 function renderTables(rows){
@@ -2058,12 +4269,18 @@ function renderTables(rows){
         .sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue']));
 
     const renderRows = (tableRows, emptyLabel, tableKey) => {
-        const totalRows = tableRows.length;
+        const rankedRows = sortTableRows(tableRows, tableKey, (row, key) => {
+            if (key === 'companyName') return row['Company name'] || '';
+            if (key === 'closeDate') return row.__closeDate || null;
+            if (key === 'totalRevenue') return num(row['Total Revenue']);
+            return '';
+        });
+        const totalRows = rankedRows.length;
         const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
         const currentPage = Math.min(STATE.tablePage[tableKey] || 1, totalPages);
         STATE.tablePage[tableKey] = currentPage;
         const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
-        const visibleRows = tableRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+        const visibleRows = rankedRows.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
         const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
 
         if (!tableRows.length) {
@@ -2081,14 +4298,21 @@ function renderTables(rows){
         }
 
         return {
-            body: visibleRows.map((row, index) => `
+            body: visibleRows.map((entry, visibleIndex) => {
+                const { row } = entry;
+                const companyName = escapeHtml(row['Company name'] || '-');
+                const companyNameHtml = row.__dealLink
+                    ? `<a href="${escapeHtml(row.__dealLink)}" target="_blank" rel="noopener noreferrer">${companyName}</a>`
+                    : companyName;
+                return `
             <tr>
-                <td class="num">${startIndex + index + 1}</td>
-                <td>${escapeHtml(row['Company name'] || '-')}</td>
+                <td class="num">${startIndex + visibleIndex + 1}</td>
+                <td>${companyNameHtml}</td>
                 <td>${escapeHtml(formatRevenueCloseDate(row.__closeDate))}</td>
                 <td class="num">${money(num(row['Total Revenue']))}</td>
             </tr>
-            `).join(''),
+            `;
+            }).join(''),
             footer: `
                 <div class="table-footer-text">Showing ${startIndex + 1} to ${endIndex} of ${totalRows} rows</div>
                 <div class="table-pager">
@@ -2122,6 +4346,7 @@ function renderTables(rows){
     });
     document.getElementById('revenueAccountsTbl').innerHTML = activeTable.body;
     document.getElementById('revenueAccountsPager').innerHTML = activeTable.footer;
+    syncRevenueTableSortHeaders(activeConfig.tableKey);
 }
 
 function renderAll(){
@@ -2175,13 +4400,23 @@ async function manualRefresh(){
     document.body.classList.add('is-refreshing');
     btn.classList.add('is-loading');
     try{
-        const { rows, linkMap } = await fetchSheet();
+        const { rows, inboundRows, linkedInAdsRows, linkedInContactsRows, googleAdsRows, linkMap, inboundLinkMap, linkedInContactsLinkMap } = await fetchSheet();
         STATE.rows = rowsToObjects(rows, linkMap);
+        STATE.marketing.rows = inboundRowsToObjects(inboundRows, inboundLinkMap);
+        STATE.marketing.linkedInAds.rows = linkedInAdsRowsToObjects(linkedInAdsRows);
+        STATE.marketing.linkedInAds.contactsRows = inboundRowsToObjects(linkedInContactsRows, linkedInContactsLinkMap);
+        STATE.marketing.googleAds.rows = googleAdsRowsToObjects(googleAdsRows);
         setupFilters();
         setupSalesFilters();
+        setupMarketingFilters();
+        setupLinkedInAdsFilters();
+        setupGoogleAdsFilters();
         document.body.classList.remove('is-refreshing');
         applyFilters();
         applySalesFilters();
+        applyMarketingFilters();
+        applyLinkedInAdsFilters();
+        applyGoogleAdsFilters();
         setActiveTab(STATE.activeTab);
         document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toLocaleString();
     } finally {
@@ -2207,6 +4442,10 @@ document.addEventListener('click', (e) => {
             if (trigger) trigger.setAttribute('aria-expanded', 'false');
         }
     });
+    const marketingWrap = document.getElementById('marketingTabWrap');
+    if (marketingWrap && !marketingWrap.contains(e.target)) {
+        closeMarketingTabMenu();
+    }
 });
 
 document.addEventListener('input', (e) => {
@@ -2216,13 +4455,16 @@ document.addEventListener('input', (e) => {
 });
 
 window.addEventListener('resize', () => {
-    ['trendChart','salesTrendChart','salesDistributionPie']
+    ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
         .forEach((id) => {
             const chart = document.getElementById(id);
             if (chart && chart.data) Plotly.Plots.resize(chart);
         });
     if (STATE.activeTab === 'sales' && STATE.sales.filtered.length) {
         renderSales();
+    }
+    if (STATE.activeTab === 'marketing' && (STATE.marketing.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length)) {
+        renderMarketing();
     }
 });
 
