@@ -115,6 +115,25 @@
         .linkedin-ads-chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}
         .chart.linkedin-ring-chart{height:220px}
         .chart.linkedin-chart{height:320px}
+        .ga4-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .ga4-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .ga4-kpi-card{min-height:118px;align-items:flex-start;justify-content:flex-start;text-align:left;padding:18px 18px 16px;border-width:1.5px}
+        .ga4-kpi-card .kpi-value{font-size:1.9em;letter-spacing:-.8px}
+        .ga4-kpi-card .kpi-label{margin-bottom:10px}
+        .ga4-kpi-card.is-blue{border-color:rgba(67,97,238,.45);background:linear-gradient(180deg,rgba(67,97,238,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-purple{border-color:rgba(124,58,237,.42);background:linear-gradient(180deg,rgba(124,58,237,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-green{border-color:rgba(0,200,117,.45);background:linear-gradient(180deg,rgba(0,200,117,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-red{border-color:rgba(239,68,68,.42);background:linear-gradient(180deg,rgba(239,68,68,.05),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-yellow{border-color:rgba(245,158,11,.48);background:linear-gradient(180deg,rgba(245,158,11,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-cyan{border-color:rgba(6,182,212,.42);background:linear-gradient(180deg,rgba(6,182,212,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-teal{border-color:rgba(20,184,166,.42);background:linear-gradient(180deg,rgba(20,184,166,.06),rgba(255,255,255,.98))}
+        .ga4-kpi-card.is-indigo{border-color:rgba(79,70,229,.42);background:linear-gradient(180deg,rgba(79,70,229,.06),rgba(255,255,255,.98))}
+        .ga4-table-stack{display:grid;gap:18px}
+        .ga4-table-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+        .ga4-table-copy{font-size:.78em;color:var(--dim)}
+        .ga4-chart-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(340px,1fr);gap:18px;margin-bottom:18px}
+        .chart.ga4-trend-chart{height:360px}
+        .chart.ga4-pie-chart{height:360px}
         .marketing-funnel-chart{display:flex;align-items:center;justify-content:center}
         .marketing-funnel-shell{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:8px 0}
         .marketing-funnel-stack{width:100%;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -206,6 +225,9 @@
         .kpi.is-green .kpi-value{color:var(--green)}
         .kpi.is-blue .kpi-value{color:var(--blue)}
         .kpi.is-purple .kpi-value{color:var(--purple)}
+        .kpi.is-cyan .kpi-value{color:#06b6d4}
+        .kpi.is-teal .kpi-value{color:#14b8a6}
+        .kpi.is-indigo .kpi-value{color:#4f46e5}
         .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
         .sales-pie-card{display:flex;flex-direction:column;gap:6px}
         .sales-distribution-card{padding-top:20px;padding-bottom:8px}
@@ -249,8 +271,8 @@
         .loading-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
         .loading-spinner{width:72px;height:72px;border-radius:50%;border:6px solid rgba(0,200,117,.16);border-top-color:var(--green);border-right-color:var(--green);animation:loadingSpin .8s linear infinite;box-shadow:0 0 0 1px rgba(0,200,117,.06)}
         @keyframes loadingSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-        @media(max-width:1200px){.scorecard-row{display:grid;grid-template-columns:1fr}.scorecard-symbol{display:none}.metric-group,.metric-group.two-card,.metric-group.is-green{width:100%}.data-row,.sales-trend-grid,.sales-pie-grid,.sales-pie-layout,.marketing-line-grid,.linkedin-ads-chart-grid{grid-template-columns:1fr}.sales-scorecards{grid-template-columns:repeat(2,minmax(0,1fr))}.linkedin-ring-flow{flex-wrap:wrap;justify-content:center}.linkedin-ring-stage{flex:0 0 calc(50% - 12px);justify-content:center}.linkedin-ring-arrow{display:none}}
-        @media(max-width:900px){.filters,.filters.sales-filters,.marketing-filters,.linkedin-ads-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head,.marketing-subtab-title{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}.linkedin-ring-flow{flex-direction:column;align-items:center}.linkedin-ring-stage{flex:0 0 auto}}
+        @media(max-width:1200px){.scorecard-row{display:grid;grid-template-columns:1fr}.scorecard-symbol{display:none}.metric-group,.metric-group.two-card,.metric-group.is-green{width:100%}.data-row,.sales-trend-grid,.sales-pie-grid,.sales-pie-layout,.marketing-line-grid,.linkedin-ads-chart-grid,.ga4-chart-grid{grid-template-columns:1fr}.sales-scorecards{grid-template-columns:repeat(2,minmax(0,1fr))}.ga4-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.linkedin-ring-flow{flex-wrap:wrap;justify-content:center}.linkedin-ring-stage{flex:0 0 calc(50% - 12px);justify-content:center}.linkedin-ring-arrow{display:none}}
+        @media(max-width:900px){.filters,.filters.sales-filters,.marketing-filters,.linkedin-ads-filters,.ga4-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head,.marketing-subtab-title,.ga4-table-head{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards,.ga4-kpi-grid{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}.linkedin-ring-flow{flex-direction:column;align-items:center}.linkedin-ring-stage{flex:0 0 auto}}
     </style>
 </head>
 <body class="is-refreshing auth-locked">
@@ -296,7 +318,8 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
             <div class="marketing-tab-menu" id="marketingTabMenu" role="menu" aria-label="Marketing sections">
-                <button class="marketing-tab-option is-active" id="marketingSubtabWebsiteFormFills" type="button" role="menuitem" onclick="setMarketingSubtab('websiteFormFills')">Website Form Fills</button>
+                <button class="marketing-tab-option is-active" id="marketingSubtabWebsitePerformance" type="button" role="menuitem" onclick="setMarketingSubtab('websitePerformance')">Website Performance</button>
+                <button class="marketing-tab-option" id="marketingSubtabWebsiteFormFills" type="button" role="menuitem" onclick="setMarketingSubtab('websiteFormFills')">Website Form Fills</button>
                 <button class="marketing-tab-option" id="marketingSubtabLinkedInAds" type="button" role="menuitem" onclick="setMarketingSubtab('linkedInAds')">LinkedIn Ads</button>
                 <button class="marketing-tab-option" id="marketingSubtabGoogleAds" type="button" role="menuitem" onclick="setMarketingSubtab('googleAds')">Google Ads</button>
             </div>
@@ -565,7 +588,7 @@
         </section>
 
         <section class="tab-panel" id="marketingPanel">
-            <div class="marketing-subpanel active" id="marketingWebsiteFormFillsPanel">
+            <div class="marketing-subpanel" id="marketingWebsiteFormFillsPanel">
                 <div class="marketing-subtab-title">
                     <div>
                         <h2>Website Form Fills</h2>
@@ -689,6 +712,113 @@
                         <tbody id="marketingContactsTbl"></tbody>
                     </table>
                     <div class="table-footer" id="marketingContactsPager"></div>
+                </div>
+            </div>
+
+            <div class="marketing-subpanel active" id="marketingWebsitePerformancePanel">
+                <div class="marketing-subtab-title">
+                    <div>
+                        <h2>Website Performance</h2>
+                    </div>
+                </div>
+
+                <div class="ga4-filters">
+                    <div class="campaign-picker" id="ga4YearPicker">
+                        <span class="cp-label">Year</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('ga4Year')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="ga4YearTriggerText">All Years</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="ga4YearMenu" role="listbox" aria-label="GA4 year options"></div>
+                    </div>
+                    <div class="campaign-picker" id="ga4QuarterPicker">
+                        <span class="cp-label">Quarter</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('ga4Quarter')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="ga4QuarterTriggerText">All Quarters</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="ga4QuarterMenu" role="listbox" aria-label="GA4 quarter options"></div>
+                    </div>
+                    <div class="campaign-picker" id="ga4MonthPicker">
+                        <span class="cp-label">Month</span>
+                        <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('ga4Month')" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="trigger-text" id="ga4MonthTriggerText">All Months</span>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                        </button>
+                        <div class="campaign-menu" id="ga4MonthMenu" role="listbox" aria-label="GA4 month options"></div>
+                    </div>
+                </div>
+
+                <div class="ga4-kpi-grid" id="ga4KpiGrid"></div>
+
+                <div class="ga4-chart-grid">
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Users by Channel Trends</h3>
+                            </div>
+                        </div>
+                        <div class="chart ga4-trend-chart" id="ga4ChannelTrendChart"></div>
+                    </div>
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Users by Channel</h3>
+                            </div>
+                        </div>
+                        <div class="chart ga4-pie-chart" id="ga4UsersByChannelChart"></div>
+                    </div>
+                </div>
+
+                <div class="ga4-table-stack">
+                    <div class="card marketing-table-card">
+                        <div class="ga4-table-head">
+                            <div>
+                                <h3>Traffic by Channel</h3>
+                            </div>
+                        </div>
+                        <table class="tbl" id="ga4ChannelTable">
+                            <thead>
+                                <tr>
+                                    <th>Session Default Channel Group</th>
+                                    <th>Total Users</th>
+                                    <th>Sessions</th>
+                                    <th>New Users</th>
+                                    <th>% New Sessions</th>
+                                    <th>Sessions per User</th>
+                                    <th>Bounce Rate</th>
+                                    <th>Avg. Session Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ga4ChannelTbl"></tbody>
+                        </table>
+                        <div class="table-footer" id="ga4ChannelPager"></div>
+                    </div>
+
+                    <div class="card marketing-table-card">
+                        <div class="ga4-table-head">
+                            <div>
+                                <h3>Top 50 Landing Pages</h3>
+                            </div>
+                        </div>
+                        <table class="tbl" id="ga4LandingTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Landing Page</th>
+                                    <th>Total Users</th>
+                                    <th>Sessions</th>
+                                    <th>New Users</th>
+                                    <th>% New Sessions</th>
+                                    <th>Sessions per User</th>
+                                    <th>Bounce Rate</th>
+                                    <th>Avg. Session Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ga4LandingTbl"></tbody>
+                        </table>
+                        <div class="table-footer" id="ga4LandingPager"></div>
+                    </div>
                 </div>
             </div>
 
@@ -949,15 +1079,17 @@ const DEALS_WORKSHEET_NAME = 'GTMDB-Deals';
 const INBOUND_WORKSHEET_NAME = 'GTMDB-Contacts-Inbound';
 const LINKEDIN_ADS_WORKSHEET_NAME = 'GTMDB-LinkedIn-Ads';
 const GOOGLE_ADS_WORKSHEET_NAME = 'GTMDB-Google-Ads';
+const GA4_WORKSHEET_NAME = 'GTMDB-GA4';
 const DEFAULT_DEAL_STAGE = 'S7a: Closed-Won / Start Onboarding';
 const REVENUE_FILTER_KEYS = ['dealType','status','year','quarter'];
 const SALES_FILTER_KEYS = ['salesCreateYear','salesCreateQuarter','salesDealType','salesSource','salesDealOwner','salesDealStage'];
 const MARKETING_FILTER_KEYS = ['marketingYear','marketingQuarter'];
 const LINKEDIN_ADS_FILTER_KEYS = ['linkedInAdsYear','linkedInAdsQuarter','linkedInAdsCampaign'];
 const GOOGLE_ADS_FILTER_KEYS = ['googleAdsYear','googleAdsQuarter','googleAdsCampaign'];
+const GA4_FILTER_KEYS = ['ga4Year','ga4Quarter','ga4Month'];
 const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClosedLost'];
 const MARKETING_TREND_VIEW_OPTIONS = ['Yearly','Quarterly','Monthly'];
-const MARKETING_SUBTABS = ['websiteFormFills', 'linkedInAds', 'googleAds'];
+const MARKETING_SUBTABS = ['websiteFormFills', 'websitePerformance', 'linkedInAds', 'googleAds'];
 const TABLE_PAGE_SIZE = 10;
 const DASHBOARD_PASSWORD = 'marketing#2026';
 const DASHBOARD_UNLOCK_KEY = 'gtmb-dashboard-unlocked';
@@ -977,7 +1109,9 @@ const STATE = {
         salesDeals: 1,
         marketingContacts: 1,
         linkedInAdsTable: 1,
-        googleAdsTable: 1
+        googleAdsTable: 1,
+        ga4ChannelTable: 1,
+        ga4LandingTable: 1
     },
     tableSort: {
         customers: { key:'totalRevenue', dir:'desc' },
@@ -1043,7 +1177,7 @@ const STATE = {
     marketing: {
         rows: [],
         filtered: [],
-        activeSubtab: 'websiteFormFills',
+        activeSubtab: 'websitePerformance',
         filters: {
             marketingYear: [],
             marketingQuarter: []
@@ -1060,6 +1194,25 @@ const STATE = {
         acquisitionView: 'yearly',
         meetingView: 'yearly',
         outcomeView: 'yearly',
+        websitePerformance: {
+            rows: [],
+            filtered: [],
+            filters: {
+                ga4Year: [],
+                ga4Quarter: [],
+                ga4Month: []
+            },
+            search: {
+                ga4Year: '',
+                ga4Quarter: '',
+                ga4Month: ''
+            },
+            filterOptions: {
+                ga4Year: [],
+                ga4Quarter: [],
+                ga4Month: []
+            }
+        },
         linkedInAds: {
             rows: [],
             filtered: [],
@@ -1185,7 +1338,7 @@ function setTheme(t, el) {
     STATE.theme = t;
     if (STATE.filtered.length) renderAll();
     if (STATE.sales.filtered.length && STATE.activeTab === 'sales') renderSales();
-    if ((STATE.marketing.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length) && STATE.activeTab === 'marketing') renderMarketing();
+    if ((STATE.marketing.filtered.length || STATE.marketing.websitePerformance.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length) && STATE.activeTab === 'marketing') renderMarketing();
 }
 
 function toggleMarketingTabMenu() {
@@ -1206,12 +1359,14 @@ function closeMarketingTabMenu() {
 }
 
 function setMarketingSubtab(subtab) {
-    const next = MARKETING_SUBTABS.includes(subtab) ? subtab : 'websiteFormFills';
+    const next = MARKETING_SUBTABS.includes(subtab) ? subtab : 'websitePerformance';
     STATE.marketing.activeSubtab = next;
     document.getElementById('marketingWebsiteFormFillsPanel')?.classList.toggle('active', next === 'websiteFormFills');
+    document.getElementById('marketingWebsitePerformancePanel')?.classList.toggle('active', next === 'websitePerformance');
     document.getElementById('marketingLinkedInAdsPanel')?.classList.toggle('active', next === 'linkedInAds');
     document.getElementById('marketingGoogleAdsPanel')?.classList.toggle('active', next === 'googleAds');
     document.getElementById('marketingSubtabWebsiteFormFills')?.classList.toggle('is-active', next === 'websiteFormFills');
+    document.getElementById('marketingSubtabWebsitePerformance')?.classList.toggle('is-active', next === 'websitePerformance');
     document.getElementById('marketingSubtabLinkedInAds')?.classList.toggle('is-active', next === 'linkedInAds');
     document.getElementById('marketingSubtabGoogleAds')?.classList.toggle('is-active', next === 'googleAds');
     setActiveTab('marketing');
@@ -1230,8 +1385,8 @@ function setActiveTab(tab) {
     document.getElementById('tabMarketing')?.classList.toggle('on', active === 'marketing');
     setTimeout(() => {
         if (active === 'sales' && STATE.sales.filtered.length) renderSales();
-        if (active === 'marketing' && (STATE.marketing.rows.length || STATE.marketing.linkedInAds.rows.length || STATE.marketing.googleAds.rows.length)) renderMarketing();
-        ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
+        if (active === 'marketing' && (STATE.marketing.rows.length || STATE.marketing.websitePerformance.rows.length || STATE.marketing.linkedInAds.rows.length || STATE.marketing.googleAds.rows.length)) renderMarketing();
+        ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
             .forEach((id) => {
                 const chart = document.getElementById(id);
                 if (chart && chart.data) Plotly.Plots.resize(chart);
@@ -1277,6 +1432,14 @@ function changeTablePage(tableKey, delta) {
     }
     if (tableKey === 'googleAdsTable') {
         renderGoogleAdsTable(STATE.marketing.googleAds.filtered);
+        return;
+    }
+    if (tableKey === 'ga4ChannelTable') {
+        renderGa4ChannelTable(STATE.marketing.websitePerformance.filtered);
+        return;
+    }
+    if (tableKey === 'ga4LandingTable') {
+        renderGa4LandingTable(STATE.marketing.websitePerformance.filtered);
         return;
     }
     renderTables(STATE.filtered);
@@ -1430,6 +1593,14 @@ function setFilterValue(key, value) {
         applyMarketingFilters();
         return;
     }
+    if (GA4_FILTER_KEYS.includes(key)) {
+        const current = new Set(STATE.marketing.websitePerformance.filters[key] || []);
+        if (current.has(normalized)) current.delete(normalized);
+        else current.add(normalized);
+        STATE.marketing.websitePerformance.filters[key] = [...current];
+        applyGa4Filters();
+        return;
+    }
     if (LINKEDIN_ADS_FILTER_KEYS.includes(key)) {
         const current = new Set(STATE.marketing.linkedInAds.filters[key] || []);
         if (current.has(normalized)) current.delete(normalized);
@@ -1512,6 +1683,11 @@ function setFilterSearch(key, value) {
         renderMarketingFilterOptions();
         return;
     }
+    if (Object.prototype.hasOwnProperty.call(STATE.marketing.websitePerformance.search, key)) {
+        STATE.marketing.websitePerformance.search[key] = String(value || '');
+        renderGa4FilterOptions();
+        return;
+    }
     if (Object.prototype.hasOwnProperty.call(STATE.marketing.linkedInAds.search, key)) {
         STATE.marketing.linkedInAds.search[key] = String(value || '');
         renderLinkedInAdsFilterOptions();
@@ -1552,6 +1728,14 @@ function syncMarketingFilterStates() {
         const picker = document.getElementById(`${key}Picker`);
         if (!picker) return;
         picker.classList.toggle('is-active', (STATE.marketing.filters[key] || []).length > 0);
+    });
+}
+
+function syncGa4FilterStates() {
+    GA4_FILTER_KEYS.forEach((key) => {
+        const picker = document.getElementById(`${key}Picker`);
+        if (!picker) return;
+        picker.classList.toggle('is-active', (STATE.marketing.websitePerformance.filters[key] || []).length > 0);
     });
 }
 
@@ -1620,6 +1804,10 @@ function getMarketingBaseRows() {
     return (STATE.marketing.rows || []).filter((row) => row.__formFillDate);
 }
 
+function getGa4BaseRows() {
+    return (STATE.marketing.websitePerformance.rows || []).filter((row) => row.__ga4Date);
+}
+
 function getLinkedInAdsBaseRows() {
     return (STATE.marketing.linkedInAds.rows || []).filter((row) => row.__adsDate);
 }
@@ -1668,6 +1856,13 @@ function getSalesFilterRowValue(row, key) {
 function getMarketingFilterRowValue(row, key) {
     if (key === 'marketingYear') return row.__formFillYear;
     if (key === 'marketingQuarter') return row.__formFillQuarter;
+    return '';
+}
+
+function getGa4FilterRowValue(row, key) {
+    if (key === 'ga4Year') return row.__ga4Year;
+    if (key === 'ga4Quarter') return row.__ga4Quarter;
+    if (key === 'ga4Month') return row.__ga4Month;
     return '';
 }
 
@@ -1771,6 +1966,25 @@ function getMarketingOptionAmountMap(key) {
     return map;
 }
 
+function getGa4OptionAmountMap(key) {
+    const ga4State = STATE.marketing.websitePerformance;
+    const scopedRows = getGa4BaseRows().filter((row) => {
+        return GA4_FILTER_KEYS.every((filterKey) => {
+            if (filterKey === key) return true;
+            const selected = ga4State.filters[filterKey] || [];
+            if (!selected.length) return true;
+            return selected.includes(getGa4FilterRowValue(row, filterKey));
+        });
+    });
+    const map = new Map();
+    scopedRows.forEach((row) => {
+        const optionValue = getGa4FilterRowValue(row, key);
+        if (!optionValue || optionValue === 'Unknown') return;
+        map.set(optionValue, (map.get(optionValue) || 0) + row.__ga4Sessions);
+    });
+    return map;
+}
+
 function getLinkedInAdsOptionAmountMap(key) {
     const scopedRows = getLinkedInAdsBaseRows().filter((row) => {
         return LINKEDIN_ADS_FILTER_KEYS.every((filterKey) => {
@@ -1825,6 +2039,25 @@ function getSalesTrendSeriesCountMap(rows) {
 function money(v){ return '$' + Number(v || 0).toLocaleString(); }
 function shortMoney(v){ const n = Number(v || 0); if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(0) + 'K'; return String(Math.round(n)); }
 function compactMoneyLabel(v){ const n = Number(v || 0); return `${n < 0 ? '-' : ''}$${shortMoney(Math.abs(n))}`; }
+function compactNumberLabel(v){ const n = Number(v || 0); if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'K'; return String(Math.round(n)); }
+function formatRatioValue(v, digits = 1) {
+    const n = Number(v || 0);
+    if (!Number.isFinite(n)) return '0';
+    return n.toFixed(digits).replace(/\.0+$/,'').replace(/(\.\d*[1-9])0+$/,'$1');
+}
+function formatPercentValue(v, digits = 1) {
+    return `${formatRatioValue(Number(v || 0) * 100, digits)}%`;
+}
+function formatDurationClock(seconds, forceHours = false) {
+    const totalSeconds = Math.max(0, Math.round(Number(seconds || 0)));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    if (forceHours || hours) {
+        return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+    return `${minutes}:${String(secs).padStart(2, '0')}`;
+}
 function formatRevenueCloseDate(date) {
     if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '-';
     const month = date.toLocaleString('en-US', { month:'short' }).toUpperCase();
@@ -1969,10 +2202,13 @@ async function fetchSheet() {
     if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in local workbook`);
     const googleAdsSheet = workbook.Sheets[GOOGLE_ADS_WORKSHEET_NAME];
     if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in local workbook`);
+    const ga4Sheet = workbook.Sheets[GA4_WORKSHEET_NAME];
+    if (!ga4Sheet) throw new Error(`Worksheet "${GA4_WORKSHEET_NAME}" not found in local workbook`);
     const rows = XLSX.utils.sheet_to_json(dealsSheet, { header: 1, raw: false, defval: '' });
     const inboundRows = XLSX.utils.sheet_to_json(inboundSheet, { header: 1, raw: false, defval: '' });
     const linkedInAdsRows = XLSX.utils.sheet_to_json(linkedInAdsSheet, { header: 1, raw: false, defval: '' });
     const googleAdsRows = XLSX.utils.sheet_to_json(googleAdsSheet, { header: 1, raw: false, defval: '' });
+    const ga4Rows = XLSX.utils.sheet_to_json(ga4Sheet, { header: 1, raw: false, defval: '' });
     const linkMap = {};
     const range = XLSX.utils.decode_range(dealsSheet['!ref'] || 'A1:A1');
     for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex += 1) {
@@ -1996,6 +2232,7 @@ async function fetchSheet() {
         inboundRows: normalizeRows(inboundRows),
         linkedInAdsRows: normalizeRows(linkedInAdsRows),
         googleAdsRows: normalizeRows(googleAdsRows),
+        ga4Rows: normalizeRows(ga4Rows),
         linkMap,
         inboundLinkMap
     };
@@ -2143,10 +2380,52 @@ function googleAdsRowsToObjects(rows) {
     return adsRowsToObjects(rows, 'google');
 }
 
+function ga4RowsToObjects(rows) {
+    const headerIndex = findStructuredHeaderRow(rows, (row) => {
+        const joined = row.join(' | ').toLowerCase();
+        return joined.includes('year month')
+            && joined.includes('session default channel group')
+            && joined.includes('landing page')
+            && joined.includes('bounce rate');
+    });
+    if (headerIndex < 0) throw new Error(`Could not find ${GA4_WORKSHEET_NAME} header row`);
+    const headers = rows[headerIndex].map((header) => String(header || '').replace(/\s+/g, ' ').trim());
+    return rows.slice(headerIndex + 1)
+        .filter((row) => row.some((cell) => cell))
+        .map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = row[index] ?? '';
+            });
+            const ga4Date = parseSheetDate(obj['Year month'] || '');
+            obj.__ga4Date = ga4Date;
+            obj.__ga4Year = ga4Date ? String(ga4Date.getFullYear()) : 'Unknown';
+            obj.__ga4Quarter = ga4Date ? quarterLabelFromDate(ga4Date) : 'Unknown';
+            obj.__ga4Month = ga4Date ? monthLabelFromDate(ga4Date) : 'Unknown';
+            obj.__ga4MonthKey = ga4Date ? `${ga4Date.getFullYear()}-${String(ga4Date.getMonth() + 1).padStart(2, '0')}` : 'Unknown';
+            obj.__ga4Channel = String(obj['Session default channel group'] || '').trim() || 'Unknown';
+            obj.__ga4LandingPage = String(obj['Landing page'] || '').trim() || '-';
+            obj.__ga4TotalUsers = num(obj['Total users']);
+            obj.__ga4Sessions = num(obj['Sessions']);
+            obj.__ga4NewUsers = num(obj['New users']);
+            obj.__ga4SessionsPerUser = num(obj['Sessions per user']);
+            obj.__ga4BounceRate = num(obj['Bounce rate']);
+            obj.__ga4AverageSessionDuration = num(obj['Average session duration']);
+            obj.__ga4Views = num(obj['Views']);
+            obj.__ga4PercentNewSessions = num(obj['% New Sessions']);
+            obj.__ga4PagesPerSession = num(obj['Pages / Session']);
+            return obj;
+        });
+}
+
 function escapeHtml(s){ return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function quarterLabelFromDate(date) {
     return `Q${Math.floor(date.getMonth()/3)+1} ${date.getFullYear()}`;
+}
+
+function monthLabelFromDate(date) {
+    return date.toLocaleString('en-US', { month:'short', year:'numeric' });
 }
 
 function sortQuarterLabels(labels) {
@@ -2154,6 +2433,14 @@ function sortQuarterLabels(labels) {
         const [qa, ya] = String(a || '').replace('Q', '').split(' ').map(Number);
         const [qb, yb] = String(b || '').replace('Q', '').split(' ').map(Number);
         return ya === yb ? qa - qb : ya - yb;
+    });
+}
+
+function sortMonthLabels(labels) {
+    return [...labels].sort((a, b) => {
+        const aDate = new Date(`1 ${String(a || '').trim()}`);
+        const bDate = new Date(`1 ${String(b || '').trim()}`);
+        return aDate - bDate;
     });
 }
 
@@ -2320,6 +2607,41 @@ function setupMarketingFilters() {
         STATE.marketing.filters[key] = current.filter((value) => allowed.has(value));
     });
     renderMarketingFilterOptions();
+}
+
+function setupGa4Filters() {
+    const scopedRows = getGa4BaseRows();
+    const ga4State = STATE.marketing.websitePerformance;
+    ga4State.filterOptions.ga4Year = getDynamicFilterOptions(
+        scopedRows,
+        GA4_FILTER_KEYS,
+        ga4State.filters,
+        getGa4FilterRowValue,
+        'ga4Year',
+        (values) => values.sort((a, b) => Number(a) - Number(b))
+    );
+    ga4State.filterOptions.ga4Quarter = getDynamicFilterOptions(
+        scopedRows,
+        GA4_FILTER_KEYS,
+        ga4State.filters,
+        getGa4FilterRowValue,
+        'ga4Quarter',
+        sortQuarterLabels
+    );
+    ga4State.filterOptions.ga4Month = getDynamicFilterOptions(
+        scopedRows,
+        GA4_FILTER_KEYS,
+        ga4State.filters,
+        getGa4FilterRowValue,
+        'ga4Month',
+        sortMonthLabels
+    );
+    GA4_FILTER_KEYS.forEach((key) => {
+        const current = ga4State.filters[key] || [];
+        const allowed = new Set(ga4State.filterOptions[key] || []);
+        ga4State.filters[key] = current.filter((value) => allowed.has(value));
+    });
+    renderGa4FilterOptions();
 }
 
 function setupLinkedInAdsFilters() {
@@ -2572,6 +2894,43 @@ function renderMarketingFilterOptions() {
     });
 }
 
+function renderGa4FilterOptions() {
+    const ga4State = STATE.marketing.websitePerformance;
+    const defs = {
+        ga4Year: { label: 'All Years', trigger: 'ga4YearTriggerText', menu: 'ga4YearMenu' },
+        ga4Quarter: { label: 'All Quarters', trigger: 'ga4QuarterTriggerText', menu: 'ga4QuarterMenu' },
+        ga4Month: { label: 'All Months', trigger: 'ga4MonthTriggerText', menu: 'ga4MonthMenu' }
+    };
+    Object.entries(defs).forEach(([key, def]) => {
+        const options = ga4State.filterOptions[key] || [];
+        const trigger = document.getElementById(def.trigger);
+        const menu = document.getElementById(def.menu);
+        if (trigger) {
+            trigger.textContent = formatSelectionLabel(ga4State.filters[key] || [], options, def.label);
+        }
+        if (!menu) return;
+        const countMap = getGa4OptionAmountMap(key);
+        const searchValue = ga4State.search[key] || '';
+        const filteredOptions = options.filter((value) => value.toLowerCase().includes(searchValue.toLowerCase()));
+        const searchHtml = `
+            <div class="campaign-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+                <input type="text" value="${escapeHtml(searchValue)}" placeholder="Type to search" data-filter-search="${key}" />
+            </div>
+        `;
+        const optionButtons = filteredOptions.length
+            ? filteredOptions.map((value) => `
+                <button class="multi-option ${(ga4State.filters[key] || []).includes(value) ? 'is-active' : ''}" type="button" role="option" aria-selected="${(ga4State.filters[key] || []).includes(value)}" data-filter-key="${key}" data-filter-value="${escapeHtml(value)}">
+                    <span class="multi-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>
+                    <span class="multi-label">${escapeHtml(value)}</span>
+                    <span class="multi-amount">${escapeHtml(compactNumberLabel(countMap.get(value) || 0))}</span>
+                </button>
+            `).join('')
+            : `<div class="multi-empty">No matches found</div>`;
+        menu.innerHTML = searchHtml + optionButtons;
+    });
+}
+
 function renderLinkedInAdsFilterOptions() {
     const linkedInState = STATE.marketing.linkedInAds;
     const defs = {
@@ -2695,6 +3054,20 @@ function applyMarketingFilters() {
         (!marketingQuarter.length || marketingQuarter.includes(row.__formFillQuarter))
     );
     STATE.tablePage.marketingContacts = 1;
+    if (STATE.activeTab === 'marketing') renderMarketing();
+}
+
+function applyGa4Filters() {
+    const ga4State = STATE.marketing.websitePerformance;
+    setupGa4Filters();
+    const { ga4Year, ga4Quarter, ga4Month } = ga4State.filters;
+    ga4State.filtered = getGa4BaseRows().filter((row) =>
+        (!ga4Year.length || ga4Year.includes(row.__ga4Year)) &&
+        (!ga4Quarter.length || ga4Quarter.includes(row.__ga4Quarter)) &&
+        (!ga4Month.length || ga4Month.includes(row.__ga4Month))
+    );
+    STATE.tablePage.ga4ChannelTable = 1;
+    STATE.tablePage.ga4LandingTable = 1;
     if (STATE.activeTab === 'marketing') renderMarketing();
 }
 
@@ -4086,6 +4459,349 @@ function renderMarketingTable(rows) {
     `;
 }
 
+function summarizeGa4Rows(rows) {
+    return rows.reduce((acc, row) => {
+        acc.totalUsers += row.__ga4TotalUsers;
+        acc.sessions += row.__ga4Sessions;
+        acc.newUsers += row.__ga4NewUsers;
+        acc.views += row.__ga4Views;
+        acc.weightedBounce += row.__ga4BounceRate * row.__ga4Sessions;
+        acc.weightedDuration += row.__ga4AverageSessionDuration * row.__ga4Sessions;
+        return acc;
+    }, {
+        totalUsers: 0,
+        sessions: 0,
+        newUsers: 0,
+        views: 0,
+        weightedBounce: 0,
+        weightedDuration: 0
+    });
+}
+
+function finalizeGa4Metrics(summary) {
+    const totalUsers = Number(summary.totalUsers || 0);
+    const sessions = Number(summary.sessions || 0);
+    const newUsers = Number(summary.newUsers || 0);
+    const views = Number(summary.views || 0);
+    return {
+        totalUsers,
+        sessions,
+        newUsers,
+        views,
+        percentNewSessions: sessions ? (newUsers / sessions) : 0,
+        sessionsPerUser: totalUsers ? (sessions / totalUsers) : 0,
+        bounceRate: sessions ? (Number(summary.weightedBounce || 0) / sessions) : 0,
+        avgSessionDuration: sessions ? (Number(summary.weightedDuration || 0) / sessions) : 0,
+        pagesPerSession: sessions ? (views / sessions) : 0
+    };
+}
+
+function aggregateGa4Rows(rows, field) {
+    const grouped = new Map();
+    rows.forEach((row) => {
+        const rawKey = field === '__ga4LandingPage' ? row.__ga4LandingPage : row.__ga4Channel;
+        const key = String(rawKey || '').trim() || '-';
+        if (!grouped.has(key)) {
+            grouped.set(key, {
+                label: key,
+                totalUsers: 0,
+                sessions: 0,
+                newUsers: 0,
+                views: 0,
+                weightedBounce: 0,
+                weightedDuration: 0
+            });
+        }
+        const bucket = grouped.get(key);
+        bucket.totalUsers += row.__ga4TotalUsers;
+        bucket.sessions += row.__ga4Sessions;
+        bucket.newUsers += row.__ga4NewUsers;
+        bucket.views += row.__ga4Views;
+        bucket.weightedBounce += row.__ga4BounceRate * row.__ga4Sessions;
+        bucket.weightedDuration += row.__ga4AverageSessionDuration * row.__ga4Sessions;
+    });
+    return [...grouped.values()]
+        .map((entry) => ({
+            label: entry.label,
+            ...finalizeGa4Metrics(entry)
+        }))
+        .sort((a, b) => {
+            if (b.totalUsers !== a.totalUsers) return b.totalUsers - a.totalUsers;
+            if (b.sessions !== a.sessions) return b.sessions - a.sessions;
+            return a.label.localeCompare(b.label);
+        });
+}
+
+const GA4_CHANNEL_COLOR_MAP = {
+    'Direct': '#2563eb',
+    'Organic Search': '#00c875',
+    'Referral': '#f59e0b',
+    'Organic Social': '#7c3aed',
+    'Unassigned': '#94a3b8',
+    'Paid Search': '#ef4444',
+    'Email': '#14b8a6',
+    'Paid Social': '#4f46e5',
+    'Display': '#06b6d4',
+    'Paid Other': '#fb923c',
+    'Cross-network': '#64748b'
+};
+const GA4_COLOR_FALLBACKS = ['#2563eb', '#00c875', '#7c3aed', '#f59e0b', '#ef4444', '#14b8a6', '#4f46e5', '#06b6d4', '#fb923c', '#94a3b8'];
+
+function getGa4TrendView() {
+    const ga4Filters = STATE.marketing.websitePerformance.filters;
+    if ((ga4Filters.ga4Month || []).length) return 'monthly';
+    if ((ga4Filters.ga4Quarter || []).length) return 'monthly';
+    if ((ga4Filters.ga4Year || []).length) return 'quarterly';
+    return 'yearly';
+}
+
+function getGa4ChannelColor(label, index = 0) {
+    return GA4_CHANNEL_COLOR_MAP[label] || GA4_COLOR_FALLBACKS[index % GA4_COLOR_FALLBACKS.length];
+}
+
+function buildGa4TrendSeries(rows, view) {
+    const bucketLabel = (date) => {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'Unknown';
+        if (view === 'monthly') return monthLabelFromDate(date);
+        if (view === 'quarterly') return quarterLabelFromDate(date);
+        return String(date.getFullYear());
+    };
+    const sortKey = (label) => {
+        if (view === 'monthly') {
+            const parsed = new Date(`1 ${String(label || '').trim()}`);
+            return Number.isNaN(parsed.getTime()) ? Number.POSITIVE_INFINITY : parsed.getTime();
+        }
+        if (view === 'quarterly') {
+            const [quarter, year] = String(label || '').replace('Q', '').split(' ').map(Number);
+            return (year * 10) + quarter;
+        }
+        return Number(label || 0);
+    };
+    const grouped = new Map();
+    const xSet = new Set();
+    rows.forEach((row) => {
+        if (!(row.__ga4Date instanceof Date) || Number.isNaN(row.__ga4Date.getTime())) return;
+        const label = bucketLabel(row.__ga4Date);
+        const channel = row.__ga4Channel || 'Unknown';
+        xSet.add(label);
+        if (!grouped.has(channel)) grouped.set(channel, new Map());
+        const channelMap = grouped.get(channel);
+        channelMap.set(label, (channelMap.get(label) || 0) + row.__ga4TotalUsers);
+    });
+    const orderedKeys = [...xSet].sort((a, b) => sortKey(a) - sortKey(b));
+    const series = [...grouped.entries()]
+        .map(([label, valueMap], index) => ({
+            label,
+            color: getGa4ChannelColor(label, index),
+            values: orderedKeys.map((key) => Number(valueMap.get(key) || 0))
+        }))
+        .filter((entry) => entry.values.some((value) => value > 0));
+    return {
+        orderedKeys,
+        series,
+        xAxisTitle: view === 'monthly' ? 'Month' : view === 'quarterly' ? 'Quarter' : 'Year'
+    };
+}
+
+function renderGa4Kpis(rows) {
+    const metrics = finalizeGa4Metrics(summarizeGa4Rows(rows));
+    const cards = [
+        { label:'Total Users', value:Number(metrics.totalUsers || 0).toLocaleString(), tone:'blue' },
+        { label:'New Users', value:Number(metrics.newUsers || 0).toLocaleString(), tone:'purple' },
+        { label:'Sessions', value:Number(metrics.sessions || 0).toLocaleString(), tone:'green' },
+        { label:'Views', value:Number(metrics.views || 0).toLocaleString(), tone:'red' },
+        { label:'Sessions per User', value:formatRatioValue(metrics.sessionsPerUser), tone:'yellow' },
+        { label:'Bounce Rate', value:formatPercentValue(metrics.bounceRate), tone:'cyan' },
+        { label:'Pages / Session', value:formatRatioValue(metrics.pagesPerSession), tone:'teal' },
+        { label:'Average Session Duration', value:formatDurationClock(metrics.avgSessionDuration, true), tone:'indigo' }
+    ];
+    document.getElementById('ga4KpiGrid').innerHTML = cards.map((card) => `
+        <div class="kpi ga4-kpi-card is-${card.tone}">
+            <div class="kpi-label">${escapeHtml(card.label)}</div>
+            <div class="kpi-value">${escapeHtml(card.value)}</div>
+        </div>
+    `).join('');
+}
+
+function plotGa4ChannelTrend(rows) {
+    const target = document.getElementById('ga4ChannelTrendChart');
+    if (!target) return;
+    const view = getGa4TrendView();
+    const trend = buildGa4TrendSeries(rows, view);
+    if (!trend.orderedKeys.length || !trend.series.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    const traces = trend.series.map((series) => ({
+        x: trend.orderedKeys,
+        y: series.values,
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: series.label,
+        line: { color: series.color, width: 3, shape: 'spline', smoothing: 0.75 },
+        marker: { size: 7, color: series.color, line: { color: '#ffffff', width: 1.2 } },
+        hovertemplate: `<b>%{x}</b><br>${series.label}: %{y:,} users<extra></extra>`
+    }));
+    Plotly.newPlot(target, traces, {
+        margin: { t: 6, b: 36, l: 54, r: 16 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: surface,
+        font: { family: 'Inter, sans-serif', color: textColor, size: 12 },
+        hovermode: 'x unified',
+        xaxis: {
+            title: trend.xAxisTitle,
+            type: 'category',
+            categoryorder: 'array',
+            categoryarray: trend.orderedKeys,
+            showgrid: true,
+            gridcolor:gridColor,
+            tickfont: { color: axisColor },
+            zeroline: false,
+            fixedrange: true,
+            automargin: true
+        },
+        yaxis: {
+            title: 'Users',
+            showgrid: true,
+            gridcolor:gridColor,
+            tickfont: { color: axisColor },
+            titlefont: { color: axisColor },
+            zeroline: false,
+            fixedrange: true,
+            automargin: true
+        },
+        legend: { orientation: 'h', y: 1.14, x: 0, bgcolor: 'rgba(0,0,0,0)' }
+    }, {
+        displayModeBar: false,
+        responsive: true,
+        scrollZoom: false,
+        doubleClick: false
+    });
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function plotGa4UsersPie(rows) {
+    const target = document.getElementById('ga4UsersByChannelChart');
+    if (!target) return;
+    const entries = aggregateGa4Rows(rows, '__ga4Channel').filter((entry) => entry.totalUsers > 0);
+    if (!entries.length) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const colors = entries.map((entry, index) => getGa4ChannelColor(entry.label, index));
+    Plotly.newPlot(target, [{
+        type: 'pie',
+        labels: entries.map((entry) => entry.label),
+        values: entries.map((entry) => entry.totalUsers),
+        marker: { colors, line: { color: '#ffffff', width: 2 } },
+        textinfo: 'percent',
+        textfont: { family: 'Inter, sans-serif', size: 13, color: textColor },
+        hovertemplate: '<b>%{label}</b><br>Users: %{value:,}<br>%{percent}<extra></extra>',
+        sort: false,
+        direction: 'clockwise',
+        automargin: true
+    }], {
+        margin: { t: 6, b: 10, l: 10, r: 10 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        font: { family: 'Inter, sans-serif', color: textColor, size: 12 },
+        showlegend: true,
+        legend: { orientation: 'v', x: 1.03, y: 0.5, xanchor: 'left', yanchor: 'middle', bgcolor: 'rgba(0,0,0,0)' }
+    }, {
+        displayModeBar: false,
+        responsive: true,
+        scrollZoom: false,
+        doubleClick: false
+    });
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
+}
+
+function renderGa4AggregateTable(entries, config) {
+    const totalRows = entries.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / TABLE_PAGE_SIZE));
+    const currentPage = Math.min(STATE.tablePage[config.tablePageKey] || 1, totalPages);
+    STATE.tablePage[config.tablePageKey] = currentPage;
+    const startIndex = totalRows ? (currentPage - 1) * TABLE_PAGE_SIZE : 0;
+    const visibleRows = entries.slice(startIndex, startIndex + TABLE_PAGE_SIZE);
+    const endIndex = totalRows ? Math.min(startIndex + TABLE_PAGE_SIZE, totalRows) : 0;
+
+    if (!totalRows) {
+        document.getElementById(config.tbodyId).innerHTML = `<tr><td colspan="${config.colspan}">No ${config.emptyLabel} data matches the current filters.</td></tr>`;
+        document.getElementById(config.pagerId).innerHTML = `
+            <div class="table-footer-text">Showing 0 to 0 of 0 rows</div>
+            <div class="table-pager">
+                <button class="table-page-btn" type="button" disabled aria-label="Previous page">&#9664;</button>
+                <div class="table-page-badge">Page 1 of 1</div>
+                <button class="table-page-btn" type="button" disabled aria-label="Next page">&#9654;</button>
+            </div>
+        `;
+        return;
+    }
+
+    document.getElementById(config.tbodyId).innerHTML = visibleRows.map((row, visibleIndex) => `
+        <tr>
+            ${config.showIndex ? `<td class="num">${startIndex + visibleIndex + 1}</td>` : ''}
+            <td>${escapeHtml(row.label)}</td>
+            <td class="num">${Number(row.totalUsers || 0).toLocaleString()}</td>
+            <td class="num">${Number(row.sessions || 0).toLocaleString()}</td>
+            <td class="num">${Number(row.newUsers || 0).toLocaleString()}</td>
+            <td class="num">${escapeHtml(formatPercentValue(row.percentNewSessions))}</td>
+            <td class="num">${escapeHtml(formatRatioValue(row.sessionsPerUser))}</td>
+            <td class="num">${escapeHtml(formatPercentValue(row.bounceRate))}</td>
+            <td class="num">${escapeHtml(formatDurationClock(row.avgSessionDuration))}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById(config.pagerId).innerHTML = `
+        <div class="table-footer-text">Showing ${startIndex + 1} to ${endIndex} of ${totalRows} rows</div>
+        <div class="table-pager">
+            <button class="table-page-btn" type="button" onclick="changeTablePage('${config.tablePageKey}', -1)" ${currentPage <= 1 ? 'disabled' : ''} aria-label="Previous page">&#9664;</button>
+            <div class="table-page-badge">Page ${currentPage} of ${totalPages}</div>
+            <button class="table-page-btn" type="button" onclick="changeTablePage('${config.tablePageKey}', 1)" ${currentPage >= totalPages ? 'disabled' : ''} aria-label="Next page">&#9654;</button>
+        </div>
+    `;
+}
+
+function renderGa4ChannelTable(rows) {
+    renderGa4AggregateTable(aggregateGa4Rows(rows, '__ga4Channel'), {
+        tablePageKey: 'ga4ChannelTable',
+        tbodyId: 'ga4ChannelTbl',
+        pagerId: 'ga4ChannelPager',
+        emptyLabel: 'channel',
+        colspan: 8,
+        showIndex: false
+    });
+}
+
+function renderGa4LandingTable(rows) {
+    renderGa4AggregateTable(aggregateGa4Rows(rows, '__ga4LandingPage').slice(0, 50), {
+        tablePageKey: 'ga4LandingTable',
+        tbodyId: 'ga4LandingTbl',
+        pagerId: 'ga4LandingPager',
+        emptyLabel: 'landing page',
+        colspan: 9,
+        showIndex: true
+    });
+}
+
+function renderWebsitePerformance() {
+    renderGa4FilterOptions();
+    syncGa4FilterStates();
+    const rows = STATE.marketing.websitePerformance.filtered;
+    renderGa4Kpis(rows);
+    plotGa4ChannelTrend(rows);
+    plotGa4UsersPie(rows);
+    renderGa4ChannelTable(rows);
+    renderGa4LandingTable(rows);
+}
+
 function renderMarketing() {
     if (STATE.marketing.activeSubtab === 'websiteFormFills') {
         renderMarketingFilterOptions();
@@ -4105,6 +4821,10 @@ function renderMarketing() {
         ], STATE.marketing.meetingView);
         plotMarketingOutcomeChart('marketingOutcomeChart', rows, STATE.marketing.outcomeView);
         renderMarketingTable(rows);
+        return;
+    }
+    if (STATE.marketing.activeSubtab === 'websitePerformance') {
+        renderWebsitePerformance();
         return;
     }
     if (STATE.marketing.activeSubtab === 'linkedInAds') {
@@ -4499,21 +5219,25 @@ async function manualRefresh(){
     document.body.classList.add('is-refreshing');
     btn.classList.add('is-loading');
     try{
-        const { rows, inboundRows, linkedInAdsRows, googleAdsRows, linkMap, inboundLinkMap } = await fetchSheet();
+        const { rows, inboundRows, linkedInAdsRows, googleAdsRows, ga4Rows, linkMap, inboundLinkMap } = await fetchSheet();
         STATE.rows = rowsToObjects(rows, linkMap);
         STATE.marketing.rows = inboundRowsToObjects(inboundRows, inboundLinkMap);
+        STATE.marketing.websitePerformance.rows = ga4RowsToObjects(ga4Rows);
+        STATE.marketing.websitePerformance.filtered = [];
         STATE.marketing.linkedInAds.rows = linkedInAdsRowsToObjects(linkedInAdsRows);
         STATE.marketing.linkedInAds.filteredContacts = [];
         STATE.marketing.googleAds.rows = googleAdsRowsToObjects(googleAdsRows);
         setupFilters();
         setupSalesFilters();
         setupMarketingFilters();
+        setupGa4Filters();
         setupLinkedInAdsFilters();
         setupGoogleAdsFilters();
         document.body.classList.remove('is-refreshing');
         applyFilters();
         applySalesFilters();
         applyMarketingFilters();
+        applyGa4Filters();
         applyLinkedInAdsFilters();
         applyGoogleAdsFilters();
         setActiveTab(STATE.activeTab);
@@ -4554,7 +5278,7 @@ document.addEventListener('input', (e) => {
 });
 
 window.addEventListener('resize', () => {
-    ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
+    ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
         .forEach((id) => {
             const chart = document.getElementById(id);
             if (chart && chart.data) Plotly.Plots.resize(chart);
@@ -4562,7 +5286,7 @@ window.addEventListener('resize', () => {
     if (STATE.activeTab === 'sales' && STATE.sales.filtered.length) {
         renderSales();
     }
-    if (STATE.activeTab === 'marketing' && (STATE.marketing.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length)) {
+    if (STATE.activeTab === 'marketing' && (STATE.marketing.filtered.length || STATE.marketing.websitePerformance.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length)) {
         renderMarketing();
     }
 });
