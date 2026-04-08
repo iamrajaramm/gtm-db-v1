@@ -25,7 +25,21 @@
         [data-theme="midnight"]{--bg:#000000;--surface:#0a0a0a;--card-border:#1a1a1a;--text:#e4e4e7;--text2:#a1a1aa;--dim:#52525b;--green:#00e88a;--green-dark:#00ff99;--green-bg:rgba(0,232,138,.08);--navy:#e4e4e7;--blue:#818cf8;--amber:#fbbf24;--red:#f87171;--purple:#c4b5fd;--hover-bg:#111;--grid-color:#1a1a1a;--pill-active-bg:#00e88a;--pill-active-text:#000;--chip-bg:#0f0f0f;--chip-border:#1a1a1a}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;padding:0;overflow-x:hidden}
+        body.auth-locked .container{display:none}
         .container{width:min(1690px, calc(100vw - 32px));min-width:0;max-width:1690px;margin:0 auto;padding:20px 0 10px}
+        .auth-gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at top,rgba(0,200,117,.08),transparent 34%),var(--bg)}
+        .auth-panel{width:min(460px,100%);background:var(--surface);border:1px solid var(--card-border);border-radius:24px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+        .auth-badge{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--green);color:#fff;font-size:21px;line-height:1;margin-bottom:18px}
+        .auth-panel h2{font-size:1.55em;font-weight:900;letter-spacing:-.5px;color:var(--text);margin-bottom:8px}
+        .auth-copy{font-size:.95em;line-height:1.65;color:var(--text2);margin-bottom:20px}
+        .auth-form{display:grid;gap:12px}
+        .auth-field{width:100%;border:1px solid var(--card-border);border-radius:16px;background:var(--bg);color:var(--text);padding:14px 16px;font:700 .95em 'Inter',sans-serif;outline:none;transition:border-color .16s ease, box-shadow .16s ease}
+        .auth-field:focus{border-color:var(--green);box-shadow:0 0 0 4px var(--green-bg)}
+        .auth-submit{border:0;border-radius:16px;background:var(--green);color:#fff;padding:14px 18px;font:800 .95em 'Inter',sans-serif;cursor:pointer;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease;box-shadow:0 12px 28px rgba(0,200,117,.22)}
+        .auth-submit:hover{transform:translateY(-1px);filter:brightness(.98)}
+        .auth-submit:active{transform:translateY(0)}
+        .auth-error{min-height:20px;font-size:.82em;font-weight:700;color:var(--red)}
+        .auth-note{margin-top:12px;font-size:.76em;font-weight:600;color:var(--dim)}
         .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
         .header-left{display:flex;align-items:center;gap:10px}
         .logo-icon{width:36px;height:36px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:white}
@@ -239,7 +253,20 @@
         @media(max-width:900px){.filters,.filters.sales-filters,.marketing-filters,.linkedin-ads-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.sales-filter-layout{grid-template-columns:1fr;width:100%}.sales-filter-column{justify-items:stretch}.sales-filter-column > .campaign-picker{width:100%}.chart-head,.marketing-subtab-title{flex-direction:column;align-items:stretch}.chart-controls{width:100%;justify-content:flex-start}.chart-card .campaign-picker,.chart-controls .campaign-picker{width:100%;min-width:0;flex:1 1 auto}.sales-trend-card #salesTrendViewPicker,.sales-trend-card #salesTrendSeriesPicker,.sales-distribution-card #salesPieDimensionPicker{width:100%;min-width:0;flex:1 1 auto}.chart-toggle{width:100%;justify-content:flex-start;flex-wrap:wrap}.sales-scorecards{grid-template-columns:1fr}.pie-legend-table th:nth-child(2),.pie-legend-table td:nth-child(2){padding-right:8px}.linkedin-ring-flow{flex-direction:column;align-items:center}.linkedin-ring-stage{flex:0 0 auto}}
     </style>
 </head>
-<body class="is-refreshing">
+<body class="is-refreshing auth-locked">
+<div class="auth-gate" id="authGate">
+    <div class="auth-panel">
+        <div class="auth-badge" aria-hidden="true">🔐</div>
+        <h2>Protected Dashboard</h2>
+        <div class="auth-copy">Enter the password to open the GTMB dashboard.</div>
+        <form class="auth-form" onsubmit="submitPassword(event)">
+            <input class="auth-field" id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" aria-label="Dashboard password">
+            <button class="auth-submit" type="submit">Open Dashboard</button>
+        </form>
+        <div class="auth-error" id="passwordError"></div>
+        <div class="auth-note">This is a temporary password gate for the shared dashboard link.</div>
+    </div>
+</div>
 <div class="container">
     <div class="header">
         <div class="header-left">
@@ -932,6 +959,9 @@ const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClose
 const MARKETING_TREND_VIEW_OPTIONS = ['Yearly','Quarterly','Monthly'];
 const MARKETING_SUBTABS = ['websiteFormFills', 'linkedInAds', 'googleAds'];
 const TABLE_PAGE_SIZE = 10;
+const DASHBOARD_PASSWORD = 'marketing#2026';
+const DASHBOARD_UNLOCK_KEY = 'gtmb-dashboard-unlocked';
+let dashboardBootstrapped = false;
 const STATE = {
     rows: [],
     filtered: [],
@@ -4428,6 +4458,41 @@ function renderAll(){
     renderTables(rows);
 }
 
+function unlockDashboard(remember = true) {
+    const gate = document.getElementById('authGate');
+    document.body.classList.remove('auth-locked');
+    if (gate) gate.style.display = 'none';
+    if (remember) {
+        try {
+            sessionStorage.setItem(DASHBOARD_UNLOCK_KEY, 'true');
+        } catch (error) {}
+    }
+}
+
+function bootstrapDashboard() {
+    if (dashboardBootstrapped) return;
+    dashboardBootstrapped = true;
+    manualRefresh();
+}
+
+function submitPassword(event) {
+    if (event) event.preventDefault();
+    const input = document.getElementById('passwordInput');
+    const error = document.getElementById('passwordError');
+    const submitted = String(input?.value || '').trim();
+    if (submitted === DASHBOARD_PASSWORD) {
+        if (error) error.textContent = '';
+        unlockDashboard(true);
+        bootstrapDashboard();
+        return;
+    }
+    if (error) error.textContent = 'Incorrect password. Please try again.';
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+}
+
 async function manualRefresh(){
     const btn = document.getElementById('refreshBtn');
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -4504,9 +4569,17 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('load', () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    if (document.body.classList.contains('auth-locked')) {
+        document.getElementById('passwordInput')?.focus();
+    }
 });
 
-manualRefresh();
+try {
+    if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
+        unlockDashboard(false);
+        bootstrapDashboard();
+    }
+} catch (error) {}
 </script>
 </body>
 </html>
