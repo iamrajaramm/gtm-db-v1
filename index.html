@@ -921,7 +921,6 @@ const WORKBOOK_FILE = './%F0%9F%94%B4%20GTMDB-Data.xlsx';
 const DEALS_WORKSHEET_NAME = 'GTMDB-Deals';
 const INBOUND_WORKSHEET_NAME = 'GTMDB-Contacts-Inbound';
 const LINKEDIN_ADS_WORKSHEET_NAME = 'GTMDB-LinkedIn-Ads';
-const LINKEDIN_CONTACTS_WORKSHEET_NAME = 'GTMDB-Contacts-Linkedin';
 const GOOGLE_ADS_WORKSHEET_NAME = 'GTMDB-Google-Ads';
 const DEFAULT_DEAL_STAGE = 'S7a: Closed-Won / Start Onboarding';
 const REVENUE_FILTER_KEYS = ['dealType','status','year','quarter'];
@@ -1034,7 +1033,6 @@ const STATE = {
         linkedInAds: {
             rows: [],
             filtered: [],
-            contactsRows: [],
             filteredContacts: [],
             filters: {
                 linkedInAdsYear: [],
@@ -1142,10 +1140,10 @@ const MARKETING_STAGE_CONFIG = [
     }
 ];
 const LINKEDIN_CONTACT_FUNNEL_CONFIG = [
-    { key:'lead', label:'Leads', color:'#2563eb', predicate:(row) => Boolean(String(row['Contact ID'] || '').trim()) },
-    { key:'mql', label:'MQL', color:'#7c3aed', predicate:(row) => Boolean(String(row['MQL Date'] || '').trim()) },
-    { key:'meetingBooked', label:'Meeting Booked', color:'#f59e0b', predicate:(row) => Boolean(String(row['Meeting Scheduled Date'] || '').trim()) },
-    { key:'meetingHappened', label:'Meeting Happened', color:'#06b6d4', predicate:(row) => Boolean(String(row['Meeting Happened Date'] || '').trim()) },
+    { key:'lead', label:'Leads', color:'#2563eb', predicate:(row) => Boolean(row.__linkedInDemoRequestDate) },
+    { key:'mql', label:'MQL', color:'#7c3aed', predicate:(row) => Boolean(row.__mqlDate) },
+    { key:'meetingBooked', label:'Meeting Booked', color:'#f59e0b', predicate:(row) => Boolean(row.__meetingBookedDate) },
+    { key:'meetingHappened', label:'Meeting Happened', color:'#06b6d4', predicate:(row) => Boolean(row.__meetingHappenedDate) },
     { key:'sao', label:'SAO', color:'#14b8a6', predicate:(row) => row.__marketingSao },
     { key:'won', label:'Won', color:'#00c875', predicate:(row) => row.__marketingClosedWon }
 ];
@@ -1596,6 +1594,10 @@ function getLinkedInAdsBaseRows() {
     return (STATE.marketing.linkedInAds.rows || []).filter((row) => row.__adsDate);
 }
 
+function getLinkedInLeadBaseRows() {
+    return (STATE.marketing.rows || []).filter((row) => row.__linkedInDemoRequestDate);
+}
+
 function getGoogleAdsBaseRows() {
     return (STATE.marketing.googleAds.rows || []).filter((row) => row.__adsDate);
 }
@@ -1698,7 +1700,7 @@ function getOptionAmountMap(key) {
                         ? row.__year
                         : row.__quarter;
         if (!optionValue || optionValue === 'Unknown') return;
-        map.set(optionValue, (map.get(optionValue) || 0) + row.__amount);
+        map.set(optionValue, (map.get(optionValue) || 0) + (row.__revenueAmount ?? row.__amount));
     });
     return map;
 }
@@ -1935,14 +1937,11 @@ async function fetchSheet() {
     if (!inboundSheet) throw new Error(`Worksheet "${INBOUND_WORKSHEET_NAME}" not found in local workbook`);
     const linkedInAdsSheet = workbook.Sheets[LINKEDIN_ADS_WORKSHEET_NAME];
     if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in local workbook`);
-    const linkedInContactsSheet = workbook.Sheets[LINKEDIN_CONTACTS_WORKSHEET_NAME];
-    if (!linkedInContactsSheet) throw new Error(`Worksheet "${LINKEDIN_CONTACTS_WORKSHEET_NAME}" not found in local workbook`);
     const googleAdsSheet = workbook.Sheets[GOOGLE_ADS_WORKSHEET_NAME];
     if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in local workbook`);
     const rows = XLSX.utils.sheet_to_json(dealsSheet, { header: 1, raw: false, defval: '' });
     const inboundRows = XLSX.utils.sheet_to_json(inboundSheet, { header: 1, raw: false, defval: '' });
     const linkedInAdsRows = XLSX.utils.sheet_to_json(linkedInAdsSheet, { header: 1, raw: false, defval: '' });
-    const linkedInContactsRows = XLSX.utils.sheet_to_json(linkedInContactsSheet, { header: 1, raw: false, defval: '' });
     const googleAdsRows = XLSX.utils.sheet_to_json(googleAdsSheet, { header: 1, raw: false, defval: '' });
     const linkMap = {};
     const range = XLSX.utils.decode_range(dealsSheet['!ref'] || 'A1:A1');
@@ -1962,24 +1961,13 @@ async function fetchSheet() {
             inboundLinkMap[rowIndex + 1] = link;
         }
     }
-    const linkedInContactsLinkMap = {};
-    const linkedInContactsRange = XLSX.utils.decode_range(linkedInContactsSheet['!ref'] || 'A1:A1');
-    for (let rowIndex = linkedInContactsRange.s.r; rowIndex <= linkedInContactsRange.e.r; rowIndex += 1) {
-        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
-        const link = extractSheetHyperlink(linkedInContactsSheet[cellRef]);
-        if (link) {
-            linkedInContactsLinkMap[rowIndex + 1] = link;
-        }
-    }
     return {
         rows: normalizeRows(rows),
         inboundRows: normalizeRows(inboundRows),
         linkedInAdsRows: normalizeRows(linkedInAdsRows),
-        linkedInContactsRows: normalizeRows(linkedInContactsRows),
         googleAdsRows: normalizeRows(googleAdsRows),
         linkMap,
         inboundLinkMap
-        ,linkedInContactsLinkMap
     };
 }
 
@@ -1997,12 +1985,17 @@ function rowsToObjects(rows, linkMap = {}){
         obj.__dealLink = linkMap[headerIndex + 2 + rowOffset] || '';
         const createDate = parseSheetDate(obj['Create Date'] || '');
         const closeDate = parseSheetDate(obj['Close Date'] || '');
+        const contractEndDate = parseSheetDate(obj['Contract End Date (GTMB)'] || '');
         obj.__createDate = createDate;
         obj.__closeDate = closeDate;
-        obj.__date = closeDate || createDate;
         obj.__amount = num(obj['Amount']);
         obj.__dealType = canonicalDealType(obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || '');
         obj.__status = canonicalStatus(obj['#Status'] || obj['#status'] || obj['Deal Stage'] || '');
+        const isChurn = lowerStatus(obj.__status) === 'churn';
+        obj.__contractEndDate = contractEndDate;
+        obj.__revenueDate = isChurn ? contractEndDate : closeDate;
+        obj.__revenueAmount = isChurn ? -Math.abs(obj.__amount) : obj.__amount;
+        obj.__date = obj.__revenueDate || null;
         obj.__salesDealType = String(obj['#Deal Type'] || obj['#deal type'] || obj['Deal Type'] || '').trim() || 'Unknown';
         obj.__dealStage = String(obj['Deal Stage'] || '').trim();
         obj.__dealOwner = String(obj['Deal Owner First Name'] || '').trim() || 'Unknown';
@@ -2011,9 +2004,9 @@ function rowsToObjects(rows, linkMap = {}){
         obj.__employeeBand = String(obj['#Number of Employees'] || obj['Number of Employees'] || '').trim() || 'Unknown';
         obj.__salesHeadcount = String(obj['#Size of Sales Team'] || obj['Size of Sales Team'] || '').trim() || 'Unknown';
         obj.__sao = String(obj['SAO (S2-S6)'] || '').trim();
-        obj.__year = obj.__closeDate ? String(obj.__closeDate.getFullYear()) : 'Unknown';
-        obj.__quarter = obj.__closeDate ? `Q${Math.floor(obj.__closeDate.getMonth()/3)+1} ${obj.__closeDate.getFullYear()}` : 'Unknown';
-        obj.__month = obj.__closeDate ? `${obj.__closeDate.toLocaleString('en-US',{month:'short'})} ${obj.__closeDate.getFullYear()}` : 'Unknown';
+        obj.__year = obj.__revenueDate ? String(obj.__revenueDate.getFullYear()) : 'Unknown';
+        obj.__quarter = obj.__revenueDate ? `Q${Math.floor(obj.__revenueDate.getMonth()/3)+1} ${obj.__revenueDate.getFullYear()}` : 'Unknown';
+        obj.__month = obj.__revenueDate ? `${obj.__revenueDate.toLocaleString('en-US',{month:'short'})} ${obj.__revenueDate.getFullYear()}` : 'Unknown';
         obj.__createYear = obj.__createDate ? String(obj.__createDate.getFullYear()) : 'Unknown';
         obj.__createQuarter = obj.__createDate ? `Q${Math.floor(obj.__createDate.getMonth()/3)+1} ${obj.__createDate.getFullYear()}` : 'Unknown';
         obj.__createMonthKey = obj.__createDate ? `${obj.__createDate.getFullYear()}-${String(obj.__createDate.getMonth()+1).padStart(2,'0')}` : 'Unknown';
@@ -2034,10 +2027,13 @@ function inboundRowsToObjects(rows, linkMap = {}) {
                 obj[header] = row[index] ?? '';
             });
             const formFillDate = parseSheetDate(obj['Website Demo Request Date'] || '');
+            const linkedInDemoRequestDate = parseSheetDate(obj['LinkedIn Demo Request Date'] || '');
             const mqlDate = parseSheetDate(obj['MQL Date'] || '');
             const meetingBookedDate = parseSheetDate(obj['Meeting Scheduled Date'] || '');
             const meetingHappenedDate = parseSheetDate(obj['Meeting Happened Date'] || '');
+            obj.__contactId = String(obj['Contact ID'] || '').trim();
             obj.__formFillDate = formFillDate;
+            obj.__linkedInDemoRequestDate = linkedInDemoRequestDate;
             obj.__mqlDate = mqlDate;
             obj.__meetingBookedDate = meetingBookedDate;
             obj.__meetingHappenedDate = meetingHappenedDate;
@@ -2046,18 +2042,26 @@ function inboundRowsToObjects(rows, linkMap = {}) {
             obj.__formFillQuarter = formFillDate ? quarterLabelFromDate(formFillDate) : 'Unknown';
             obj.__formFillMonthKey = formFillDate ? `${formFillDate.getFullYear()}-${String(formFillDate.getMonth() + 1).padStart(2, '0')}` : 'Unknown';
             obj.__formFillMonth = formFillDate ? formFillDate.toLocaleString('en-US', { month:'short', year:'numeric' }) : 'Unknown';
+            obj.__linkedInDemoYear = linkedInDemoRequestDate ? String(linkedInDemoRequestDate.getFullYear()) : 'Unknown';
+            obj.__linkedInDemoQuarter = linkedInDemoRequestDate ? quarterLabelFromDate(linkedInDemoRequestDate) : 'Unknown';
             obj.__referenceYear = obj.__referenceDate ? String(obj.__referenceDate.getFullYear()) : 'Unknown';
             obj.__referenceQuarter = obj.__referenceDate ? quarterLabelFromDate(obj.__referenceDate) : 'Unknown';
             obj.__marketingAmount = num(obj['Amount']);
             obj.__marketingSao = String(obj['SAO (S2-S6)'] || '').trim().toLowerCase() === 'true';
+            obj.__companyDomain = String(obj['Company Domain Name'] || '').trim() || '';
+            obj.__dealId = String(obj['Deal ID'] || '').trim();
+            obj.__dealName = String(obj['Deal Name'] || '').trim() || '-';
             const stage = String(obj['Deal Stage'] || '').trim();
             const stageLower = stage.toLowerCase();
+            obj.__dealStage = stage || '-';
             obj.__marketingClosedWon = stageLower === lowerStage(DEFAULT_DEAL_STAGE);
             obj.__marketingClosedLost = stageLower.includes('s7b') || stageLower.includes('closed-lost');
             obj.__companyName = String(obj['Company name'] || '').trim() || '-';
             obj.__email = String(obj['Email'] || '').trim() || '-';
+            obj.__howDidHear = String(obj['How did you hear about us?'] || '').trim() || '';
+            obj.__howDidHearGrouped = String(obj['How did you hear about us? (Grouped)'] || '').trim() || '';
             obj.__campaignInteracted = String(obj['Ad Campaign Interacted'] || '').trim() || '';
-            obj.__contactLink = linkMap[headerIndex + 2 + rowOffset] || extractHyperlinkFromText(obj['Contact ID'] || '');
+            obj.__contactLink = linkMap[headerIndex + 2 + rowOffset] || extractHyperlinkFromText(obj.__contactId || '');
             return obj;
         });
 }
@@ -2673,9 +2677,9 @@ function applyLinkedInAdsFilters() {
         (!linkedInAdsQuarter.length || linkedInAdsQuarter.includes(row.__adsQuarter)) &&
         (!linkedInAdsCampaign.length || linkedInAdsCampaign.includes(row.__campaign))
     );
-    linkedInState.filteredContacts = (linkedInState.contactsRows || []).filter((row) => {
-        const matchYear = !linkedInAdsYear.length || linkedInAdsYear.includes(row.__referenceYear);
-        const matchQuarter = !linkedInAdsQuarter.length || linkedInAdsQuarter.includes(row.__referenceQuarter);
+    linkedInState.filteredContacts = getLinkedInLeadBaseRows().filter((row) => {
+        const matchYear = !linkedInAdsYear.length || linkedInAdsYear.includes(row.__linkedInDemoYear);
+        const matchQuarter = !linkedInAdsQuarter.length || linkedInAdsQuarter.includes(row.__linkedInDemoQuarter);
         return matchYear && matchQuarter;
     });
     STATE.tablePage.linkedInAdsTable = 1;
@@ -2696,15 +2700,15 @@ function applyGoogleAdsFilters() {
 }
 
 function hasMarketingMql(row) {
-    return Boolean(String(row['MQL Date'] || '').trim());
+    return Boolean(row.__mqlDate);
 }
 
 function hasMarketingMeetingBooked(row) {
-    return Boolean(String(row['Meeting Scheduled Date'] || '').trim());
+    return Boolean(row.__meetingBookedDate);
 }
 
 function hasMarketingMeetingHappened(row) {
-    return Boolean(String(row['Meeting Happened Date'] || '').trim());
+    return Boolean(row.__meetingHappenedDate);
 }
 
 function isMarketingClosedWon(row) {
@@ -2828,7 +2832,7 @@ function aggregateBy(rows, keyFn){
         const key = keyFn(r);
         groups[key] ||= { deals:0, amount:0 };
         groups[key].deals += 1;
-        groups[key].amount += r.__amount;
+        groups[key].amount += (r.__revenueAmount ?? r.__amount);
     });
     return groups;
 }
@@ -4036,9 +4040,9 @@ function renderMarketingTable(rows) {
             <td>${escapeHtml(row.__companyName)}</td>
             <td>${row.__contactLink ? `<a href="${escapeHtml(row.__contactLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.__email)}</a>` : escapeHtml(row.__email)}</td>
             <td>${escapeHtml(formatRevenueCloseDate(row.__formFillDate))}</td>
-            <td>${escapeHtml(String(row['Deal Name'] || '').trim() || '-')}</td>
-            <td>${escapeHtml(String(row['Deal Stage'] || '').trim() || '-')}</td>
-            <td class="num">${money(num(row['Amount']))}</td>
+            <td>${escapeHtml(row.__dealName)}</td>
+            <td>${escapeHtml(row.__dealStage)}</td>
+            <td class="num">${money(row.__marketingAmount)}</td>
         </tr>
     `).join('');
 
@@ -4253,26 +4257,51 @@ function renderSalesTable(rows) {
 }
 
 function renderTables(rows){
-    const { year, quarter } = STATE.filters;
-    const scopedRows = STATE.rows.filter((row) =>
-        isClosedWonStage(row) &&
-        (!year.length || year.includes(row.__year)) &&
-        (!quarter.length || quarter.includes(row.__quarter))
-    );
+    const scopedRows = (STATE.trendBreakdown || []).length
+        ? rows.filter((row) => STATE.trendBreakdown.includes(getTrendBreakdownCategory(row)))
+        : rows;
 
-    const customers = [...scopedRows]
-        .filter((row) => isDealType(row, 'New Logo') && isStatus(row, 'Customer'))
-        .sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue']));
+    const uniqueRevenueRows = (tableRows) => {
+        const grouped = new Map();
+        tableRows.forEach((row) => {
+            const companyName = String(row['Company name'] || row.__companyName || '-').trim() || '-';
+            const key = companyName.toLowerCase();
+            const revenueValue = num(row['Total Revenue']);
+            const dateValue = row.__revenueDate || null;
+            const existing = grouped.get(key);
+            if (!existing) {
+                grouped.set(key, {
+                    ...row,
+                    __tableCompanyName: companyName,
+                    __tableRevenue: revenueValue,
+                    __tableDate: dateValue
+                });
+                return;
+            }
+            existing.__tableRevenue = Math.max(existing.__tableRevenue, revenueValue);
+            if (dateValue && (!existing.__tableDate || dateValue > existing.__tableDate)) {
+                existing.__tableDate = dateValue;
+            }
+            if (!existing.__dealLink && row.__dealLink) {
+                existing.__dealLink = row.__dealLink;
+            }
+        });
+        return [...grouped.values()];
+    };
 
-    const churns = [...scopedRows]
-        .filter((row) => isDealType(row, 'New Logo') && isStatus(row, 'Churn'))
-        .sort((a,b) => num(b['Total Revenue']) - num(a['Total Revenue']));
+    const customers = uniqueRevenueRows(scopedRows
+        .filter((row) => isStatus(row, 'Customer'))
+    ).sort((a,b) => (b.__tableRevenue || 0) - (a.__tableRevenue || 0));
+
+    const churns = uniqueRevenueRows(scopedRows
+        .filter((row) => isStatus(row, 'Churn'))
+    ).sort((a,b) => (b.__tableRevenue || 0) - (a.__tableRevenue || 0));
 
     const renderRows = (tableRows, emptyLabel, tableKey) => {
         const rankedRows = sortTableRows(tableRows, tableKey, (row, key) => {
-            if (key === 'companyName') return row['Company name'] || '';
-            if (key === 'closeDate') return row.__closeDate || null;
-            if (key === 'totalRevenue') return num(row['Total Revenue']);
+            if (key === 'companyName') return row.__tableCompanyName || row['Company name'] || '';
+            if (key === 'closeDate') return row.__tableDate || row.__revenueDate || null;
+            if (key === 'totalRevenue') return row.__tableRevenue ?? num(row['Total Revenue']);
             return '';
         });
         const totalRows = rankedRows.length;
@@ -4300,7 +4329,7 @@ function renderTables(rows){
         return {
             body: visibleRows.map((entry, visibleIndex) => {
                 const { row } = entry;
-                const companyName = escapeHtml(row['Company name'] || '-');
+                const companyName = escapeHtml(row.__tableCompanyName || row['Company name'] || '-');
                 const companyNameHtml = row.__dealLink
                     ? `<a href="${escapeHtml(row.__dealLink)}" target="_blank" rel="noopener noreferrer">${companyName}</a>`
                     : companyName;
@@ -4308,8 +4337,8 @@ function renderTables(rows){
             <tr>
                 <td class="num">${startIndex + visibleIndex + 1}</td>
                 <td>${companyNameHtml}</td>
-                <td>${escapeHtml(formatRevenueCloseDate(row.__closeDate))}</td>
-                <td class="num">${money(num(row['Total Revenue']))}</td>
+                <td>${escapeHtml(formatRevenueCloseDate(row.__tableDate || row.__revenueDate))}</td>
+                <td class="num">${money(row.__tableRevenue ?? num(row['Total Revenue']))}</td>
             </tr>
             `;
             }).join(''),
@@ -4341,6 +4370,11 @@ function renderTables(rows){
     const activeTable = renderRows(activeConfig.rows, activeConfig.emptyLabel, activeConfig.tableKey);
 
     document.getElementById('revenueTableTitle').textContent = activeConfig.title;
+    const revenueDateSortButton = document.getElementById('revenueSortDateBtn');
+    if (revenueDateSortButton) {
+        const dateLabel = activeView === 'churns' ? 'Contract End Date' : 'Close Date';
+        revenueDateSortButton.innerHTML = `${dateLabel} <span class="tbl-sort-icon" id="revenueSortDateIcon">↕</span>`;
+    }
     document.querySelectorAll('input[name="revenueTableView"]').forEach((input) => {
         input.checked = input.value === activeView;
     });
@@ -4400,11 +4434,11 @@ async function manualRefresh(){
     document.body.classList.add('is-refreshing');
     btn.classList.add('is-loading');
     try{
-        const { rows, inboundRows, linkedInAdsRows, linkedInContactsRows, googleAdsRows, linkMap, inboundLinkMap, linkedInContactsLinkMap } = await fetchSheet();
+        const { rows, inboundRows, linkedInAdsRows, googleAdsRows, linkMap, inboundLinkMap } = await fetchSheet();
         STATE.rows = rowsToObjects(rows, linkMap);
         STATE.marketing.rows = inboundRowsToObjects(inboundRows, inboundLinkMap);
         STATE.marketing.linkedInAds.rows = linkedInAdsRowsToObjects(linkedInAdsRows);
-        STATE.marketing.linkedInAds.contactsRows = inboundRowsToObjects(linkedInContactsRows, linkedInContactsLinkMap);
+        STATE.marketing.linkedInAds.filteredContacts = [];
         STATE.marketing.googleAds.rows = googleAdsRowsToObjects(googleAdsRows);
         setupFilters();
         setupSalesFilters();
