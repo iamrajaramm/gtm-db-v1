@@ -1445,7 +1445,7 @@ function refreshCampaignPerformanceFrame() {
         campaignPerformanceRefreshPending = true;
         return;
     }
-    campaignPerformanceRefreshPending = false;
+    campaignPerformanceRefreshPending = true;
     applyThemeToCampaignPerformanceFrame();
     try {
         frame.contentWindow.postMessage({ type: 'campaign-performance-refresh' }, '*');
@@ -1482,9 +1482,13 @@ window.addEventListener('message', (event) => {
     }
     if (data.type === 'campaign-performance-ready') {
         applyThemeToCampaignPerformanceFrame();
-        if (campaignPerformanceRefreshPending) {
+        if (campaignPerformanceRefreshPending || STATE?.rows?.length) {
             refreshCampaignPerformanceFrame();
         }
+        return;
+    }
+    if (data.type === 'campaign-performance-refreshed') {
+        campaignPerformanceRefreshPending = false;
     }
 });
 window.addEventListener('resize', () => {
@@ -2329,28 +2333,10 @@ function normalizeRows(rows) {
 }
 
 async function fetchSheet() {
-    const workbookSources = [
-        { url: `${LIVE_WORKBOOK_URL}&_t=${Date.now()}`, label: 'live Google Sheet' },
-        { url: `${WORKBOOK_FILE}?_t=${Date.now()}`, label: 'local workbook fallback' }
-    ];
-    let buffer = null;
-    let lastError = null;
-    for (const source of workbookSources) {
-        try {
-            const resp = await fetch(source.url, { cache: 'no-store' });
-            if (!resp.ok) throw new Error(`Failed to fetch ${source.label}`);
-            buffer = await resp.arrayBuffer();
-            if (buffer && buffer.byteLength > 0) {
-                break;
-            }
-            throw new Error(`Empty response from ${source.label}`);
-        } catch (error) {
-            lastError = error;
-        }
-    }
-    if (!buffer) {
-        throw lastError || new Error('Failed to fetch dashboard workbook');
-    }
+    const resp = await fetch(`${LIVE_WORKBOOK_URL}&_t=${Date.now()}`, { cache: 'no-store' });
+    if (!resp.ok) throw new Error('Failed to fetch live Google Sheet');
+    const buffer = await resp.arrayBuffer();
+    if (!buffer || buffer.byteLength === 0) throw new Error('Empty response from live Google Sheet');
     const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
     const dealsSheet = workbook.Sheets[DEALS_WORKSHEET_NAME];
     if (!dealsSheet) throw new Error(`Worksheet "${DEALS_WORKSHEET_NAME}" not found in workbook`);
