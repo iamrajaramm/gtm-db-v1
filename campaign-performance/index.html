@@ -1295,14 +1295,21 @@ async function getSheetText(gid, forceRefresh = false) {
     if (!forceRefresh && SHEET_TEXT_CACHE[gid]) {
         return SHEET_TEXT_CACHE[gid];
     }
-    const proxyUrl = `/api/sheet?sheetId=${SHEET_ID}&gid=${gid}&_t=${Date.now()}`;
-    const resp = await fetch(proxyUrl, { cache: 'no-store' });
-    const sheetText = await resp.text();
-
-    if (!resp.ok) throw new Error(`Fetch failed for gid ${gid}`);
-    if (!sheetText || sheetText.trim().length === 0) throw new Error(`Empty sheet response for gid ${gid}`);
-    SHEET_TEXT_CACHE[gid] = sheetText;
-    return sheetText;
+    const proxyUrl = `/api/sheet?sheetId=${encodeURIComponent(SHEET_ID)}&gid=${encodeURIComponent(gid)}&_t=${Date.now()}`;
+    const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=tsv&gid=${gid}&_t=${Date.now()}`;
+    const endpoints = [proxyUrl, directUrl];
+    let lastError = null;
+    for (const url of endpoints) {
+        try {
+            const resp = await fetch(url, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const sheetText = await resp.text();
+            if (!sheetText || !sheetText.trim() || sheetText.trim().startsWith('<!')) throw new Error('Empty or HTML response');
+            SHEET_TEXT_CACHE[gid] = sheetText;
+            return sheetText;
+        } catch (e) { lastError = e; }
+    }
+    throw new Error(`Fetch failed for gid ${gid}: ${lastError?.message}`);
 }
 
 function getDealStageStyle(stageText) {

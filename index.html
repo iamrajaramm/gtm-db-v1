@@ -2329,12 +2329,20 @@ function normalizeRows(rows) {
 }
 
 async function fetchTSV(gid) {
-    const url = `/api/sheet?sheetId=${LIVE_WORKBOOK_SHEET_ID}&gid=${gid}&_t=${Date.now()}`;
-    const resp = await fetch(url, { cache: 'no-store' });
-    if (!resp.ok) throw new Error(`Failed to fetch live Google Sheet tab (gid=${gid})`);
-    const text = await resp.text();
-    if (!text || !text.trim()) throw new Error(`Empty response from Google Sheet tab (gid=${gid})`);
-    return text.split(/\r?\n/).map(line => line.split('\t'));
+    const proxyUrl = `/api/sheet?sheetId=${encodeURIComponent(LIVE_WORKBOOK_SHEET_ID)}&gid=${encodeURIComponent(gid)}&_t=${Date.now()}`;
+    const directUrl = `https://docs.google.com/spreadsheets/d/${LIVE_WORKBOOK_SHEET_ID}/export?format=tsv&gid=${gid}&_t=${Date.now()}`;
+    const endpoints = [proxyUrl, directUrl];
+    let lastError = null;
+    for (const url of endpoints) {
+        try {
+            const resp = await fetch(url, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const text = await resp.text();
+            if (!text || !text.trim() || text.trim().startsWith('<!')) throw new Error('Empty or HTML response');
+            return text.split(/\r?\n/).map(line => line.split('\t'));
+        } catch (e) { lastError = e; }
+    }
+    throw new Error(`Failed to fetch Google Sheet tab (gid=${gid}): ${lastError?.message}`);
 }
 
 async function fetchSheet() {
