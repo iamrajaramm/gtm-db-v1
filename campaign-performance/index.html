@@ -1295,8 +1295,8 @@ async function getSheetText(gid, forceRefresh = false) {
     if (!forceRefresh && SHEET_TEXT_CACHE[gid]) {
         return SHEET_TEXT_CACHE[gid];
     }
-    const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=tsv&gid=${gid}&_t=${Date.now()}`;
-    const resp = await fetch(directUrl, { cache: 'no-store' });
+    const proxyUrl = `/api/sheet?sheetId=${SHEET_ID}&gid=${gid}&_t=${Date.now()}`;
+    const resp = await fetch(proxyUrl, { cache: 'no-store' });
     const sheetText = await resp.text();
 
     if (!resp.ok) throw new Error(`Fetch failed for gid ${gid}`);

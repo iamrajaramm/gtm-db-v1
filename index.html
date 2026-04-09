@@ -17,7 +17,6 @@
         });
     </script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         [data-theme="light"]{--bg:#EEEEEE;--surface:#ffffff;--card-border:#dcdcdc;--text:#0d0d12;--text2:#3d3d4e;--dim:#8a8a99;--green:#00c875;--green-dark:#00a35c;--green-bg:#e6faf0;--navy:#0d0d12;--blue:#4361ee;--amber:#f59e0b;--red:#ef4444;--purple:#7c3aed;--hover-bg:#f0f0f2;--grid-color:#f0f0f2;--pill-active-bg:#0d0d12;--pill-active-text:#fff;--chip-bg:white;--chip-border:#ebebeb}
@@ -1116,9 +1115,14 @@
 </div>
 
 <script>
-const WORKBOOK_FILE = './%F0%9F%94%B4%20GTMDB-Data.xlsx';
 const LIVE_WORKBOOK_SHEET_ID = '1PvgKWPJTfnZgtRyKTcUUteTWEoALBe_qBiSY0kLT-Lo';
-const LIVE_WORKBOOK_URL = `https://docs.google.com/spreadsheets/d/${LIVE_WORKBOOK_SHEET_ID}/export?format=xlsx`;
+const TAB_GIDS = {
+    deals: 571282469,
+    inbound: 1970171828,
+    linkedInAds: 617648114,
+    googleAds: 1752759334,
+    ga4: 301206009
+};
 const DEALS_WORKSHEET_NAME = 'GTMDB-Deals';
 const INBOUND_WORKSHEET_NAME = 'GTMDB-Contacts-Inbound';
 const LINKEDIN_ADS_WORKSHEET_NAME = 'GTMDB-LinkedIn-Ads';
@@ -2278,14 +2282,6 @@ function parseCsv(text){
     return rows.map(r => r.map(c => String(c || '').trim())).filter(r => r.some(c => c));
 }
 
-function extractSheetHyperlink(cell) {
-    if (!cell) return '';
-    if (cell.l && cell.l.Target) return String(cell.l.Target).trim();
-    const formula = String(cell.f || '').trim();
-    const match = formula.match(/HYPERLINK\("([^"]+)"/i);
-    return match ? String(match[1] || '').trim() : '';
-}
-
 function extractHyperlinkFromText(value) {
     const match = String(value || '').match(/HYPERLINK\("([^"]+)"/i);
     return match ? String(match[1] || '').trim() : '';
@@ -2332,53 +2328,31 @@ function normalizeRows(rows) {
         .filter((row) => row.some((cell) => cell));
 }
 
+async function fetchTSV(gid) {
+    const url = `/api/sheet?sheetId=${LIVE_WORKBOOK_SHEET_ID}&gid=${gid}&_t=${Date.now()}`;
+    const resp = await fetch(url, { cache: 'no-store' });
+    if (!resp.ok) throw new Error(`Failed to fetch live Google Sheet tab (gid=${gid})`);
+    const text = await resp.text();
+    if (!text || !text.trim()) throw new Error(`Empty response from Google Sheet tab (gid=${gid})`);
+    return text.split(/\r?\n/).map(line => line.split('\t'));
+}
+
 async function fetchSheet() {
-    const resp = await fetch(`${LIVE_WORKBOOK_URL}&_t=${Date.now()}`, { cache: 'no-store' });
-    if (!resp.ok) throw new Error('Failed to fetch live Google Sheet');
-    const buffer = await resp.arrayBuffer();
-    if (!buffer || buffer.byteLength === 0) throw new Error('Empty response from live Google Sheet');
-    const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
-    const dealsSheet = workbook.Sheets[DEALS_WORKSHEET_NAME];
-    if (!dealsSheet) throw new Error(`Worksheet "${DEALS_WORKSHEET_NAME}" not found in workbook`);
-    const inboundSheet = workbook.Sheets[INBOUND_WORKSHEET_NAME];
-    if (!inboundSheet) throw new Error(`Worksheet "${INBOUND_WORKSHEET_NAME}" not found in workbook`);
-    const linkedInAdsSheet = workbook.Sheets[LINKEDIN_ADS_WORKSHEET_NAME];
-    if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in workbook`);
-    const googleAdsSheet = workbook.Sheets[GOOGLE_ADS_WORKSHEET_NAME];
-    if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in workbook`);
-    const ga4Sheet = workbook.Sheets[GA4_WORKSHEET_NAME];
-    if (!ga4Sheet) throw new Error(`Worksheet "${GA4_WORKSHEET_NAME}" not found in workbook`);
-    const rows = XLSX.utils.sheet_to_json(dealsSheet, { header: 1, raw: false, defval: '' });
-    const inboundRows = XLSX.utils.sheet_to_json(inboundSheet, { header: 1, raw: false, defval: '' });
-    const linkedInAdsRows = XLSX.utils.sheet_to_json(linkedInAdsSheet, { header: 1, raw: false, defval: '' });
-    const googleAdsRows = XLSX.utils.sheet_to_json(googleAdsSheet, { header: 1, raw: false, defval: '' });
-    const ga4Rows = XLSX.utils.sheet_to_json(ga4Sheet, { header: 1, raw: false, defval: '' });
-    const linkMap = {};
-    const range = XLSX.utils.decode_range(dealsSheet['!ref'] || 'A1:A1');
-    for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex += 1) {
-        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
-        const link = extractSheetHyperlink(dealsSheet[cellRef]);
-        if (link) {
-            linkMap[rowIndex + 1] = link;
-        }
-    }
-    const inboundLinkMap = {};
-    const inboundRange = XLSX.utils.decode_range(inboundSheet['!ref'] || 'A1:A1');
-    for (let rowIndex = inboundRange.s.r; rowIndex <= inboundRange.e.r; rowIndex += 1) {
-        const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: 0 });
-        const link = extractSheetHyperlink(inboundSheet[cellRef]);
-        if (link) {
-            inboundLinkMap[rowIndex + 1] = link;
-        }
-    }
+    const [rows, inboundRows, linkedInAdsRows, googleAdsRows, ga4Rows] = await Promise.all([
+        fetchTSV(TAB_GIDS.deals),
+        fetchTSV(TAB_GIDS.inbound),
+        fetchTSV(TAB_GIDS.linkedInAds),
+        fetchTSV(TAB_GIDS.googleAds),
+        fetchTSV(TAB_GIDS.ga4)
+    ]);
     return {
         rows: normalizeRows(rows),
         inboundRows: normalizeRows(inboundRows),
         linkedInAdsRows: normalizeRows(linkedInAdsRows),
         googleAdsRows: normalizeRows(googleAdsRows),
         ga4Rows: normalizeRows(ga4Rows),
-        linkMap,
-        inboundLinkMap
+        linkMap: {},
+        inboundLinkMap: {}
     };
 }
 
