@@ -631,11 +631,13 @@ const LIVE = {
 };
 
 const DEFAULT_CAMPAIGN = "Operation Exodus";
+const FIVE_LEVERS_CAMPAIGN = "Five Levers";
 const PRESIDENTS_CAMPAIGN = "President's Club";
 let activeCampaign = sessionStorage.getItem("campaignReport.activeCampaign") || DEFAULT_CAMPAIGN;
 const SHEET_TEXT_CACHE = {};
 let selectedPresidentEmail = '__all__';
 let presidentLeadDetailsVisible = false;
+const FIXED_CAMPAIGN_ORDER = [DEFAULT_CAMPAIGN, FIVE_LEVERS_CAMPAIGN, PRESIDENTS_CAMPAIGN];
 
 function fmtInt(v) { return Number(v || 0).toLocaleString(); }
 function fmtMoney(v, d = 0) {
@@ -762,9 +764,12 @@ function togglePresidentEmailMenu() {
 function populateCampaignOptions(campaigns) {
     const menu = document.getElementById('campaignMenu');
     if (!menu) return;
-    const uniq = [...new Set((campaigns || []).map(x => String(x || '').trim()).filter(Boolean))];
-    if (!uniq.some(x => campaignKey(x) === campaignKey(DEFAULT_CAMPAIGN))) uniq.unshift(DEFAULT_CAMPAIGN);
-    if (!uniq.some(x => campaignKey(x) === campaignKey(PRESIDENTS_CAMPAIGN))) uniq.push(PRESIDENTS_CAMPAIGN);
+    const discovered = [...new Set((campaigns || []).map(x => String(x || '').trim()).filter(Boolean))];
+    const fixed = [...FIXED_CAMPAIGN_ORDER];
+    const extras = discovered
+        .filter(name => !FIXED_CAMPAIGN_ORDER.some(fixedName => campaignKey(fixedName) === campaignKey(name)))
+        .sort((a, b) => a.localeCompare(b));
+    const uniq = [...fixed, ...extras];
     campaignOptions = uniq;
     const match = uniq.find(x => campaignKey(x) === campaignKey(activeCampaign)) || DEFAULT_CAMPAIGN;
     activeCampaign = match;
@@ -781,7 +786,7 @@ function onCampaignChange(nextCampaign) {
         manualRefresh(true, true);
         return;
     }
-    manualRefresh(false, false);
+    manualRefresh(false, false, false);
 }
 function channelKeyFromText(v) {
     const s = String(v || '').toLowerCase();
@@ -1804,9 +1809,8 @@ async function fetchLiveData(forceRefresh = false) {
         const ts = document.getElementById('ts');
         if (ts) ts.textContent = 'Last refreshed (GMT): ' + new Date().toUTCString();
         loaded = true;
-        console.log('KPI + section live data loaded');
     } catch(e) {
-        console.log('Using fallback data:', e.message);
+        console.error('Campaign Performance live data load failed:', e);
     } finally {
         if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); }
     }
@@ -1817,7 +1821,7 @@ let autoRefreshTimer = null;
 let liveLoaded = false;
 let funnelLayoutObserver = null;
 
-function clearReportForLoad() {
+function clearReportForLoad(hideSections = true) {
     const ids = ['v1','v2','v3','v4','v5','s1','s2','s3','s4','s5'];
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -1874,17 +1878,39 @@ function clearReportForLoad() {
     if (pcTableCard) pcTableCard.style.display = 'none';
 
     const ts = document.getElementById('ts');
-    if (ts) ts.textContent = 'Last refreshed (GMT): -';
+    if (ts && hideSections) ts.textContent = 'Last refreshed (GMT): -';
 
-    document.querySelectorAll('.sec').forEach(el => { el.style.display = 'none'; });
+    if (hideSections) {
+        document.querySelectorAll('.sec').forEach(el => { el.style.display = 'none'; });
+    }
 }
 
-async function manualRefresh(forceRefresh = true, showLoading = true) {
+function showLiveDataError(message) {
+    const loadingState = document.getElementById('loadingState');
+    if (loadingState) {
+        const copy = loadingState.querySelector('.loading-copy');
+        if (copy) copy.textContent = message || 'Unable to load live data';
+    }
+    document.body.classList.add('is-refreshing');
+}
+
+async function manualRefresh(forceRefresh = true, showLoading = true, hideSections = showLoading) {
     if (showLoading) document.body.classList.add('is-refreshing');
-    clearReportForLoad();
+    const loadingState = document.getElementById('loadingState');
+    if (loadingState) {
+        const copy = loadingState.querySelector('.loading-copy');
+        if (copy) copy.textContent = 'Fetching live data';
+    }
+    clearReportForLoad(hideSections);
     const ok = await fetchLiveData(forceRefresh);
     if (showLoading) document.body.classList.remove('is-refreshing');
-    if (!ok) return;
+    if (!ok) {
+        showLiveDataError('Unable to load live data');
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'campaign-performance-refreshed', ok: false }, '*');
+        }
+        return;
+    }
     liveLoaded = true;
     document.querySelectorAll('.sec').forEach(el => { el.style.display = ''; });
     const onBtn = document.querySelector('.ch-pill.on');
@@ -1892,6 +1918,9 @@ async function manualRefresh(forceRefresh = true, showLoading = true) {
     applyCampaignLayout(currentKey, onBtn);
     renderExodusProgress();
     renderAllAfterLayout();
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'campaign-performance-refreshed', ok: true }, '*');
+    }
     if (!EMBED_MODE && !autoRefreshTimer) {
         autoRefreshTimer = setInterval(fetchLiveData, 300000);
     }
@@ -2160,7 +2189,7 @@ function filterLeadTable(channelKey) {
 }
 function init(){
     updateCampaignTitle();
-    populateCampaignOptions([DEFAULT_CAMPAIGN, PRESIDENTS_CAMPAIGN]);
+    populateCampaignOptions([DEFAULT_CAMPAIGN, FIVE_LEVERS_CAMPAIGN, PRESIDENTS_CAMPAIGN]);
     document.addEventListener('click', (e) => {
         const picker = document.getElementById('campaignPicker');
         if (picker && !picker.contains(e.target)) closeCampaignMenu();
@@ -2192,14 +2221,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
