@@ -100,6 +100,8 @@
         .marketing-tab-option.is-active{background:var(--pill-active-bg);color:var(--pill-active-text)}
         .marketing-subpanel{display:none}
         .marketing-subpanel.active{display:block}
+        .campaign-embed-card{padding:0;overflow:visible}
+        .campaign-embed-frame{display:block;width:100%;min-height:480px;border:0;background:transparent;overflow:hidden}
         .marketing-subtab-title{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
         .marketing-subtab-title h2{font-size:1.15em;font-weight:800;color:var(--text)}
         .marketing-subtab-copy{font-size:.78em;color:var(--dim);margin-top:4px}
@@ -323,6 +325,7 @@
                 <button class="marketing-tab-option" id="marketingSubtabWebsiteFormFills" type="button" role="menuitem" onclick="setMarketingSubtab('websiteFormFills')">Website Form Fills</button>
                 <button class="marketing-tab-option" id="marketingSubtabLinkedInAds" type="button" role="menuitem" onclick="setMarketingSubtab('linkedInAds')">LinkedIn Ads</button>
                 <button class="marketing-tab-option" id="marketingSubtabGoogleAds" type="button" role="menuitem" onclick="setMarketingSubtab('googleAds')">Google Ads</button>
+                <button class="marketing-tab-option" id="marketingSubtabCampaignPerformance" type="button" role="menuitem" onclick="setMarketingSubtab('campaignPerformance')">Campaign Performance</button>
             </div>
         </div>
     </div>
@@ -820,14 +823,14 @@
                     <div class="card marketing-table-card">
                         <div class="ga4-table-head">
                             <div>
-                                <h3>Top 50 Landing Pages</h3>
+                                <h3>Top 50 Page Paths</h3>
                             </div>
                         </div>
                         <table class="tbl" id="ga4LandingTable">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Landing Page</th>
+                                    <th>Page Path</th>
                                     <th>Total Users</th>
                                     <th>Sessions</th>
                                     <th>New Users</th>
@@ -1089,6 +1092,24 @@
                     <div class="table-footer" id="googleAdsPager"></div>
                 </div>
             </div>
+
+            <div class="marketing-subpanel" id="marketingCampaignPerformancePanel">
+                <div class="marketing-subtab-title">
+                    <div>
+                        <h2>Campaign Performance</h2>
+                    </div>
+                </div>
+
+                <div class="campaign-embed-card">
+                    <iframe
+                        id="campaignPerformanceFrame"
+                        class="campaign-embed-frame"
+                        src="./campaign-performance/index.html?embed=1"
+                        title="Campaign Performance Report"
+                        loading="lazy"
+                        onload="syncCampaignPerformanceFrameHeight()"></iframe>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -1111,7 +1132,7 @@ const GOOGLE_ADS_FILTER_KEYS = ['googleAdsYear','googleAdsQuarter','googleAdsCam
 const GA4_FILTER_KEYS = ['ga4Year','ga4Quarter','ga4Month'];
 const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClosedLost'];
 const MARKETING_TREND_VIEW_OPTIONS = ['Yearly','Quarterly','Monthly'];
-const MARKETING_SUBTABS = ['websiteFormFills', 'websitePerformance', 'linkedInAds', 'googleAds'];
+const MARKETING_SUBTABS = ['websiteFormFills', 'websitePerformance', 'linkedInAds', 'googleAds', 'campaignPerformance'];
 const TABLE_PAGE_SIZE = 10;
 const DASHBOARD_PASSWORD = 'marketing#2026';
 const DASHBOARD_UNLOCK_KEY = 'gtmb-dashboard-unlocked';
@@ -1381,6 +1402,59 @@ function closeMarketingTabMenu() {
     if (button) button.setAttribute('aria-expanded', 'false');
 }
 
+function syncCampaignPerformanceFrameHeight(height) {
+    const frame = document.getElementById('campaignPerformanceFrame');
+    if (!frame) return;
+    frame.setAttribute('scrolling', 'no');
+    if (typeof height === 'number' && Number.isFinite(height) && height > 0) {
+        frame.style.height = `${Math.ceil(height) + 2}px`;
+        return;
+    }
+    try {
+        const doc = frame.contentDocument || frame.contentWindow?.document;
+        if (!doc) return;
+        const root = doc.querySelector('.container');
+        const nextHeight = Math.max(
+            root ? Math.ceil(root.getBoundingClientRect().height) : 0,
+            root ? root.scrollHeight : 0,
+            480
+        );
+        frame.style.height = `${nextHeight + 2}px`;
+    } catch (error) {
+        // Ignore height sync errors while the embedded report is still loading.
+    }
+}
+
+let campaignPerformanceHeightSyncTimer = null;
+function startCampaignPerformanceHeightSync() {
+    if (campaignPerformanceHeightSyncTimer) return;
+    campaignPerformanceHeightSyncTimer = window.setInterval(() => {
+        if (STATE?.activeTab === 'marketing' && STATE?.marketing?.activeSubtab === 'campaignPerformance') {
+            syncCampaignPerformanceFrameHeight();
+            return;
+        }
+        stopCampaignPerformanceHeightSync();
+    }, 350);
+}
+
+function stopCampaignPerformanceHeightSync() {
+    if (!campaignPerformanceHeightSyncTimer) return;
+    window.clearInterval(campaignPerformanceHeightSyncTimer);
+    campaignPerformanceHeightSyncTimer = null;
+}
+
+window.addEventListener('message', (event) => {
+    const data = event.data || {};
+    if (data.type === 'campaign-performance-height') {
+        syncCampaignPerformanceFrameHeight(Number(data.height) || 0);
+    }
+});
+window.addEventListener('resize', () => {
+    if (STATE?.activeTab === 'marketing' && STATE?.marketing?.activeSubtab === 'campaignPerformance') {
+        syncCampaignPerformanceFrameHeight();
+    }
+});
+
 function setMarketingSubtab(subtab) {
     const next = MARKETING_SUBTABS.includes(subtab) ? subtab : 'websitePerformance';
     STATE.marketing.activeSubtab = next;
@@ -1388,10 +1462,18 @@ function setMarketingSubtab(subtab) {
     document.getElementById('marketingWebsitePerformancePanel')?.classList.toggle('active', next === 'websitePerformance');
     document.getElementById('marketingLinkedInAdsPanel')?.classList.toggle('active', next === 'linkedInAds');
     document.getElementById('marketingGoogleAdsPanel')?.classList.toggle('active', next === 'googleAds');
+    document.getElementById('marketingCampaignPerformancePanel')?.classList.toggle('active', next === 'campaignPerformance');
     document.getElementById('marketingSubtabWebsiteFormFills')?.classList.toggle('is-active', next === 'websiteFormFills');
     document.getElementById('marketingSubtabWebsitePerformance')?.classList.toggle('is-active', next === 'websitePerformance');
     document.getElementById('marketingSubtabLinkedInAds')?.classList.toggle('is-active', next === 'linkedInAds');
     document.getElementById('marketingSubtabGoogleAds')?.classList.toggle('is-active', next === 'googleAds');
+    document.getElementById('marketingSubtabCampaignPerformance')?.classList.toggle('is-active', next === 'campaignPerformance');
+    if (next === 'campaignPerformance') {
+        startCampaignPerformanceHeightSync();
+        setTimeout(() => syncCampaignPerformanceFrameHeight(), 50);
+    } else {
+        stopCampaignPerformanceHeightSync();
+    }
     setActiveTab('marketing');
     closeMarketingTabMenu();
 }
@@ -2404,7 +2486,7 @@ function ga4RowsToObjects(rows) {
         const joined = row.join(' | ').toLowerCase();
         return joined.includes('year month')
             && joined.includes('session default channel group')
-            && joined.includes('landing page')
+            && (joined.includes('page path') || joined.includes('full page url') || joined.includes('landing page'))
             && joined.includes('bounce rate');
     });
     if (headerIndex < 0) throw new Error(`Could not find ${GA4_WORKSHEET_NAME} header row`);
@@ -2423,7 +2505,7 @@ function ga4RowsToObjects(rows) {
             obj.__ga4Month = ga4Date ? monthLabelFromDate(ga4Date) : 'Unknown';
             obj.__ga4MonthKey = ga4Date ? `${ga4Date.getFullYear()}-${String(ga4Date.getMonth() + 1).padStart(2, '0')}` : 'Unknown';
             obj.__ga4Channel = String(obj['Session default channel group'] || '').trim() || 'Unknown';
-            obj.__ga4LandingPage = String(obj['Landing page'] || '').trim() || '-';
+            obj.__ga4LandingPage = String(obj['Page path'] || obj['Full page URL'] || obj['Landing page'] || '').trim() || '-';
             obj.__ga4TotalUsers = num(obj['Total users']);
             obj.__ga4Sessions = num(obj['Sessions']);
             obj.__ga4NewUsers = num(obj['New users']);
@@ -4864,7 +4946,7 @@ function renderGa4AggregateTable(entries, config) {
     document.getElementById(config.tbodyId).innerHTML = visibleRows.map((row, visibleIndex) => `
         <tr>
             ${config.showIndex ? `<td class="num">${startIndex + visibleIndex + 1}</td>` : ''}
-            <td>${escapeHtml(row.label)}</td>
+            <td>${typeof config.renderLabel === 'function' ? config.renderLabel(row) : escapeHtml(row.label)}</td>
             <td class="num">${Number(row.totalUsers || 0).toLocaleString()}</td>
             <td class="num">${Number(row.sessions || 0).toLocaleString()}</td>
             <td class="num">${Number(row.newUsers || 0).toLocaleString()}</td>
@@ -4896,14 +4978,30 @@ function renderGa4ChannelTable(rows) {
     });
 }
 
+function getGtmbuddyPageUrl(path) {
+    const raw = String(path || '').trim();
+    if (!raw || raw === '-') return '';
+    if (/^https?:\/\//i.test(raw)) return raw;
+    const normalized = raw.startsWith('/') ? raw : `/${raw}`;
+    return `https://gtmbuddy.ai${normalized}`;
+}
+
 function renderGa4LandingTable(rows) {
-    renderGa4AggregateTable(aggregateGa4Rows(rows, '__ga4LandingPage').slice(0, 50), {
+    const visibleLandingRows = aggregateGa4Rows(rows, '__ga4LandingPage')
+        .filter((entry) => String(entry.label || '').trim() !== '-')
+        .slice(0, 50);
+    renderGa4AggregateTable(visibleLandingRows, {
         tablePageKey: 'ga4LandingTable',
         tbodyId: 'ga4LandingTbl',
         pagerId: 'ga4LandingPager',
-        emptyLabel: 'landing page',
+        emptyLabel: 'page path',
         colspan: 9,
-        showIndex: true
+        showIndex: true,
+        renderLabel: (row) => {
+            const href = getGtmbuddyPageUrl(row.label);
+            if (!href) return escapeHtml(row.label);
+            return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(row.label)}</a>`;
+        }
     });
 }
 
@@ -4950,6 +5048,10 @@ function renderMarketing() {
     }
     if (STATE.marketing.activeSubtab === 'googleAds') {
         renderGoogleAds();
+        return;
+    }
+    if (STATE.marketing.activeSubtab === 'campaignPerformance') {
+        syncCampaignPerformanceFrameHeight();
     }
 }
 
