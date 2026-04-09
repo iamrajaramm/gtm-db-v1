@@ -1106,8 +1106,7 @@
                         class="campaign-embed-frame"
                         src="./campaign-performance/index.html?embed=1"
                         title="Campaign Performance Report"
-                        loading="lazy"
-                        onload="syncCampaignPerformanceFrameHeight()"></iframe>
+                        onload="handleCampaignPerformanceFrameLoad()"></iframe>
                 </div>
             </div>
         </section>
@@ -1118,6 +1117,8 @@
 
 <script>
 const WORKBOOK_FILE = './%F0%9F%94%B4%20GTMDB-Data.xlsx';
+const LIVE_WORKBOOK_SHEET_ID = '1PvgKWPJTfnZgtRyKTcUUteTWEoALBe_qBiSY0kLT-Lo';
+const LIVE_WORKBOOK_URL = `https://docs.google.com/spreadsheets/d/${LIVE_WORKBOOK_SHEET_ID}/export?format=xlsx`;
 const DEALS_WORKSHEET_NAME = 'GTMDB-Deals';
 const INBOUND_WORKSHEET_NAME = 'GTMDB-Contacts-Inbound';
 const LINKEDIN_ADS_WORKSHEET_NAME = 'GTMDB-LinkedIn-Ads';
@@ -1380,6 +1381,7 @@ function setTheme(t, el) {
     document.querySelectorAll('.theme-switch .theme-btn').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     STATE.theme = t;
+    applyThemeToCampaignPerformanceFrame();
     if (STATE.filtered.length) renderAll();
     if (STATE.sales.filtered.length && STATE.activeTab === 'sales') renderSales();
     if ((STATE.marketing.filtered.length || STATE.marketing.websitePerformance.filtered.length || STATE.marketing.linkedInAds.filtered.length || STATE.marketing.googleAds.filtered.length) && STATE.activeTab === 'marketing') renderMarketing();
@@ -1426,6 +1428,35 @@ function syncCampaignPerformanceFrameHeight(height) {
 }
 
 let campaignPerformanceHeightSyncTimer = null;
+let campaignPerformanceRefreshPending = false;
+function applyThemeToCampaignPerformanceFrame() {
+    const frame = document.getElementById('campaignPerformanceFrame');
+    const theme = STATE?.theme || 'light';
+    if (!frame?.contentWindow) return;
+    try {
+        frame.contentWindow.postMessage({ type: 'campaign-performance-theme', theme }, '*');
+    } catch (error) {
+        // Ignore transient iframe timing issues while the embedded report is loading.
+    }
+}
+function refreshCampaignPerformanceFrame() {
+    const frame = document.getElementById('campaignPerformanceFrame');
+    if (!frame?.contentWindow) {
+        campaignPerformanceRefreshPending = true;
+        return;
+    }
+    campaignPerformanceRefreshPending = false;
+    applyThemeToCampaignPerformanceFrame();
+    try {
+        frame.contentWindow.postMessage({ type: 'campaign-performance-refresh' }, '*');
+    } catch (error) {
+        campaignPerformanceRefreshPending = true;
+    }
+}
+function handleCampaignPerformanceFrameLoad() {
+    syncCampaignPerformanceFrameHeight();
+    applyThemeToCampaignPerformanceFrame();
+}
 function startCampaignPerformanceHeightSync() {
     if (campaignPerformanceHeightSyncTimer) return;
     campaignPerformanceHeightSyncTimer = window.setInterval(() => {
@@ -1447,6 +1478,13 @@ window.addEventListener('message', (event) => {
     const data = event.data || {};
     if (data.type === 'campaign-performance-height') {
         syncCampaignPerformanceFrameHeight(Number(data.height) || 0);
+        return;
+    }
+    if (data.type === 'campaign-performance-ready') {
+        applyThemeToCampaignPerformanceFrame();
+        if (campaignPerformanceRefreshPending) {
+            refreshCampaignPerformanceFrame();
+        }
     }
 });
 window.addEventListener('resize', () => {
@@ -2291,20 +2329,39 @@ function normalizeRows(rows) {
 }
 
 async function fetchSheet() {
-    const resp = await fetch(`${WORKBOOK_FILE}?_t=${Date.now()}`, { cache: 'no-store' });
-    if (!resp.ok) throw new Error('Failed to fetch local workbook');
-    const buffer = await resp.arrayBuffer();
+    const workbookSources = [
+        { url: `${LIVE_WORKBOOK_URL}&_t=${Date.now()}`, label: 'live Google Sheet' },
+        { url: `${WORKBOOK_FILE}?_t=${Date.now()}`, label: 'local workbook fallback' }
+    ];
+    let buffer = null;
+    let lastError = null;
+    for (const source of workbookSources) {
+        try {
+            const resp = await fetch(source.url, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`Failed to fetch ${source.label}`);
+            buffer = await resp.arrayBuffer();
+            if (buffer && buffer.byteLength > 0) {
+                break;
+            }
+            throw new Error(`Empty response from ${source.label}`);
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    if (!buffer) {
+        throw lastError || new Error('Failed to fetch dashboard workbook');
+    }
     const workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
     const dealsSheet = workbook.Sheets[DEALS_WORKSHEET_NAME];
-    if (!dealsSheet) throw new Error(`Worksheet "${DEALS_WORKSHEET_NAME}" not found in local workbook`);
+    if (!dealsSheet) throw new Error(`Worksheet "${DEALS_WORKSHEET_NAME}" not found in workbook`);
     const inboundSheet = workbook.Sheets[INBOUND_WORKSHEET_NAME];
-    if (!inboundSheet) throw new Error(`Worksheet "${INBOUND_WORKSHEET_NAME}" not found in local workbook`);
+    if (!inboundSheet) throw new Error(`Worksheet "${INBOUND_WORKSHEET_NAME}" not found in workbook`);
     const linkedInAdsSheet = workbook.Sheets[LINKEDIN_ADS_WORKSHEET_NAME];
-    if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in local workbook`);
+    if (!linkedInAdsSheet) throw new Error(`Worksheet "${LINKEDIN_ADS_WORKSHEET_NAME}" not found in workbook`);
     const googleAdsSheet = workbook.Sheets[GOOGLE_ADS_WORKSHEET_NAME];
-    if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in local workbook`);
+    if (!googleAdsSheet) throw new Error(`Worksheet "${GOOGLE_ADS_WORKSHEET_NAME}" not found in workbook`);
     const ga4Sheet = workbook.Sheets[GA4_WORKSHEET_NAME];
-    if (!ga4Sheet) throw new Error(`Worksheet "${GA4_WORKSHEET_NAME}" not found in local workbook`);
+    if (!ga4Sheet) throw new Error(`Worksheet "${GA4_WORKSHEET_NAME}" not found in workbook`);
     const rows = XLSX.utils.sheet_to_json(dealsSheet, { header: 1, raw: false, defval: '' });
     const inboundRows = XLSX.utils.sheet_to_json(inboundSheet, { header: 1, raw: false, defval: '' });
     const linkedInAdsRows = XLSX.utils.sheet_to_json(linkedInAdsSheet, { header: 1, raw: false, defval: '' });
@@ -5438,6 +5495,7 @@ async function manualRefresh(){
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.body.classList.add('is-refreshing');
     btn.classList.add('is-loading');
+    refreshCampaignPerformanceFrame();
     try{
         const { rows, inboundRows, linkedInAdsRows, googleAdsRows, ga4Rows, linkMap, inboundLinkMap } = await fetchSheet();
         STATE.rows = rowsToObjects(rows, linkMap);
