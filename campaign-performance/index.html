@@ -633,6 +633,7 @@ const LIVE = {
 const DEFAULT_CAMPAIGN = "Operation Exodus";
 const PRESIDENTS_CAMPAIGN = "President's Club";
 let activeCampaign = sessionStorage.getItem("campaignReport.activeCampaign") || DEFAULT_CAMPAIGN;
+const SHEET_TEXT_CACHE = {};
 let selectedPresidentEmail = '__all__';
 let presidentLeadDetailsVisible = false;
 
@@ -776,9 +777,11 @@ function onCampaignChange(nextCampaign) {
     closeCampaignMenu();
     updateCampaignTitle();
     populateCampaignOptions(campaignOptions);
-    clearReportForLoad();
-    renderExodusProgress();
-    manualRefresh();
+    if (!liveLoaded) {
+        manualRefresh(true, true);
+        return;
+    }
+    manualRefresh(false, false);
 }
 function channelKeyFromText(v) {
     const s = String(v || '').toLowerCase();
@@ -1288,13 +1291,17 @@ function renderExodusProgress() {
     wrap.style.display = '';
 }
 
-async function getSheetText(gid) {
+async function getSheetText(gid, forceRefresh = false) {
+    if (!forceRefresh && SHEET_TEXT_CACHE[gid]) {
+        return SHEET_TEXT_CACHE[gid];
+    }
     const directUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=tsv&gid=${gid}&_t=${Date.now()}`;
     const resp = await fetch(directUrl, { cache: 'no-store' });
     const sheetText = await resp.text();
 
     if (!resp.ok) throw new Error(`Fetch failed for gid ${gid}`);
     if (!sheetText || sheetText.trim().length === 0) throw new Error(`Empty sheet response for gid ${gid}`);
+    SHEET_TEXT_CACHE[gid] = sheetText;
     return sheetText;
 }
 
@@ -1305,14 +1312,14 @@ function getDealStageStyle(stageText) {
     if (/^S[1-6]\b/.test(stage)) return 'background:var(--green-bg);color:var(--green-dark);';
     return 'background:#f3f4f6;color:#6b7280;';
 }
-async function fetchLiveData() {
+async function fetchLiveData(forceRefresh = false) {
     let loaded = false;
     const discoveredCampaigns = new Set([activeCampaign]);
     const btn = document.getElementById('refreshBtn');
     if (btn) { btn.disabled = true; btn.classList.add('is-loading'); }
 
     try {
-        const sheetText = await getSheetText(GID);
+        const sheetText = await getSheetText(GID, forceRefresh);
         const rows = parseTSV(sheetText);
         const sheetLines = sheetText
             .split(/\r?\n/)
@@ -1391,7 +1398,7 @@ async function fetchLiveData() {
         }
 
         // [1] Leads
-        const leadsText = await getSheetText(TAB_GIDS.leads);
+            const leadsText = await getSheetText(TAB_GIDS.leads, forceRefresh);
         const leadRows = parseTSV(leadsText);
         const headerIdx = leadRows.findIndex(r => r.join('|').toLowerCase().includes('company name') && r.join('|').toLowerCase().includes('email'));
         if (headerIdx >= 0) {
@@ -1453,7 +1460,7 @@ async function fetchLiveData() {
         }
 
         // [5] Sequences -> outbound metrics + table
-        const seqText = await getSheetText(TAB_GIDS.sequences);
+            const seqText = await getSheetText(TAB_GIDS.sequences, forceRefresh);
         const seqRows = parseTSV(seqText);
         const seqHeader = seqRows.findIndex(r => (r[0] || '').toLowerCase() === 'campaign' && (r[1] || '').toLowerCase().includes('sequence'));
         if (seqHeader >= 0) {
@@ -1526,7 +1533,7 @@ async function fetchLiveData() {
         }
 
         // [2] LinkedIn Ads -> ad metrics + table
-        const adsText = await getSheetText(TAB_GIDS.linkedInAds);
+            const adsText = await getSheetText(TAB_GIDS.linkedInAds, forceRefresh);
         const adsRows = parseTSV(adsText);
         const adsHeader = adsRows.findIndex(r => (r[0] || '').toLowerCase().includes('linkedin campaign name'));
         if (adsHeader >= 0) {
@@ -1597,7 +1604,7 @@ async function fetchLiveData() {
         }
 
         // [3] GA4 -> organic search table + totals
-        const gaText = await getSheetText(TAB_GIDS.ga4);
+        const gaText = await getSheetText(TAB_GIDS.ga4, forceRefresh);
         const gaRows = parseTSV(gaText);
         const gaHeader = gaRows.findIndex(r => (r[0] || '').toLowerCase().includes('full page url'));
         if (gaHeader >= 0) {
@@ -1637,7 +1644,7 @@ async function fetchLiveData() {
         }
 
         // [4] L-Posts -> organic linkedin totals + table + bar chart
-        const liText = await getSheetText(TAB_GIDS.lPosts);
+        const liText = await getSheetText(TAB_GIDS.lPosts, forceRefresh);
         const liRows = parseTSV(liText);
         const liHeader = liRows.findIndex(r => {
             const normalized = r.map(v => normalizeKey(v));
@@ -1707,7 +1714,7 @@ async function fetchLiveData() {
             renderOrganicLinkedInSection();
         }
         if (isPresidentsClubCampaign()) {
-            const pcText = await getSheetText(TAB_GIDS.presidentsClub);
+            const pcText = await getSheetText(TAB_GIDS.presidentsClub, forceRefresh);
             const pcRows = parseTSV(pcText);
             discoveredCampaigns.add(PRESIDENTS_CAMPAIGN);
             const pcEmailData = parsePresidentEmailSection(pcRows);
@@ -1872,11 +1879,11 @@ function clearReportForLoad() {
     document.querySelectorAll('.sec').forEach(el => { el.style.display = 'none'; });
 }
 
-async function manualRefresh() {
-    document.body.classList.add('is-refreshing');
+async function manualRefresh(forceRefresh = true, showLoading = true) {
+    if (showLoading) document.body.classList.add('is-refreshing');
     clearReportForLoad();
-    const ok = await fetchLiveData();
-    document.body.classList.remove('is-refreshing');
+    const ok = await fetchLiveData(forceRefresh);
+    if (showLoading) document.body.classList.remove('is-refreshing');
     if (!ok) return;
     liveLoaded = true;
     document.querySelectorAll('.sec').forEach(el => { el.style.display = ''; });
@@ -2185,12 +2192,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
 
