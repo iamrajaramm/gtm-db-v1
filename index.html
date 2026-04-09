@@ -116,7 +116,7 @@
         .chart.linkedin-ring-chart{height:220px}
         .chart.linkedin-chart{height:320px}
         .ga4-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
-        .ga4-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+        .ga4-kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
         .ga4-kpi-card{min-height:118px;align-items:flex-start;justify-content:flex-start;text-align:left;padding:18px 18px 16px;border-width:1.5px}
         .ga4-kpi-card .kpi-value{font-size:1.9em;letter-spacing:-.8px}
         .ga4-kpi-card .kpi-label{margin-bottom:10px}
@@ -131,6 +131,7 @@
         .ga4-table-stack{display:grid;gap:18px}
         .ga4-table-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
         .ga4-table-copy{font-size:.78em;color:var(--dim)}
+        .ga4-primary-chart-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
         .ga4-chart-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(340px,1fr);gap:18px;margin-bottom:18px}
         .chart.ga4-trend-chart{height:360px}
         .chart.ga4-pie-chart{height:360px}
@@ -751,6 +752,27 @@
 
                 <div class="ga4-kpi-grid" id="ga4KpiGrid"></div>
 
+                <div class="ga4-primary-chart-grid">
+                    <div class="card chart-card marketing-chart-card">
+                        <div class="chart-head">
+                            <div>
+                                <h3>Total Users Trend</h3>
+                            </div>
+                            <div class="chart-controls">
+                                <div class="campaign-picker" id="ga4TrendViewPicker">
+                                    <span class="cp-label">View</span>
+                                    <button class="campaign-trigger" type="button" onclick="toggleFilterMenu('ga4TrendView')" aria-haspopup="listbox" aria-expanded="false">
+                                        <span class="trigger-text" id="ga4TrendViewTriggerText">Yearly</span>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+                                    </button>
+                                    <div class="campaign-menu" id="ga4TrendViewMenu" role="listbox" aria-label="GA4 trend view options"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart ga4-trend-chart" id="ga4TotalUsersTrendChart"></div>
+                    </div>
+                </div>
+
                 <div class="ga4-chart-grid">
                     <div class="card chart-card marketing-chart-card">
                         <div class="chart-head">
@@ -1197,6 +1219,7 @@ const STATE = {
         websitePerformance: {
             rows: [],
             filtered: [],
+            trendView: 'yearly',
             filters: {
                 ga4Year: [],
                 ga4Quarter: [],
@@ -1386,7 +1409,7 @@ function setActiveTab(tab) {
     setTimeout(() => {
         if (active === 'sales' && STATE.sales.filtered.length) renderSales();
         if (active === 'marketing' && (STATE.marketing.rows.length || STATE.marketing.websitePerformance.rows.length || STATE.marketing.linkedInAds.rows.length || STATE.marketing.googleAds.rows.length)) renderMarketing();
-        ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
+        ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4TotalUsersTrendChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
             .forEach((id) => {
                 const chart = document.getElementById(id);
                 if (chart && chart.data) Plotly.Plots.resize(chart);
@@ -1543,7 +1566,7 @@ function toggleFilterMenu(key) {
 function setFilterValue(key, value) {
     const normalized = String(value || '').trim();
     if (key === 'trendView') {
-        STATE.trendView = (STATE.filters.year || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        STATE.trendView = normalized.toLowerCase() || 'yearly';
         closeFilterMenu(key);
         renderFilterOptions();
         renderAll();
@@ -1563,9 +1586,6 @@ function setFilterValue(key, value) {
         if (current.has(normalized)) current.delete(normalized);
         else current.add(normalized);
         STATE.filters[key] = [...current];
-        if ((STATE.filters.year || []).length) {
-            STATE.trendView = 'monthly';
-        }
         applyFilters();
         return;
     }
@@ -1574,9 +1594,6 @@ function setFilterValue(key, value) {
         if (current.has(normalized)) current.delete(normalized);
         else current.add(normalized);
         STATE.sales.filters[key] = [...current];
-        if ((STATE.sales.filters.salesCreateYear || []).length) {
-            STATE.sales.trend.view = 'monthly';
-        }
         applySalesFilters();
         return;
     }
@@ -1585,12 +1602,14 @@ function setFilterValue(key, value) {
         if (current.has(normalized)) current.delete(normalized);
         else current.add(normalized);
         STATE.marketing.filters[key] = [...current];
-        if ((STATE.marketing.filters.marketingYear || []).length) {
-            STATE.marketing.acquisitionView = 'monthly';
-            STATE.marketing.meetingView = 'monthly';
-            STATE.marketing.outcomeView = 'monthly';
-        }
         applyMarketingFilters();
+        return;
+    }
+    if (key === 'ga4TrendView') {
+        STATE.marketing.websitePerformance.trendView = normalized.toLowerCase() || 'yearly';
+        closeFilterMenu(key);
+        renderGa4FilterOptions();
+        renderWebsitePerformance();
         return;
     }
     if (GA4_FILTER_KEYS.includes(key)) {
@@ -1618,7 +1637,7 @@ function setFilterValue(key, value) {
         return;
     }
     if (key === 'salesTrendView') {
-        STATE.sales.trend.view = (STATE.sales.filters.salesCreateYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        STATE.sales.trend.view = normalized.toLowerCase() || 'yearly';
         closeFilterMenu(key);
         renderSalesFilterOptions();
         renderSales();
@@ -1641,21 +1660,21 @@ function setFilterValue(key, value) {
         return;
     }
     if (key === 'marketingAcquisitionView') {
-        STATE.marketing.acquisitionView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        STATE.marketing.acquisitionView = normalized.toLowerCase() || 'yearly';
         closeFilterMenu(key);
         renderMarketingFilterOptions();
         renderMarketing();
         return;
     }
     if (key === 'marketingMeetingView') {
-        STATE.marketing.meetingView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        STATE.marketing.meetingView = normalized.toLowerCase() || 'yearly';
         closeFilterMenu(key);
         renderMarketingFilterOptions();
         renderMarketing();
         return;
     }
     if (key === 'marketingOutcomeView') {
-        STATE.marketing.outcomeView = (STATE.marketing.filters.marketingYear || []).length ? 'monthly' : (normalized.toLowerCase() || 'yearly');
+        STATE.marketing.outcomeView = normalized.toLowerCase() || 'yearly';
         closeFilterMenu(key);
         renderMarketingFilterOptions();
         renderMarketing();
@@ -2715,6 +2734,7 @@ function setupGoogleAdsFilters() {
 }
 
 function renderFilterOptions() {
+    const currentRevenueTrendView = `${getRevenueTrendView().charAt(0).toUpperCase()}${getRevenueTrendView().slice(1)}`;
     const defs = {
         dealType: { label: 'All Deal Types', trigger: 'dealTypeTriggerText', menu: 'dealTypeMenu' },
         status: { label: 'All Statuses', trigger: 'statusTriggerText', menu: 'statusMenu' },
@@ -2725,7 +2745,7 @@ function renderFilterOptions() {
     };
     Object.entries(defs).forEach(([key, def]) => {
         const current = key === 'trendView'
-            ? `${STATE.trendView.charAt(0).toUpperCase()}${STATE.trendView.slice(1)}`
+            ? currentRevenueTrendView
             : key === 'trendBreakdown'
                 ? STATE.trendBreakdown
                 : STATE.filters[key];
@@ -2800,10 +2820,11 @@ function renderSalesFilterOptions() {
     const trendViewMenu = document.getElementById('salesTrendViewMenu');
     const trendSeriesTrigger = document.getElementById('salesTrendSeriesTriggerText');
     const trendSeriesMenu = document.getElementById('salesTrendSeriesMenu');
-    if (trendViewTrigger) trendViewTrigger.textContent = `${STATE.sales.trend.view.charAt(0).toUpperCase()}${STATE.sales.trend.view.slice(1)}`;
+    const currentSalesTrendView = `${getSalesTrendView().charAt(0).toUpperCase()}${getSalesTrendView().slice(1)}`;
+    if (trendViewTrigger) trendViewTrigger.textContent = currentSalesTrendView;
     if (trendViewMenu) {
         trendViewMenu.innerHTML = (STATE.filterOptions.trendView || []).map((value) => `
-            <button class="campaign-option ${STATE.sales.trend.view === value.toLowerCase() ? 'is-active' : ''}" type="button" role="option" aria-selected="${STATE.sales.trend.view === value.toLowerCase()}" data-filter-key="salesTrendView" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
+            <button class="campaign-option ${currentSalesTrendView === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${currentSalesTrendView === value}" data-filter-key="salesTrendView" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
         `).join('');
     }
     if (trendSeriesTrigger) trendSeriesTrigger.textContent = getSalesTrendSeriesLabel();
@@ -2877,9 +2898,9 @@ function renderMarketingFilterOptions() {
     });
 
     const viewDefs = {
-        marketingAcquisitionView: { trigger: 'marketingAcquisitionViewTriggerText', menu: 'marketingAcquisitionViewMenu', value: STATE.marketing.acquisitionView },
-        marketingMeetingView: { trigger: 'marketingMeetingViewTriggerText', menu: 'marketingMeetingViewMenu', value: STATE.marketing.meetingView },
-        marketingOutcomeView: { trigger: 'marketingOutcomeViewTriggerText', menu: 'marketingOutcomeViewMenu', value: STATE.marketing.outcomeView }
+        marketingAcquisitionView: { trigger: 'marketingAcquisitionViewTriggerText', menu: 'marketingAcquisitionViewMenu', value: getMarketingTrendView(STATE.marketing.acquisitionView) },
+        marketingMeetingView: { trigger: 'marketingMeetingViewTriggerText', menu: 'marketingMeetingViewMenu', value: getMarketingTrendView(STATE.marketing.meetingView) },
+        marketingOutcomeView: { trigger: 'marketingOutcomeViewTriggerText', menu: 'marketingOutcomeViewMenu', value: getMarketingTrendView(STATE.marketing.outcomeView) }
     };
     Object.entries(viewDefs).forEach(([key, def]) => {
         const trigger = document.getElementById(def.trigger);
@@ -2929,6 +2950,16 @@ function renderGa4FilterOptions() {
             : `<div class="multi-empty">No matches found</div>`;
         menu.innerHTML = searchHtml + optionButtons;
     });
+
+    const trendViewTrigger = document.getElementById('ga4TrendViewTriggerText');
+    const trendViewMenu = document.getElementById('ga4TrendViewMenu');
+    const currentTrendView = `${getGa4TrendView().charAt(0).toUpperCase()}${getGa4TrendView().slice(1)}`;
+    if (trendViewTrigger) trendViewTrigger.textContent = currentTrendView;
+    if (trendViewMenu) {
+        trendViewMenu.innerHTML = MARKETING_TREND_VIEW_OPTIONS.map((value) => `
+            <button class="campaign-option ${currentTrendView === value ? 'is-active' : ''}" type="button" role="option" aria-selected="${currentTrendView === value}" data-filter-key="ga4TrendView" data-filter-value="${escapeHtml(value)}">${escapeHtml(value)}</button>
+        `).join('');
+    }
 }
 
 function renderLinkedInAdsFilterOptions() {
@@ -3006,9 +3037,6 @@ function renderGoogleAdsFilterOptions() {
 }
 
 function applyFilters(){
-    if ((STATE.filters.year || []).length) {
-        STATE.trendView = 'monthly';
-    }
     setupFilters();
     const { dealType, status, year, quarter } = STATE.filters;
     STATE.filtered = STATE.rows.filter(r =>
@@ -3024,9 +3052,6 @@ function applyFilters(){
 }
 
 function applySalesFilters() {
-    if ((STATE.sales.filters.salesCreateYear || []).length) {
-        STATE.sales.trend.view = 'monthly';
-    }
     setupSalesFilters();
     const { salesCreateYear, salesCreateQuarter, salesDealType, salesSource, salesDealOwner, salesDealStage } = STATE.sales.filters;
     STATE.sales.filtered = getSalesBaseRows().filter((row) =>
@@ -3042,11 +3067,6 @@ function applySalesFilters() {
 }
 
 function applyMarketingFilters() {
-    if ((STATE.marketing.filters.marketingYear || []).length) {
-        STATE.marketing.acquisitionView = 'monthly';
-        STATE.marketing.meetingView = 'monthly';
-        STATE.marketing.outcomeView = 'monthly';
-    }
     setupMarketingFilters();
     const { marketingYear, marketingQuarter } = STATE.marketing.filters;
     STATE.marketing.filtered = getMarketingBaseRows().filter((row) =>
@@ -3418,7 +3438,7 @@ function plotSalesMultiTrend(elId, rows) {
         return;
     }
 
-    const view = STATE.sales.trend.view || 'yearly';
+    const view = getSalesTrendView();
     const metric = STATE.sales.trend.metric || 'amount';
     const baseTrend = buildTrendView(rows, '__createDate', view);
     const orderedKeys = baseTrend.orderedKeys || [];
@@ -3771,18 +3791,33 @@ function plotMarketingOutcomeChart(elId, rows, view) {
     requestAnimationFrame(() => Plotly.Plots.resize(target));
 }
 
+function getEffectiveDrilldownView(preferredView = 'yearly', yearSelections = [], quarterSelections = [], monthSelections = []) {
+    if ((monthSelections || []).length) return 'monthly';
+    if ((quarterSelections || []).length) return 'monthly';
+    if ((yearSelections || []).length) return 'quarterly';
+    return preferredView || 'yearly';
+}
+
+function getRevenueTrendView() {
+    return getEffectiveDrilldownView(STATE.trendView, STATE.filters.year, STATE.filters.quarter);
+}
+
+function getSalesTrendView() {
+    return getEffectiveDrilldownView(STATE.sales.trend.view, STATE.sales.filters.salesCreateYear, STATE.sales.filters.salesCreateQuarter);
+}
+
+function getMarketingTrendView(preferredView = 'yearly') {
+    return getEffectiveDrilldownView(preferredView, STATE.marketing.filters.marketingYear, STATE.marketing.filters.marketingQuarter);
+}
+
 function getLinkedInAdsTrendView() {
     const { linkedInAdsYear, linkedInAdsQuarter } = STATE.marketing.linkedInAds.filters;
-    if ((linkedInAdsQuarter || []).length) return 'monthly';
-    if ((linkedInAdsYear || []).length) return 'quarterly';
-    return 'yearly';
+    return getEffectiveDrilldownView('yearly', linkedInAdsYear, linkedInAdsQuarter);
 }
 
 function getGoogleAdsTrendView() {
     const { googleAdsYear, googleAdsQuarter } = STATE.marketing.googleAds.filters;
-    if ((googleAdsQuarter || []).length) return 'monthly';
-    if ((googleAdsYear || []).length) return 'quarterly';
-    return 'yearly';
+    return getEffectiveDrilldownView('yearly', googleAdsYear, googleAdsQuarter);
 }
 
 function aggregateAdsRowsByCampaign(rows) {
@@ -4548,11 +4583,8 @@ const GA4_CHANNEL_COLOR_MAP = {
 const GA4_COLOR_FALLBACKS = ['#2563eb', '#00c875', '#7c3aed', '#f59e0b', '#ef4444', '#14b8a6', '#4f46e5', '#06b6d4', '#fb923c', '#94a3b8'];
 
 function getGa4TrendView() {
-    const ga4Filters = STATE.marketing.websitePerformance.filters;
-    if ((ga4Filters.ga4Month || []).length) return 'monthly';
-    if ((ga4Filters.ga4Quarter || []).length) return 'monthly';
-    if ((ga4Filters.ga4Year || []).length) return 'quarterly';
-    return 'yearly';
+    const { ga4Year, ga4Quarter, ga4Month } = STATE.marketing.websitePerformance.filters;
+    return getEffectiveDrilldownView(STATE.marketing.websitePerformance.trendView, ga4Year, ga4Quarter, ga4Month);
 }
 
 function getGa4ChannelColor(label, index = 0) {
@@ -4609,10 +4641,7 @@ function renderGa4Kpis(rows) {
         { label:'Total Users', value:Number(metrics.totalUsers || 0).toLocaleString(), tone:'blue' },
         { label:'New Users', value:Number(metrics.newUsers || 0).toLocaleString(), tone:'purple' },
         { label:'Sessions', value:Number(metrics.sessions || 0).toLocaleString(), tone:'green' },
-        { label:'Views', value:Number(metrics.views || 0).toLocaleString(), tone:'red' },
-        { label:'Sessions per User', value:formatRatioValue(metrics.sessionsPerUser), tone:'yellow' },
-        { label:'Bounce Rate', value:formatPercentValue(metrics.bounceRate), tone:'cyan' },
-        { label:'Pages / Session', value:formatRatioValue(metrics.pagesPerSession), tone:'teal' },
+        { label:'Pages per Session', value:formatRatioValue(metrics.pagesPerSession), tone:'teal' },
         { label:'Average Session Duration', value:formatDurationClock(metrics.avgSessionDuration, true), tone:'indigo' }
     ];
     document.getElementById('ga4KpiGrid').innerHTML = cards.map((card) => `
@@ -4621,6 +4650,93 @@ function renderGa4Kpis(rows) {
             <div class="kpi-value">${escapeHtml(card.value)}</div>
         </div>
     `).join('');
+}
+
+function plotGa4TotalUsersTrend(rows) {
+    const target = document.getElementById('ga4TotalUsersTrendChart');
+    if (!target) return;
+    const view = getGa4TrendView();
+    const bucketLabel = (date) => {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'Unknown';
+        if (view === 'monthly') return monthLabelFromDate(date);
+        if (view === 'quarterly') return quarterLabelFromDate(date);
+        return String(date.getFullYear());
+    };
+    const sortKey = (label) => {
+        if (view === 'monthly') {
+            const parsed = new Date(`1 ${String(label || '').trim()}`);
+            return Number.isNaN(parsed.getTime()) ? Number.POSITIVE_INFINITY : parsed.getTime();
+        }
+        if (view === 'quarterly') {
+            const [quarter, year] = String(label || '').replace('Q', '').split(' ').map(Number);
+            return (year * 10) + quarter;
+        }
+        return Number(label || 0);
+    };
+    const grouped = new Map();
+    rows.forEach((row) => {
+        if (!(row.__ga4Date instanceof Date) || Number.isNaN(row.__ga4Date.getTime())) return;
+        const label = bucketLabel(row.__ga4Date);
+        grouped.set(label, (grouped.get(label) || 0) + row.__ga4TotalUsers);
+    });
+    const orderedKeys = [...grouped.keys()].sort((a, b) => sortKey(a) - sortKey(b));
+    const values = orderedKeys.map((key) => Number(grouped.get(key) || 0));
+    if (!orderedKeys.length || !values.some((value) => value > 0)) {
+        Plotly.purge(target);
+        target.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-weight:700">No data available for the selected filters.</div>';
+        return;
+    }
+    const axisColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim();
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+    const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+    Plotly.newPlot(target, [{
+        x: orderedKeys,
+        y: values,
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Total Users',
+        line: { color: '#2563eb', width: 3, shape: 'spline', smoothing: 0.75 },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(37,99,235,.16)',
+        marker: { size: 7, color: '#2563eb', line: { color: '#ffffff', width: 1.2 } },
+        hovertemplate: '<b>%{x}</b><br>Total Users: %{y:,}<extra></extra>'
+    }], {
+        margin: { t: 6, b: 36, l: 54, r: 16 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: surface,
+        font: { family: 'Inter, sans-serif', color: textColor, size: 12 },
+        hovermode: 'x unified',
+        xaxis: {
+            title: view === 'monthly' ? 'Month' : view === 'quarterly' ? 'Quarter' : 'Year',
+            type: 'category',
+            categoryorder: 'array',
+            categoryarray: orderedKeys,
+            showgrid: true,
+            gridcolor:gridColor,
+            tickfont: { color: axisColor },
+            zeroline: false,
+            fixedrange: true,
+            automargin: true
+        },
+        yaxis: {
+            title: 'Total Users',
+            showgrid: true,
+            gridcolor:gridColor,
+            tickfont: { color: axisColor },
+            titlefont: { color: axisColor },
+            zeroline: false,
+            fixedrange: true,
+            automargin: true
+        },
+        legend: { orientation: 'h', y: 1.14, x: 0, bgcolor: 'rgba(0,0,0,0)' }
+    }, {
+        displayModeBar: false,
+        responsive: true,
+        scrollZoom: false,
+        doubleClick: false
+    });
+    requestAnimationFrame(() => Plotly.Plots.resize(target));
 }
 
 function plotGa4ChannelTrend(rows) {
@@ -4796,6 +4912,7 @@ function renderWebsitePerformance() {
     syncGa4FilterStates();
     const rows = STATE.marketing.websitePerformance.filtered;
     renderGa4Kpis(rows);
+    plotGa4TotalUsersTrend(rows);
     plotGa4ChannelTrend(rows);
     plotGa4UsersPie(rows);
     renderGa4ChannelTable(rows);
@@ -4814,12 +4931,12 @@ function renderMarketing() {
         plotMarketingTrendChart('marketingAcquisitionChart', rows, [
             { label:'Form Fills', color:'#2563eb', predicate:(row) => Boolean(row.__formFillDate) },
             { label:'MQL', color:'#f59e0b', predicate:(row) => hasMarketingMql(row) }
-        ], STATE.marketing.acquisitionView);
+        ], getMarketingTrendView(STATE.marketing.acquisitionView));
         plotMarketingTrendChart('marketingMeetingChart', rows, [
             { label:'Meeting Booked', color:'#f59e0b', predicate:(row) => hasMarketingMeetingBooked(row) },
             { label:'Meeting Happened', color:'#06b6d4', predicate:(row) => hasMarketingMeetingHappened(row) }
-        ], STATE.marketing.meetingView);
-        plotMarketingOutcomeChart('marketingOutcomeChart', rows, STATE.marketing.outcomeView);
+        ], getMarketingTrendView(STATE.marketing.meetingView));
+        plotMarketingOutcomeChart('marketingOutcomeChart', rows, getMarketingTrendView(STATE.marketing.outcomeView));
         renderMarketingTable(rows);
         return;
     }
@@ -5168,9 +5285,10 @@ function renderAll(){
 
     const trendTitle = document.getElementById('trendChartTitle');
     if (trendTitle) trendTitle.textContent = 'Net ARR Trends';
-    if (STATE.trendView === 'yearly') {
+    const revenueTrendView = getRevenueTrendView();
+    if (revenueTrendView === 'yearly') {
         plotTrend('trendChart', yearly, yearlyKeys, 'Year');
-    } else if (STATE.trendView === 'quarterly') {
+    } else if (revenueTrendView === 'quarterly') {
         plotTrend('trendChart', quarterly, quarterlyKeys, 'Quarter');
     } else {
         plotTrend('trendChart', monthlyLabelMap, monthLabels, 'Month');
@@ -5278,7 +5396,7 @@ document.addEventListener('input', (e) => {
 });
 
 window.addEventListener('resize', () => {
-    ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
+    ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4TotalUsersTrendChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
         .forEach((id) => {
             const chart = document.getElementById(id);
             if (chart && chart.data) Plotly.Plots.resize(chart);
