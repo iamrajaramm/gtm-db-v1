@@ -6190,6 +6190,7 @@ function cpRenderPresidentLeadDetails(rows) {
     const iStage = cpFindColumnIndex(headers, aliasMap.stage);
     const iLink = cpFindColumnIndex(headers, aliasMap.link);
     leadTable.innerHTML = '';
+    const leadRows = [];
     for (let i = headerIndex + 1; i < rows.length; i++) {
         const r = rows[i];
         if (!r || !r.some(cell => String(cell || '').trim())) continue;
@@ -6197,18 +6198,21 @@ function cpRenderPresidentLeadDetails(rows) {
         const email = iEmail >= 0 ? (r[iEmail] || '-') : '-';
         const job = iJobTitle >= 0 ? (r[iJobTitle] || '-') : '-';
         const amountNum = iAmount >= 0 ? cpPn(r[iAmount]) : 0;
-        const amountText = amountNum > 0 ? cpFmtMoney(amountNum, 0) : '-';
         const stage = iStage >= 0 ? (r[iStage] || '-') : '-';
         const link = iLink >= 0 && /^https?:\/\//i.test(r[iLink] || '') ? r[iLink] : '#';
-        const openAttr = link === '#' ? '' : ' target="_blank"';
-        leadTable.innerHTML += `<tr data-lead-channel="pc">
-            <td><strong><a href="${cpEsc(link)}"${openAttr} style="color:var(--green);text-decoration:none;border-bottom:1px dashed var(--green)">${cpEsc(company)}</a></strong></td>
-            <td>${cpEsc(email)}</td>
-            <td style="font-size:.82em;color:var(--dim)">${cpEsc(job)}</td>
-            <td class="num ${amountNum > 0 ? 'grn' : ''}" ${amountNum > 0 ? '' : 'style="color:var(--dim)"'}>${cpEsc(amountText)}</td>
-            <td><span style="${cpGetDealStageStyle(stage)}padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:700">${cpEsc(stage)}</span></td>
-        </tr>`;
+        leadRows.push({ company, email, job, amountNum, stage, link });
     }
+    cpSortLeadRowsByStage(leadRows).forEach((row) => {
+        const amountText = row.amountNum > 0 ? cpFmtMoney(row.amountNum, 0) : '-';
+        const openAttr = row.link === '#' ? '' : ' target="_blank"';
+        leadTable.innerHTML += `<tr data-lead-channel="pc">
+            <td><strong><a href="${cpEsc(row.link)}"${openAttr} style="color:var(--green);text-decoration:none;border-bottom:1px dashed var(--green)">${cpEsc(row.company)}</a></strong></td>
+            <td>${cpEsc(row.email)}</td>
+            <td style="font-size:.82em;color:var(--dim)">${cpEsc(row.job)}</td>
+            <td class="num ${row.amountNum > 0 ? 'grn' : ''}" ${row.amountNum > 0 ? '' : 'style="color:var(--dim)"'}>${cpEsc(amountText)}</td>
+            <td><span style="${cpGetDealStageStyle(row.stage)}padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:700">${cpEsc(row.stage)}</span></td>
+        </tr>`;
+    });
     return leadTable.children.length > 0;
 }
 function cpRenderOrganicSearchSection() {
@@ -6628,6 +6632,24 @@ function cpGetDealStageStyle(stageText) {
     if (/^S[1-6]\b/.test(stage)) return 'background:var(--green-bg);color:var(--green-dark);';
     return 'background:#f3f4f6;color:#6b7280;';
 }
+function cpGetDealStageRank(stageText) {
+    const stage = String(stageText || '').trim().toUpperCase();
+    const match = stage.match(/^S(\d{1,2})(?:[A-Z]|\b)/);
+    if (!match) return -1;
+    return Number(match[1]);
+}
+function cpSortLeadRowsByStage(rows) {
+    return [...rows].sort((a, b) => {
+        const aRank = cpGetDealStageRank(a.stage);
+        const bRank = cpGetDealStageRank(b.stage);
+        const aHasStage = aRank >= 0;
+        const bHasStage = bRank >= 0;
+        if (aHasStage && !bHasStage) return -1;
+        if (!aHasStage && bHasStage) return 1;
+        if (aRank !== bRank) return bRank - aRank;
+        return String(a.company || '').localeCompare(String(b.company || ''));
+    });
+}
 function cpIsWonStage(stage) { return /\bwon\b/.test(stage); }
 function cpIsLostStage(stage) { return /\blost\b/.test(stage); }
 function cpIsActiveStage(stage) {
@@ -6744,6 +6766,7 @@ async function cpFetchLiveData(forceRefresh = false) {
             const tbody = document.getElementById('leadTbl');
             if (tbody) {
                 tbody.innerHTML = '';
+                const filteredLeads = [];
                 for (let i = headerIdx + 1; i < leadRows.length; i++) {
                     const r = leadRows[i];
                     if (!r || !r.some(x => String(x || '').trim() !== '')) continue;
@@ -6770,15 +6793,28 @@ async function cpFetchLiveData(forceRefresh = false) {
                         ? 'background:var(--amber-bg);color:var(--amber);'
                         : cpGetDealStageStyle(r[iDealStage]);
                     const safeLink = /^https?:\/\//i.test(link) ? link : '#';
-                    const openAttr = safeLink === '#' ? '' : ' target="_blank"';
-                    tbody.innerHTML += `<tr data-lead-channel="${chKey}">
-                        <td><strong><a href="${cpEsc(safeLink)}"${openAttr} style="color:var(--green);text-decoration:none;border-bottom:1px dashed var(--green)">${cpEsc(company)}</a></strong></td>
-                        <td>${cpEsc(email)}</td>
-                        <td style="font-size:.82em;color:var(--dim)">${cpEsc(job)}</td>
-                        <td class="num ${amtNum > 0 ? 'grn' : ''}" ${amtNum > 0 ? '' : 'style="color:var(--dim)"'}>${cpEsc(amtText)}</td>
-                        <td><span style="${stageCls}padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:700">${cpEsc(stage)}</span></td>
-                    </tr>`;
+                    filteredLeads.push({
+                        channelKey: chKey,
+                        company,
+                        email,
+                        job,
+                        amountNum: amtNum,
+                        amountText: amtText,
+                        stage,
+                        stageCls,
+                        safeLink
+                    });
                 }
+                cpSortLeadRowsByStage(filteredLeads).forEach((row) => {
+                    const openAttr = row.safeLink === '#' ? '' : ' target="_blank"';
+                    tbody.innerHTML += `<tr data-lead-channel="${row.channelKey}">
+                        <td><strong><a href="${cpEsc(row.safeLink)}"${openAttr} style="color:var(--green);text-decoration:none;border-bottom:1px dashed var(--green)">${cpEsc(row.company)}</a></strong></td>
+                        <td>${cpEsc(row.email)}</td>
+                        <td style="font-size:.82em;color:var(--dim)">${cpEsc(row.job)}</td>
+                        <td class="num ${row.amountNum > 0 ? 'grn' : ''}" ${row.amountNum > 0 ? '' : 'style="color:var(--dim)"'}>${cpEsc(row.amountText)}</td>
+                        <td><span style="${row.stageCls}padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:700">${cpEsc(row.stage)}</span></td>
+                    </tr>`;
+                });
                 cpFilterLeadTable(currentKey);
             }
         }
@@ -7042,11 +7078,8 @@ async function cpFetchLiveData(forceRefresh = false) {
                 CP_LIVE.ga = pcOrganicSearchData;
                 cpRenderOrganicSearchSection();
             }
-            const pcLinkedInData = cpParsePresidentOrganicLinkedInSection(pcRows);
-            if (pcLinkedInData.rows.length) {
-                CP_LIVE.li = pcLinkedInData;
-                cpRenderOrganicLinkedInSection();
-            }
+            // PC LinkedIn data comes from L-Posts tab (individual posts, same as Operation Exodus)
+            // Do not overwrite CP_LIVE.li with the PC sheet's profile-aggregated summary
             cpRenderPresidentEmailSelect();
             cpRenderPresidentEmailMetrics();
             const pcTbl = document.getElementById('pcTbl');
