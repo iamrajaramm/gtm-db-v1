@@ -1420,7 +1420,7 @@
                         <div class="sec-head">Channel: Organic - Search</div>
                         <div class="card">
                             <table class="tbl">
-                                <thead><tr><th>Landing Page</th><th>Users</th><th>Sessions</th><th>Views</th><th>Engagement Rate</th><th>Leads</th></tr></thead>
+                                <thead><tr><th>Landing Page</th><th>Users</th><th>Sessions</th><th>Views</th><th>Engagement Rate</th></tr></thead>
                                 <tbody id="gaTbl"></tbody>
                             </table>
                             <div class="mrow" id="gaTotals"></div>
@@ -6309,7 +6309,6 @@ function cpRenderOrganicSearchSection() {
                 <td class="num">${cpFmtInt(g.sessions)}</td>
                 <td class="num">${cpFmtInt(g.views)}</td>
                 <td class="num grn">${cpFmtEngagement(g.engagement)}</td>
-                <td class="num">${cpFmtInt(g.leads)}</td>
             </tr>`;
         });
     }
@@ -6490,7 +6489,7 @@ function cpRenderOrganicLinkedInSection() {
     const liHead = document.getElementById('liHead');
     if (liHead) {
         liHead.innerHTML = CP_LIVE.li.mode === 'profile'
-            ? '<th>Profile</th><th>Posts</th><th>Impressions</th><th>Likes</th><th>Comments</th><th>Reposts</th><th>Leads</th>'
+            ? '<th>Profile</th><th>Posts</th><th>Impressions</th><th>Likes</th><th>Comments</th><th>Reposts</th>'
             : '<th>Post Preview</th><th>Posted By</th><th>Date</th><th>Impressions</th><th>Likes</th><th>Comments</th><th>Shares</th>';
     }
     const liTbl = document.getElementById('liTbl');
@@ -6505,7 +6504,6 @@ function cpRenderOrganicLinkedInSection() {
                 <td class="num">${cpFmtInt(row.likes)}</td>
                 <td class="num">${cpFmtInt(row.comments)}</td>
                 <td class="num">${cpFmtInt(row.reposts)}</td>
-                <td class="num">${cpFmtInt(row.leads)}</td>
             </tr>`;
         });
         return;
