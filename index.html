@@ -91,6 +91,30 @@
         /* ── Glossary panel ──────────────────────────────── */
         #glossaryPanel{display:none}
         #glossaryPanel.active{display:block}
+        /* ── Metric Map button ────────────────────────────── */
+        .mmap-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--card-border);background:linear-gradient(180deg,var(--surface) 0%,var(--hover-bg) 100%);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.35);flex-shrink:0}
+        .mmap-btn:hover{transform:translateY(-1px);border-color:var(--blue);box-shadow:0 8px 18px rgba(0,0,0,.12),0 0 0 3px rgba(67,97,238,.12)}
+        .mmap-btn.is-active{border-color:var(--blue);background:linear-gradient(180deg,rgba(67,97,238,.1) 0%,var(--surface) 100%);color:var(--blue)}
+        /* ── Metric Map panel ─────────────────────────────── */
+        #metricMapPanel{display:none}
+        #metricMapPanel.active{display:block}
+        .mmap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:16px;flex-wrap:wrap}
+        .mmap-title{font-size:1.35em;font-weight:900;letter-spacing:-.5px;color:var(--text)}
+        .mmap-title span{font-size:.55em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;display:block;margin-bottom:4px}
+        .mmap-back{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:.8em;font-weight:700;cursor:pointer;transition:all .16s}
+        .mmap-back:hover{border-color:var(--blue);color:var(--blue)}
+        .mmap-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding:10px 16px;background:var(--surface);border:1px solid var(--card-border);border-radius:12px}
+        .mmap-legend-label{font-size:.65em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-right:4px}
+        .mmap-legend-item{display:flex;align-items:center;gap:6px;font-size:.76em;font-weight:600;color:var(--text2)}
+        .mmap-legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+        .mmap-canvas-wrap{position:relative;overflow:auto;border:1px solid var(--card-border);border-radius:14px;background:var(--bg);height:calc(100vh - 210px);min-height:400px}
+        .mmap-zoom-controls{position:sticky;top:12px;left:12px;z-index:10;display:inline-flex;flex-direction:column;gap:4px;pointer-events:none}
+        .mmap-zoom-controls button{pointer-events:all;width:32px;height:32px;border-radius:8px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:1em;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.1);transition:border-color .15s,background .15s}
+        .mmap-zoom-controls button:hover{border-color:var(--blue);background:var(--hover-bg)}
+        .mmap-tooltip{position:fixed;z-index:9999;max-width:280px;padding:10px 14px;border-radius:10px;border:1px solid var(--card-border);background:var(--surface);box-shadow:0 8px 24px rgba(0,0,0,.15);pointer-events:none}
+        .mmap-tooltip-name{font-size:.82em;font-weight:800;color:var(--text);margin-bottom:4px}
+        .mmap-tooltip-def{font-size:.77em;color:var(--dim);line-height:1.5}
+        .mmap-tooltip-formula{font-size:.73em;color:var(--blue);margin-top:5px;font-style:italic}
         .glos-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
         .glos-title{font-size:1.35em;font-weight:900;letter-spacing:-.5px;color:var(--text)}
         .glos-title span{font-size:.55em;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;display:block;margin-bottom:4px}
@@ -465,6 +489,12 @@
                 <svg class="icon-stop" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="spin-ring" cx="12" cy="12" r="7.5" stroke-dasharray="24 14"></circle><path d="M9 9L15 15M15 9L9 15"></path></svg>
             </button>
             <button class="glossary-btn" id="glossaryBtn" onclick="toggleGlossary()" title="Glossary - definitions for all metrics" aria-label="Open glossary" type="button">?</button>
+            <button class="mmap-btn" id="metricMapBtn" onclick="toggleMetricMap()" title="Metric map - how metrics connect" aria-label="Open metric map" type="button">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
+                    <line x1="7" y1="11.5" x2="17" y2="6.5"/><line x1="7" y1="12.5" x2="17" y2="17.5"/>
+                </svg>
+            </button>
             <div class="theme-switch">
                 <button class="theme-btn active" onclick="setTheme('light',this)" title="Light theme" aria-label="Light theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.5M12 19v2.5M21.5 12H19M5 12H2.5M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8M18.7 18.7l-1.8-1.8M7.1 7.1L5.3 5.3"></path></svg></button>
                 <button class="theme-btn" onclick="setTheme('dim',this)" title="Dim theme" aria-label="Dim theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5Z"></path></svg></button>
@@ -1494,6 +1524,44 @@
                 <div class="glos-empty" id="glosEmpty" style="display:none">No metrics match your search.</div>
             </div>
         </section>
+
+        <!-- ════════════════════════════════════════════════
+             METRIC MAP PANEL
+             ════════════════════════════════════════════════ -->
+        <section class="tab-panel" id="metricMapPanel">
+            <div class="mmap-header">
+                <div>
+                    <div class="mmap-title"><span>Dashboard Reference</span>Metric Map</div>
+                </div>
+                <button class="mmap-back" onclick="toggleMetricMap()" type="button">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back to Dashboard
+                </button>
+            </div>
+            <div class="mmap-legend">
+                <span class="mmap-legend-label">Category</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--green)"></span>Revenue</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--blue)"></span>Pipeline / Deals</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--purple)"></span>Website</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--amber)"></span>Paid Ads</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:#0d9488"></span>Outbound</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--dim)"></span>LinkedIn</span>
+                <span class="mmap-legend-item"><span class="mmap-legend-swatch" style="background:var(--red)"></span>Negative / Cost</span>
+            </div>
+            <div class="mmap-canvas-wrap" id="mmapCanvasWrap">
+                <div class="mmap-zoom-controls">
+                    <button onclick="mmapZoom(1.25)" title="Zoom in" type="button">+</button>
+                    <button onclick="mmapZoom(0.8)" title="Zoom out" type="button">-</button>
+                    <button onclick="mmapZoomReset()" title="Reset zoom" type="button" style="font-size:.65em;letter-spacing:0">RST</button>
+                </div>
+                <svg id="mmapSvg" xmlns="http://www.w3.org/2000/svg" style="display:block;transform-origin:top left"></svg>
+            </div>
+            <div class="mmap-tooltip" id="mmapTooltip" style="display:none">
+                <div class="mmap-tooltip-name" id="mmapTipName"></div>
+                <div class="mmap-tooltip-def" id="mmapTipDef"></div>
+                <div class="mmap-tooltip-formula" id="mmapTipFormula"></div>
+            </div>
+        </section>
     </div>
 
     <div class="footer">GTMB Dashboard | <span id="ts">Last refreshed: -</span></div>
@@ -1907,6 +1975,12 @@ function setActiveTab(tab) {
     if (_gp && _gp.classList.contains('active')) {
         _gp.classList.remove('active');
         _gb && _gb.classList.remove('is-active');
+    }
+    const _mp = document.getElementById('metricMapPanel');
+    const _mb = document.getElementById('metricMapBtn');
+    if (_mp && _mp.classList.contains('active')) {
+        _mp.classList.remove('active');
+        _mb && _mb.classList.remove('is-active');
     }
     document.getElementById('revenuePanel')?.classList.toggle('active', active === 'revenue');
     document.getElementById('salesPanel')?.classList.toggle('active', active === 'sales');
@@ -7722,6 +7796,288 @@ function glosRender() {
 // =====================================================================
 // END GLOSSARY
 // =====================================================================
+
+// =====================================================================
+// METRIC MAP
+// =====================================================================
+const MMAP_NODES = [
+    // Tier 0 - North Star
+    { id:'total-revenue',    label:'Total Revenue',          tier:0, cat:'rev',  formula:null },
+    // Tier 1 - Net ARR
+    { id:'net-arr',          label:'Net ARR',                tier:1, cat:'rev',  formula:'New ARR + Upsell - Downsell - Churn' },
+    // Tier 2 - Revenue components
+    { id:'new-arr',          label:'New ARR',                tier:2, cat:'rev',  formula:null },
+    { id:'upsell',           label:'Upsell',                 tier:2, cat:'rev',  formula:null },
+    { id:'downsell',         label:'Downsell',               tier:2, cat:'neg',  formula:null },
+    { id:'churn',            label:'Churn',                  tier:2, cat:'neg',  formula:null },
+    // Tier 3 - Pipeline
+    { id:'pipeline-created', label:'Pipeline Created',       tier:3, cat:'deal', formula:null },
+    { id:'active-pipeline',  label:'Active Pipeline',        tier:3, cat:'deal', formula:null },
+    { id:'won-amount',       label:'Won Amount',             tier:3, cat:'deal', formula:null },
+    { id:'lost-amount',      label:'Lost Amount',            tier:3, cat:'neg',  formula:null },
+    { id:'deal-count',       label:'Deal Count',             tier:3, cat:'deal', formula:null },
+    { id:'sao',              label:'SAO',                    tier:3, cat:'deal', formula:null },
+    // Tier 4 - Channel outputs
+    { id:'form-fills',       label:'Form Fill Date',         tier:4, cat:'web',  formula:null },
+    { id:'leads-ads',        label:'Leads (Ads)',            tier:4, cat:'ads',  formula:null },
+    { id:'meetings-booked',  label:'Meetings Booked',        tier:4, cat:'cp',   formula:null },
+    { id:'li-engagement',    label:'Engagement (LinkedIn)',  tier:4, cat:'li',   formula:'Likes + Comments + Reposts' },
+    // Tier 5 - Website details
+    { id:'sessions',         label:'Sessions',               tier:5, cat:'web',  formula:null },
+    { id:'total-users',      label:'Total Users',            tier:5, cat:'web',  formula:null },
+    { id:'bounce-rate',      label:'Bounce Rate',            tier:5, cat:'neg',  formula:null },
+    { id:'engagement-rate',  label:'Engagement Rate',        tier:5, cat:'web',  formula:null },
+    { id:'landing-page',     label:'Landing Page',           tier:5, cat:'web',  formula:null },
+    // Tier 5 - Ads details
+    { id:'impressions',      label:'Impressions',            tier:5, cat:'ads',  formula:null },
+    { id:'clicks',           label:'Clicks',                 tier:5, cat:'ads',  formula:null },
+    { id:'ctr',              label:'CTR',                    tier:5, cat:'ads',  formula:'Clicks / Impressions x 100' },
+    { id:'cpc',              label:'CPC',                    tier:5, cat:'neg',  formula:'Total Spend / Total Clicks' },
+    { id:'cpl',              label:'CPL',                    tier:5, cat:'neg',  formula:'Total Spend / Total Leads' },
+    { id:'spend',            label:'Spend / Cost',           tier:5, cat:'neg',  formula:null },
+    // Tier 5 - Outbound details
+    { id:'contacts-touched', label:'Contacts Touched',       tier:5, cat:'cp',   formula:null },
+    { id:'sent',             label:'Sent',                   tier:5, cat:'cp',   formula:null },
+    { id:'delivered',        label:'Delivered',              tier:5, cat:'cp',   formula:null },
+    { id:'open-rate',        label:'Open Rate',              tier:5, cat:'cp',   formula:null },
+    { id:'click-rate',       label:'Click Rate',             tier:5, cat:'cp',   formula:null },
+    { id:'reply-rate',       label:'Reply Rate',             tier:5, cat:'cp',   formula:null },
+    // Tier 5 - LinkedIn details
+    { id:'li-impressions',   label:'Impressions (LinkedIn)', tier:5, cat:'li',   formula:null },
+    { id:'total-posts',      label:'Total Posts',            tier:5, cat:'li',   formula:null },
+    { id:'likes',            label:'Likes',                  tier:5, cat:'li',   formula:null },
+    { id:'comments',         label:'Comments',               tier:5, cat:'li',   formula:null },
+    { id:'shares',           label:'Shares / Reposts',       tier:5, cat:'li',   formula:null },
+];
+
+const MMAP_EDGES = [
+    { from:'total-revenue',    to:'net-arr' },
+    { from:'net-arr',          to:'new-arr' },
+    { from:'net-arr',          to:'upsell' },
+    { from:'net-arr',          to:'downsell' },
+    { from:'net-arr',          to:'churn' },
+    { from:'new-arr',          to:'pipeline-created' },
+    { from:'new-arr',          to:'won-amount' },
+    { from:'pipeline-created', to:'active-pipeline' },
+    { from:'pipeline-created', to:'lost-amount' },
+    { from:'pipeline-created', to:'deal-count' },
+    { from:'pipeline-created', to:'sao' },
+    { from:'pipeline-created', to:'form-fills' },
+    { from:'pipeline-created', to:'leads-ads' },
+    { from:'sao',              to:'meetings-booked' },
+    { from:'form-fills',       to:'sessions' },
+    { from:'form-fills',       to:'total-users' },
+    { from:'form-fills',       to:'bounce-rate' },
+    { from:'form-fills',       to:'engagement-rate' },
+    { from:'form-fills',       to:'landing-page' },
+    { from:'leads-ads',        to:'impressions' },
+    { from:'leads-ads',        to:'clicks' },
+    { from:'leads-ads',        to:'ctr' },
+    { from:'leads-ads',        to:'cpc' },
+    { from:'leads-ads',        to:'cpl' },
+    { from:'leads-ads',        to:'spend' },
+    { from:'meetings-booked',  to:'contacts-touched' },
+    { from:'meetings-booked',  to:'sent' },
+    { from:'meetings-booked',  to:'delivered' },
+    { from:'meetings-booked',  to:'open-rate' },
+    { from:'meetings-booked',  to:'click-rate' },
+    { from:'meetings-booked',  to:'reply-rate' },
+    { from:'sessions',         to:'li-engagement' },
+    { from:'li-engagement',    to:'li-impressions' },
+    { from:'li-engagement',    to:'total-posts' },
+    { from:'li-engagement',    to:'likes' },
+    { from:'li-engagement',    to:'comments' },
+    { from:'li-engagement',    to:'shares' },
+];
+
+function mmapBuildDefLookup() {
+    const map = {};
+    GLOS_METRICS.forEach(m => { map[m.name.toLowerCase()] = m.def; });
+    return map;
+}
+
+function mmapGetDef(label, defLookup) {
+    const key = label.toLowerCase();
+    if (defLookup[key]) return defLookup[key];
+    for (const [k, v] of Object.entries(defLookup)) {
+        if (k.includes(key) || key.includes(k.split('(')[0].trim().toLowerCase())) return v;
+    }
+    return '';
+}
+
+let mmapScale = 1;
+let mmapPrevTab = null;
+
+function toggleMetricMap() {
+    const panel = document.getElementById('metricMapPanel');
+    const btn   = document.getElementById('metricMapBtn');
+    const isOpen = panel && panel.classList.contains('active');
+    if (isOpen) {
+        panel.classList.remove('active');
+        btn && btn.classList.remove('is-active');
+        if (mmapPrevTab) {
+            document.getElementById(mmapPrevTab + 'Panel')?.classList.add('active');
+            document.getElementById('tab' + mmapPrevTab.charAt(0).toUpperCase() + mmapPrevTab.slice(1))?.classList.add('on');
+        }
+    } else {
+        mmapPrevTab = STATE.activeTab || 'revenue';
+        ['revenue','sales','marketing'].forEach(t => {
+            document.getElementById(t + 'Panel')?.classList.remove('active');
+            document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.remove('on');
+        });
+        // Close glossary if open
+        const gp = document.getElementById('glossaryPanel');
+        const gb = document.getElementById('glossaryBtn');
+        if (gp && gp.classList.contains('active')) {
+            gp.classList.remove('active');
+            gb && gb.classList.remove('is-active');
+        }
+        panel.classList.add('active');
+        btn && btn.classList.add('is-active');
+        mmapScale = 1;
+        setTimeout(mmapRender, 40);
+    }
+}
+
+function mmapLayout() {
+    const NODE_W = 168, NODE_H = 44, COL_GAP = 220, ROW_GAP = 18;
+    const tiers = {};
+    MMAP_NODES.forEach(n => { (tiers[n.tier] = tiers[n.tier] || []).push(n); });
+    Object.entries(tiers).forEach(([tier, nodes]) => {
+        const totalH = nodes.length * NODE_H + (nodes.length - 1) * ROW_GAP;
+        nodes.forEach((n, i) => {
+            n.x = Number(tier) * (NODE_W + COL_GAP) + 24;
+            n.y = i * (NODE_H + ROW_GAP) - totalH / 2;
+        });
+    });
+    const minY = Math.min(...MMAP_NODES.map(n => n.y));
+    MMAP_NODES.forEach(n => { n.y -= minY - 36; });
+    const maxX = Math.max(...MMAP_NODES.map(n => n.x)) + NODE_W + 32;
+    const maxY = Math.max(...MMAP_NODES.map(n => n.y)) + NODE_H + 32;
+    return { svgW: maxX, svgH: maxY, NODE_W, NODE_H };
+}
+
+function mmapRender() {
+    const svg = document.getElementById('mmapSvg');
+    if (!svg) return;
+    const defLookup = mmapBuildDefLookup();
+    const { svgW, svgH, NODE_W, NODE_H } = mmapLayout();
+    const catColors = {
+        rev:'var(--green)', deal:'var(--blue)', web:'var(--purple)',
+        ads:'var(--amber)', cp:'#0d9488', li:'var(--dim)', neg:'var(--red)'
+    };
+    const tierLabels = { 0:'North Star', 1:'Net ARR', 2:'Components', 3:'Pipeline', 4:'Channel Output', 5:'Channel Activity' };
+    const COL_GAP = 220;
+
+    svg.setAttribute('width', svgW);
+    svg.setAttribute('height', svgH);
+    svg.style.width  = svgW + 'px';
+    svg.style.height = svgH + 'px';
+    svg.style.transform = 'scale(' + mmapScale + ')';
+
+    const nodeById = {};
+    MMAP_NODES.forEach(n => { nodeById[n.id] = n; });
+
+    let html = '';
+
+    // Tier column header labels
+    Object.entries(tierLabels).forEach(([tier, label]) => {
+        const tx = Number(tier) * (NODE_W + COL_GAP) + 24 + NODE_W / 2;
+        html += `<text x="${tx}" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="var(--dim)" font-family="system-ui,sans-serif" letter-spacing="1">${label.toUpperCase()}</text>`;
+    });
+
+    // Edges (drawn behind nodes)
+    MMAP_EDGES.forEach(e => {
+        const f = nodeById[e.from], t = nodeById[e.to];
+        if (!f || !t) return;
+        const x1 = f.x + NODE_W, y1 = f.y + NODE_H / 2;
+        const x2 = t.x,          y2 = t.y + NODE_H / 2;
+        const cx = (x1 + x2) / 2;
+        html += `<path d="M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}" fill="none" stroke="var(--card-border)" stroke-width="1.5" opacity="0.8"/>`;
+    });
+
+    // Nodes
+    MMAP_NODES.forEach(n => {
+        const color  = catColors[n.cat] || 'var(--dim)';
+        const def    = mmapGetDef(n.label, defLookup);
+        const safeLabel   = n.label.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        const safeDef     = (def  || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        const safeFormula = (n.formula || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        html += `<g class="mmap-node" data-def="${safeDef}" data-label="${safeLabel}" data-formula="${safeFormula}" style="cursor:pointer">
+            <rect x="${n.x}" y="${n.y}" width="${NODE_W}" height="${NODE_H}" rx="8" fill="var(--surface)" stroke="var(--card-border)" stroke-width="1"/>
+            <rect x="${n.x}" y="${n.y}" width="4" height="${NODE_H}" rx="2" fill="${color}"/>
+            <text x="${n.x + 14}" y="${n.y + NODE_H / 2}" font-size="11.5" fill="var(--text)" dominant-baseline="middle" font-family="system-ui,sans-serif" font-weight="600">${safeLabel}</text>
+        </g>`;
+    });
+
+    svg.innerHTML = html;
+
+    // Tooltip events
+    const tooltip  = document.getElementById('mmapTooltip');
+    const tipName  = document.getElementById('mmapTipName');
+    const tipDef   = document.getElementById('mmapTipDef');
+    const tipFormula = document.getElementById('mmapTipFormula');
+    svg.querySelectorAll('.mmap-node').forEach(el => {
+        el.addEventListener('mouseenter', ev => {
+            if (!tooltip) return;
+            tipName.textContent    = el.dataset.label   || '';
+            tipDef.textContent     = el.dataset.def     || '';
+            tipFormula.textContent = el.dataset.formula ? 'Formula: ' + el.dataset.formula : '';
+            tipFormula.style.display = el.dataset.formula ? '' : 'none';
+            tooltip.style.display  = 'block';
+            mmapPositionTooltip(ev);
+        });
+        el.addEventListener('mousemove',  mmapPositionTooltip);
+        el.addEventListener('mouseleave', () => { if (tooltip) tooltip.style.display = 'none'; });
+    });
+}
+
+function mmapPositionTooltip(ev) {
+    const tooltip = document.getElementById('mmapTooltip');
+    if (!tooltip) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const tw = tooltip.offsetWidth || 260, th = tooltip.offsetHeight || 80;
+    let left = ev.clientX + 14, top = ev.clientY + 14;
+    if (left + tw > vw - 10) left = ev.clientX - tw - 14;
+    if (top  + th > vh - 10) top  = ev.clientY - th - 14;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top  = top  + 'px';
+}
+
+function mmapZoom(factor) {
+    const svg = document.getElementById('mmapSvg');
+    if (!svg) return;
+    mmapScale = Math.max(0.3, Math.min(3, mmapScale * factor));
+    svg.style.transform = 'scale(' + mmapScale + ')';
+    const w = parseFloat(svg.getAttribute('width'))  || 0;
+    const h = parseFloat(svg.getAttribute('height')) || 0;
+    const wrap = document.getElementById('mmapCanvasWrap');
+    if (wrap) {
+        let spacer = wrap.querySelector('.mmap-spacer');
+        if (!spacer) {
+            spacer = document.createElement('div');
+            spacer.className = 'mmap-spacer';
+            spacer.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none';
+            wrap.appendChild(spacer);
+        }
+        spacer.style.width  = (w * mmapScale) + 'px';
+        spacer.style.height = (h * mmapScale) + 'px';
+    }
+}
+
+function mmapZoomReset() {
+    mmapScale = 1;
+    const svg = document.getElementById('mmapSvg');
+    if (svg) svg.style.transform = 'scale(1)';
+    const spacer = document.querySelector('.mmap-spacer');
+    if (spacer) { spacer.style.width = ''; spacer.style.height = ''; }
+    const wrap = document.getElementById('mmapCanvasWrap');
+    if (wrap) { wrap.scrollTop = 0; wrap.scrollLeft = 0; }
+}
+// =====================================================================
+// END METRIC MAP
+// =====================================================================
+
 try {
     if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
         unlockDashboard(false);
