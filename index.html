@@ -464,7 +464,7 @@
                 <svg class="icon-refresh" viewBox="0 0 24 24" aria-hidden="true"><g class="r-body" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></g></svg>
                 <svg class="icon-stop" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="spin-ring" cx="12" cy="12" r="7.5" stroke-dasharray="24 14"></circle><path d="M9 9L15 15M15 9L9 15"></path></svg>
             </button>
-            <button class="glossary-btn" id="glossaryBtn" onclick="toggleGlossary()" title="Glossary — definitions for all metrics" aria-label="Open glossary" type="button">?</button>
+            <button class="glossary-btn" id="glossaryBtn" onclick="toggleGlossary()" title="Glossary - definitions for all metrics" aria-label="Open glossary" type="button">?</button>
             <div class="theme-switch">
                 <button class="theme-btn active" onclick="setTheme('light',this)" title="Light theme" aria-label="Light theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2.5v2.5M12 19v2.5M21.5 12H19M5 12H2.5M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8M18.7 18.7l-1.8-1.8M7.1 7.1L5.3 5.3"></path></svg></button>
                 <button class="theme-btn" onclick="setTheme('dim',this)" title="Dim theme" aria-label="Dim theme" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4 7 7 0 0 0 20 14.5Z"></path></svg></button>
@@ -1901,6 +1901,13 @@ function setActiveTab(tab) {
     const active = tab === 'sales' ? 'sales' : tab === 'marketing' ? 'marketing' : 'revenue';
     STATE.activeTab = active;
     if (active !== 'marketing') closeMarketingTabMenu();
+    // Close glossary if open
+    const _gp = document.getElementById('glossaryPanel');
+    const _gb = document.getElementById('glossaryBtn');
+    if (_gp && _gp.classList.contains('active')) {
+        _gp.classList.remove('active');
+        _gb && _gb.classList.remove('is-active');
+    }
     document.getElementById('revenuePanel')?.classList.toggle('active', active === 'revenue');
     document.getElementById('salesPanel')?.classList.toggle('active', active === 'sales');
     document.getElementById('marketingPanel')?.classList.toggle('active', active === 'marketing');
