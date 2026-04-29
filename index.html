@@ -8126,20 +8126,11 @@ const APPS_SCRIPT_LOG_URL = 'https://script.google.com/macros/s/AKfycbxvGilVnww-
 const SESSION_LOG = {
     email: null,
     loginTimeRaw: null,
+    loginTimeStr: null,
     clicks: 0,
     filterClicks: 0,
-    tabsViewed: new Set(),
-    flushed: false
+    tabsViewed: new Set()
 };
-
-function logSessionStart(email) {
-    SESSION_LOG.email = email;
-    SESSION_LOG.loginTimeRaw = new Date();
-    SESSION_LOG.clicks = 0;
-    SESSION_LOG.filterClicks = 0;
-    SESSION_LOG.tabsViewed = new Set(['Revenue']);
-    SESSION_LOG.flushed = false;
-}
 
 function formatISTLog(date) {
     var ist = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
@@ -8162,20 +8153,57 @@ function formatSessionDuration(ms) {
     return mins + 'm ' + secs + 's';
 }
 
+function saveSessionToStorage() {
+    try {
+        sessionStorage.setItem('gtmb-sl-email', SESSION_LOG.email || '');
+        sessionStorage.setItem('gtmb-sl-start', SESSION_LOG.loginTimeRaw ? SESSION_LOG.loginTimeRaw.toISOString() : '');
+        sessionStorage.setItem('gtmb-sl-loginstr', SESSION_LOG.loginTimeStr || '');
+        sessionStorage.setItem('gtmb-sl-clicks', String(SESSION_LOG.clicks));
+        sessionStorage.setItem('gtmb-sl-fclicks', String(SESSION_LOG.filterClicks));
+        sessionStorage.setItem('gtmb-sl-tabs', JSON.stringify(Array.from(SESSION_LOG.tabsViewed)));
+    } catch(e) {}
+}
+
+function logSessionStart(email) {
+    // Fresh login — clear any old session data
+    SESSION_LOG.email = email;
+    SESSION_LOG.loginTimeRaw = new Date();
+    SESSION_LOG.loginTimeStr = formatISTLog(SESSION_LOG.loginTimeRaw);
+    SESSION_LOG.clicks = 0;
+    SESSION_LOG.filterClicks = 0;
+    SESSION_LOG.tabsViewed = new Set(['Revenue']);
+    saveSessionToStorage();
+}
+
+function resumeSessionIfExists() {
+    // Called on page restore (hard refresh within same tab)
+    try {
+        var email = sessionStorage.getItem('gtmb-sl-email');
+        var start = sessionStorage.getItem('gtmb-sl-start');
+        var loginStr = sessionStorage.getItem('gtmb-sl-loginstr');
+        if (!email || !start) return false;
+        SESSION_LOG.email = email;
+        SESSION_LOG.loginTimeRaw = new Date(start);
+        SESSION_LOG.loginTimeStr = loginStr;
+        SESSION_LOG.clicks = parseInt(sessionStorage.getItem('gtmb-sl-clicks') || '0');
+        SESSION_LOG.filterClicks = parseInt(sessionStorage.getItem('gtmb-sl-fclicks') || '0');
+        SESSION_LOG.tabsViewed = new Set(JSON.parse(sessionStorage.getItem('gtmb-sl-tabs') || '["Revenue"]'));
+        return true;
+    } catch(e) { return false; }
+}
+
 function flushSessionLog() {
-    if (SESSION_LOG.flushed || !SESSION_LOG.email || !SESSION_LOG.loginTimeRaw) return;
-    SESSION_LOG.flushed = true;
+    if (!SESSION_LOG.email || !SESSION_LOG.loginTimeRaw) return;
     var duration = Date.now() - SESSION_LOG.loginTimeRaw.getTime();
     var payload = JSON.stringify({
         email: SESSION_LOG.email,
-        loginTime: formatISTLog(SESSION_LOG.loginTimeRaw),
+        loginTime: SESSION_LOG.loginTimeStr,
         sessionDuration: formatSessionDuration(duration),
         totalClicks: SESSION_LOG.clicks,
         filterClicks: SESSION_LOG.filterClicks,
         tabsViewed: SESSION_LOG.tabsViewed.size > 0 ? Array.from(SESSION_LOG.tabsViewed).join(', ') : 'Revenue'
     });
     try {
-        // Use text/plain to avoid CORS preflight on sendBeacon
         if (navigator.sendBeacon) {
             navigator.sendBeacon(APPS_SCRIPT_LOG_URL, new Blob([payload], {type: 'text/plain'}));
         } else {
@@ -8195,6 +8223,7 @@ document.addEventListener('click', function(e) {
         var label = (tabBtn.textContent || '').trim().replace(/\s+/g, ' ');
         if (label) SESSION_LOG.tabsViewed.add(label);
     }
+    saveSessionToStorage();
 }, true);
 
 window.addEventListener('beforeunload', flushSessionLog);
@@ -8208,8 +8237,11 @@ document.addEventListener('visibilitychange', function() {
 try {
     if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
         unlockDashboard(false);
-        const _restoredEmail = sessionStorage.getItem('gtmb-auth-email') || '';
-        if (_restoredEmail) logSessionStart(_restoredEmail);
+        // Resume existing session (hard refresh) or start new one
+        if (!resumeSessionIfExists()) {
+            var _email = sessionStorage.getItem('gtmb-auth-email') || '';
+            if (_email) logSessionStart(_email);
+        }
         bootstrapDashboard();
     }
 } catch (error) {}
