@@ -285,6 +285,12 @@
         .kpi.is-teal .kpi-value{color:#14b8a6}
         .kpi.is-indigo .kpi-value{color:#4f46e5}
         .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
+        .kpi-baseline-row{display:flex;align-items:center;gap:5px;margin-top:7px}
+        .kpi-atl-badge{font-size:.58em;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:5px;text-transform:uppercase;line-height:1.4}
+        .kpi-atl-badge--atl{background:rgba(0,200,117,.14);color:var(--green)}
+        .kpi-atl-badge--btl{background:rgba(239,68,68,.1);color:var(--red)}
+        .kpi-atl-badge--neu{background:rgba(138,138,153,.12);color:var(--dim)}
+        .kpi-baseline-val{font-size:.68em;font-weight:600;color:var(--dim)}
         .sales-pie-card{display:flex;flex-direction:column;gap:6px}
         .sales-distribution-card{padding-top:20px;padding-bottom:8px}
         .sales-distribution-card .chart-head{margin-bottom:10px}
@@ -520,7 +526,7 @@
 
     <div class="ch-row">
         <span class="ch-label">Tab</span>
-        <button class="ch-pill on" id="tabRevenue" type="button" onclick="setActiveTab('revenue')">GTMB - Revenue</button>
+        <button class="ch-pill on" id="tabRevenue" type="button" onclick="setActiveTab('revenue')">Revenue</button>
         <button class="ch-pill" id="tabSales" type="button" onclick="setActiveTab('sales')">Sales</button>
         <div class="marketing-tab-wrap" id="marketingTabWrap">
             <button class="ch-pill marketing-tab-btn" id="tabMarketing" type="button" onclick="toggleMarketingTabMenu()" aria-haspopup="menu" aria-expanded="false">
@@ -3958,45 +3964,79 @@ function buildTrendView(rows, dateField, view) {
     };
 }
 
-function renderKpis(metrics){
-    const renderCard = (label, value, sub, tone) => `
-        <div class="kpi is-${tone}">
-            <div class="kpi-label">${escapeHtml(label)}</div>
-            <div class="kpi-value">${money(value)}</div>
-            <div class="kpi-sub">${escapeHtml(sub)}</div>
-        </div>
-    `;
-    document.getElementById('kpiGrid').innerHTML = `
-        <div class="metric-group is-yellow two-card">
-            ${renderCard('New ARR', metrics.newArr, 'Closed-won new logo', 'yellow')}
-            ${renderCard('Upsell', metrics.upsell, 'Closed-won expansion', 'yellow')}
-        </div>
-        <div class="scorecard-symbol" aria-hidden="true">-</div>
-        <div class="metric-group is-red two-card">
-            ${renderCard('Downsell', Math.abs(metrics.downsell), 'Closed-won contraction', 'red')}
-            ${renderCard('Churn', metrics.churn, 'Closed-won churn status', 'red')}
-        </div>
-        <div class="scorecard-symbol" aria-hidden="true">=</div>
-        <div class="metric-group is-green">
-            ${renderCard('Net ARR', metrics.net, 'Customer status total', 'green')}
-        </div>
-    `;
+function getLastQLabel(){
+    var now=new Date(),q=Math.floor(now.getMonth()/3)+1,y=now.getFullYear();
+    return q===1?('Q4 '+(y-1)):('Q'+(q-1)+' '+y);
+}
+function getLastQRevRows(){
+    var lq=getLastQLabel();
+    return (STATE.rows||[]).filter(function(r){return r.__quarter===lq;});
+}
+function getLastQSalesRows(){
+    var lq=getLastQLabel();
+    return (STATE.rows||[]).filter(function(r){return r.__createQuarter===lq;});
+}
+function getLastQGa4Rows(){
+    var lq=getLastQLabel();
+    return (STATE.marketing.websitePerformance.rows||[]).filter(function(r){return r.__ga4Quarter===lq;});
+}
+function atlBadge(cur,bVal,lowerIsBetter,fmtFn){
+    if(bVal===undefined||bVal===null)return '';
+    var atl=lowerIsBetter?cur<bVal:cur>bVal,btl=lowerIsBetter?cur>bVal:cur<bVal;
+    var cls=atl?'atl':btl?'btl':'neu',txt=atl?'ATL':btl?'BTL':'-';
+    return '<div class="kpi-baseline-row"><span class="kpi-atl-badge kpi-atl-badge--'+cls+'">'+txt+'</span><span class="kpi-baseline-val">Last Q: '+fmtFn(bVal)+'</span></div>';
+}
+function atlTone(def,cur,bVal,lowerIsBetter){
+    if(bVal===undefined||bVal===null)return def;
+    var atl=lowerIsBetter?cur<bVal:cur>bVal,btl=lowerIsBetter?cur>bVal:cur<bVal;
+    return atl?'green':btl?'red':def;
 }
 
-function renderSalesKpis(metrics) {
-    const cards = [
-        { label:'Deals Created', value:metrics.dealsCreated, tone:'blue' },
-        { label:'SAO', value:metrics.sao, tone:'purple' },
-        { label:'Closed Won', value:metrics.closedWon, tone:'green' },
-        { label:'Closed Lost', value:metrics.closedLost, tone:'red' },
-        { label:'Active Deals', value:metrics.activeDeals, tone:'yellow' }
+function renderKpis(metrics,baseline){
+    var b=baseline&&getLastQRevRows().length?baseline:null;
+    var rc=function(label,cur,sub,def,bVal,li){
+        var tone=atlTone(def,cur,bVal,li);
+        var badge=atlBadge(cur,bVal,li,money);
+        return '<div class="kpi is-'+tone+'">'
+            +'<div class="kpi-label">'+escapeHtml(label)+'</div>'
+            +'<div class="kpi-value">'+money(cur)+'</div>'
+            +'<div class="kpi-sub">'+escapeHtml(sub)+'</div>'
+            +badge+'</div>';
+    };
+    document.getElementById('kpiGrid').innerHTML=
+        '<div class="metric-group is-yellow two-card">'
+        +rc('New ARR',metrics.newArr,'Closed-won new logo','yellow',b?b.newArr:null,false)
+        +rc('Upsell',metrics.upsell,'Closed-won expansion','yellow',b?b.upsell:null,false)
+        +'</div>'
+        +'<div class="scorecard-symbol" aria-hidden="true">-</div>'
+        +'<div class="metric-group is-red two-card">'
+        +rc('Downsell',Math.abs(metrics.downsell),'Closed-won contraction','red',b?Math.abs(b.downsell||0):null,true)
+        +rc('Churn',metrics.churn,'Closed-won churn status','red',b?b.churn:null,true)
+        +'</div>'
+        +'<div class="scorecard-symbol" aria-hidden="true">=</div>'
+        +'<div class="metric-group is-green">'
+        +rc('Net ARR',metrics.net,'Customer status total','green',b?b.net:null,false)
+        +'</div>';
+}
+
+function renderSalesKpis(metrics,baseline){
+    var b=baseline&&getLastQSalesRows().length?baseline:null;
+    var fmt=function(v){return Number(v||0).toLocaleString();};
+    var cards=[
+        {label:'Deals Created',cur:metrics.dealsCreated,def:'blue',  bVal:b?b.dealsCreated:null,li:false},
+        {label:'SAO',          cur:metrics.sao,         def:'purple',bVal:b?b.sao:null,         li:false},
+        {label:'Closed Won',   cur:metrics.closedWon,   def:'green', bVal:b?b.closedWon:null,   li:false},
+        {label:'Closed Lost',  cur:metrics.closedLost,  def:'red',   bVal:b?b.closedLost:null,  li:true},
+        {label:'Active Deals', cur:metrics.activeDeals, def:'yellow',bVal:null,                 li:false}
     ];
-    document.getElementById('salesKpiGrid').innerHTML = cards.map((card) => `
-        <div class="kpi is-${card.tone}">
-            <div class="kpi-label">${escapeHtml(card.label)}</div>
-            <div class="kpi-value">${Number(card.value || 0).toLocaleString()}</div>
-        </div>
-    `).join('');
+    document.getElementById('salesKpiGrid').innerHTML=cards.map(function(card){
+        var tone=atlTone(card.def,card.cur,card.bVal,card.li);
+        var badge=atlBadge(card.cur,card.bVal,card.li,fmt);
+        return '<div class="kpi is-'+tone+'">'
+            +'<div class="kpi-label">'+escapeHtml(card.label)+'</div>'
+            +'<div class="kpi-value">'+fmt(card.cur)+'</div>'
+            +badge+'</div>';
+    }).join('');
 }
 
 function plotTrend(elId, groups, orderedKeys, xAxisTitle, metric = STATE.trendMetric){
@@ -5078,7 +5118,8 @@ function renderSales() {
     const rows = STATE.sales.filtered;
     renderSalesFilterOptions();
     syncSalesFilterStates();
-    renderSalesKpis(getSalesMetrics(rows));
+    const salesBaseline = getSalesMetrics(getLastQSalesRows());
+    renderSalesKpis(getSalesMetrics(rows), salesBaseline);
     document.querySelectorAll('input[name="salesTrendMetric"]').forEach((input) => {
         input.checked = input.value === STATE.sales.trend.metric;
     });
@@ -5287,21 +5328,25 @@ function buildGa4TrendSeries(rows, view) {
     };
 }
 
-function renderGa4Kpis(rows) {
-    const metrics = finalizeGa4Metrics(summarizeGa4Rows(rows));
-    const cards = [
-        { label:'Total Users', value:Number(metrics.totalUsers || 0).toLocaleString(), tone:'blue' },
-        { label:'New Users', value:Number(metrics.newUsers || 0).toLocaleString(), tone:'purple' },
-        { label:'Sessions', value:Number(metrics.sessions || 0).toLocaleString(), tone:'green' },
-        { label:'Pages per Session', value:formatRatioValue(metrics.pagesPerSession), tone:'teal' },
-        { label:'Average Session Duration', value:formatDurationClock(metrics.avgSessionDuration, true), tone:'indigo' }
+function renderGa4Kpis(rows,baselineRows){
+    var m=finalizeGa4Metrics(summarizeGa4Rows(rows));
+    var bm=baselineRows&&baselineRows.length?finalizeGa4Metrics(summarizeGa4Rows(baselineRows)):null;
+    var numFmt=function(v){return Number(v||0).toLocaleString();};
+    var cards=[
+        {label:'Total Users',             cur:m.totalUsers,         bVal:bm?bm.totalUsers:null,         def:'blue',  fmt:numFmt,                                        li:false},
+        {label:'New Users',               cur:m.newUsers,           bVal:bm?bm.newUsers:null,           def:'purple',fmt:numFmt,                                        li:false},
+        {label:'Sessions',                cur:m.sessions,           bVal:bm?bm.sessions:null,           def:'green', fmt:numFmt,                                        li:false},
+        {label:'Pages per Session',       cur:m.pagesPerSession,    bVal:bm?bm.pagesPerSession:null,    def:'teal',  fmt:function(v){return formatRatioValue(v);},      li:false},
+        {label:'Average Session Duration',cur:m.avgSessionDuration, bVal:bm?bm.avgSessionDuration:null, def:'indigo',fmt:function(v){return formatDurationClock(v,true);},li:false}
     ];
-    document.getElementById('ga4KpiGrid').innerHTML = cards.map((card) => `
-        <div class="kpi ga4-kpi-card is-${card.tone}">
-            <div class="kpi-label">${escapeHtml(card.label)}</div>
-            <div class="kpi-value">${escapeHtml(card.value)}</div>
-        </div>
-    `).join('');
+    document.getElementById('ga4KpiGrid').innerHTML=cards.map(function(card){
+        var tone=atlTone(card.def,card.cur,card.bVal,card.li);
+        var badge=atlBadge(card.cur,card.bVal,card.li,card.fmt);
+        return '<div class="kpi ga4-kpi-card is-'+tone+'">'
+            +'<div class="kpi-label">'+escapeHtml(card.label)+'</div>'
+            +'<div class="kpi-value">'+escapeHtml(card.fmt(card.cur))+'</div>'
+            +badge+'</div>';
+    }).join('');
 }
 
 function plotGa4TotalUsersTrend(rows) {
@@ -5579,7 +5624,7 @@ function renderWebsitePerformance() {
     renderGa4FilterOptions();
     syncGa4FilterStates();
     const rows = STATE.marketing.websitePerformance.filtered;
-    renderGa4Kpis(rows);
+    renderGa4Kpis(rows, getLastQGa4Rows());
     plotGa4TotalUsersTrend(rows);
     plotGa4ChannelTrend(rows);
     plotGa4UsersPie(rows);
@@ -5927,7 +5972,8 @@ function renderTables(rows){
 function renderAll(){
     const rows = STATE.filtered;
     const metrics = getMetrics(rows);
-    renderKpis(metrics);
+    const revBaseline = getMetrics(getLastQRevRows());
+    renderKpis(metrics, revBaseline);
     syncFilterStates();
 
     document.querySelectorAll('input[name="trendMetricView"]').forEach((input) => {
