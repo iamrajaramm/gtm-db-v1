@@ -8118,15 +8118,6 @@ function mmapZoomReset() {
 // END METRIC MAP
 // =====================================================================
 
-try {
-    if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
-        unlockDashboard(false);
-        const _restoredEmail = sessionStorage.getItem('gtmb-auth-email') || '';
-        if (_restoredEmail) logSessionStart(_restoredEmail);
-        bootstrapDashboard();
-    }
-} catch (error) {}
-
 // =====================================================================
 // ACTIVITY LOGGER
 // =====================================================================
@@ -8184,10 +8175,11 @@ function flushSessionLog() {
         tabsViewed: SESSION_LOG.tabsViewed.size > 0 ? Array.from(SESSION_LOG.tabsViewed).join(', ') : 'Revenue'
     });
     try {
+        // Use text/plain to avoid CORS preflight on sendBeacon
         if (navigator.sendBeacon) {
-            navigator.sendBeacon(APPS_SCRIPT_LOG_URL, new Blob([payload], {type: 'application/json'}));
+            navigator.sendBeacon(APPS_SCRIPT_LOG_URL, new Blob([payload], {type: 'text/plain'}));
         } else {
-            fetch(APPS_SCRIPT_LOG_URL, {method:'POST', body:payload, keepalive:true, headers:{'Content-Type':'application/json'}}).catch(function(){});
+            fetch(APPS_SCRIPT_LOG_URL, {method:'POST', body:payload, keepalive:true, headers:{'Content-Type':'text/plain'}}).catch(function(){});
         }
     } catch(e) {}
 }
@@ -8212,6 +8204,15 @@ document.addEventListener('visibilitychange', function() {
 // =====================================================================
 // END ACTIVITY LOGGER
 // =====================================================================
+
+try {
+    if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
+        unlockDashboard(false);
+        const _restoredEmail = sessionStorage.getItem('gtmb-auth-email') || '';
+        if (_restoredEmail) logSessionStart(_restoredEmail);
+        bootstrapDashboard();
+    }
+} catch (error) {}
 </script>
 </body>
 </html>
