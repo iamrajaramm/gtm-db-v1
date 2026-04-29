@@ -8230,9 +8230,6 @@ document.addEventListener('click', function(e) {
 }, true);
 
 window.addEventListener('beforeunload', flushSessionLog);
-document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'hidden') flushSessionLog();
-});
 // =====================================================================
 // END ACTIVITY LOGGER
 // =====================================================================
