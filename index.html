@@ -1983,6 +1983,11 @@ function setMarketingSubtab(subtab) {
 function setActiveTab(tab) {
     const active = tab === 'sales' ? 'sales' : tab === 'marketing' ? 'marketing' : 'revenue';
     STATE.activeTab = active;
+    if (SESSION_LOG && SESSION_LOG.email) {
+        const tabLabel = active === 'sales' ? 'Sales' : active === 'marketing' ? 'Marketing' : 'Revenue';
+        SESSION_LOG.tabsViewed.add(tabLabel);
+        saveSessionToStorage();
+    }
     if (active !== 'marketing') closeMarketingTabMenu();
     // Close glossary if open
     const _gp = document.getElementById('glossaryPanel');
@@ -4448,10 +4453,13 @@ function plotMarketingOutcomeChart(elId, rows, view) {
 }
 
 function getEffectiveDrilldownView(preferredView = 'yearly', yearSelections = [], quarterSelections = [], monthSelections = []) {
-    if ((monthSelections || []).length) return 'monthly';
-    if ((quarterSelections || []).length) return 'monthly';
-    if ((yearSelections || []).length) return 'quarterly';
-    return preferredView || 'yearly';
+    const order = {yearly: 0, quarterly: 1, monthly: 2};
+    var autoDrill = 'yearly';
+    if ((yearSelections || []).length) autoDrill = 'quarterly';
+    if ((quarterSelections || []).length) autoDrill = 'monthly';
+    if ((monthSelections || []).length) autoDrill = 'monthly';
+    var preferred = preferredView || 'yearly';
+    return (order[preferred] >= order[autoDrill]) ? preferred : autoDrill;
 }
 
 function getRevenueTrendView() {
@@ -8217,11 +8225,6 @@ document.addEventListener('click', function(e) {
     SESSION_LOG.clicks++;
     if (e.target.closest('.multi-option, .filter-trigger, [data-filter-key], [data-filter-search], .campaign-option')) {
         SESSION_LOG.filterClicks++;
-    }
-    var tabBtn = e.target.closest('.tab-btn');
-    if (tabBtn) {
-        var label = (tabBtn.textContent || '').trim().replace(/\s+/g, ' ');
-        if (label) SESSION_LOG.tabsViewed.add(label);
     }
     saveSessionToStorage();
 }, true);
