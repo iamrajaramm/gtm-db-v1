@@ -285,12 +285,6 @@
         .kpi.is-teal .kpi-value{color:#14b8a6}
         .kpi.is-indigo .kpi-value{color:#4f46e5}
         .kpi-sub{font-size:.75em;color:var(--dim);margin-top:6px}
-        .kpi-baseline-row{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:7px}
-        .kpi-atl-badge{font-size:.58em;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:5px;text-transform:uppercase;line-height:1.4}
-        .kpi-atl-badge--atl{background:rgba(0,200,117,.14);color:var(--green)}
-        .kpi-atl-badge--btl{background:rgba(239,68,68,.1);color:var(--red)}
-        .kpi-atl-badge--neu{background:rgba(138,138,153,.12);color:var(--dim)}
-        .kpi-baseline-val{font-size:.68em;font-weight:600;color:var(--dim)}
         .sales-pie-card{display:flex;flex-direction:column;gap:6px}
         .sales-distribution-card{padding-top:20px;padding-bottom:8px}
         .sales-distribution-card .chart-head{margin-bottom:10px}
@@ -3964,77 +3958,45 @@ function buildTrendView(rows, dateField, view) {
     };
 }
 
-function getLastQLabel() {
-    const now = new Date();
-    const q = Math.floor(now.getMonth() / 3) + 1;
-    const y = now.getFullYear();
-    return q === 1 ? `Q4 ${y - 1}` : `Q${q - 1} ${y}`;
-}
-function getLastQRevRows() {
-    const lq = getLastQLabel();
-    return (STATE.rows || []).filter(r => r.__quarter === lq);
-}
-function getLastQSalesRows() {
-    const lq = getLastQLabel();
-    return (STATE.rows || []).filter(r => r.__createQuarter === lq);
-}
-function renderKpis(metrics, baseline){
-    const lqLabel = getLastQLabel();
-    const hasBaseline = baseline && (STATE.rows || []).filter(r => r.__quarter === lqLabel).length > 0;
-    const renderCard = (label, value, sub, defaultTone, bVal, lowerIsBetter) => {
-        let tone = defaultTone;
-        let baselineHtml = '';
-        if (hasBaseline && bVal !== undefined) {
-            const atl = lowerIsBetter ? value < bVal : value > bVal;
-            const btl = lowerIsBetter ? value > bVal : value < bVal;
-            tone = atl ? 'green' : btl ? 'red' : defaultTone;
-            const badgeCls = atl ? 'atl' : btl ? 'btl' : 'neu';
-            const badgeText = atl ? 'ATL' : btl ? 'BTL' : '-';
-            baselineHtml = `<div class="kpi-baseline-row"><span class="kpi-atl-badge kpi-atl-badge--${badgeCls}">${badgeText}</span><span class="kpi-baseline-val">Last Q avg: ${money(bVal)}</span></div>`;
-        }
-        return `<div class="kpi is-${tone}"><div class="kpi-label">${escapeHtml(label)}</div><div class="kpi-value">${money(value)}</div><div class="kpi-sub">${escapeHtml(sub)}</div>${baselineHtml}</div>`;
-    };
+function renderKpis(metrics){
+    const renderCard = (label, value, sub, tone) => `
+        <div class="kpi is-${tone}">
+            <div class="kpi-label">${escapeHtml(label)}</div>
+            <div class="kpi-value">${money(value)}</div>
+            <div class="kpi-sub">${escapeHtml(sub)}</div>
+        </div>
+    `;
     document.getElementById('kpiGrid').innerHTML = `
         <div class="metric-group is-yellow two-card">
-            ${renderCard('New ARR', metrics.newArr, 'Closed-won new logo', 'yellow', baseline?.newArr, false)}
-            ${renderCard('Upsell', metrics.upsell, 'Closed-won expansion', 'yellow', baseline?.upsell, false)}
+            ${renderCard('New ARR', metrics.newArr, 'Closed-won new logo', 'yellow')}
+            ${renderCard('Upsell', metrics.upsell, 'Closed-won expansion', 'yellow')}
         </div>
         <div class="scorecard-symbol" aria-hidden="true">-</div>
         <div class="metric-group is-red two-card">
-            ${renderCard('Downsell', Math.abs(metrics.downsell), 'Closed-won contraction', 'red', Math.abs(baseline?.downsell || 0), true)}
-            ${renderCard('Churn', metrics.churn, 'Closed-won churn status', 'red', baseline?.churn || 0, true)}
+            ${renderCard('Downsell', Math.abs(metrics.downsell), 'Closed-won contraction', 'red')}
+            ${renderCard('Churn', metrics.churn, 'Closed-won churn status', 'red')}
         </div>
         <div class="scorecard-symbol" aria-hidden="true">=</div>
         <div class="metric-group is-green">
-            ${renderCard('Net ARR', metrics.net, 'Customer status total', 'green', baseline?.net, false)}
+            ${renderCard('Net ARR', metrics.net, 'Customer status total', 'green')}
         </div>
     `;
 }
 
-function renderSalesKpis(metrics, baseline) {
-    const lqLabel = getLastQLabel();
-    const hasBaseline = baseline && (STATE.rows || []).filter(r => r.__createQuarter === lqLabel).length > 0;
+function renderSalesKpis(metrics) {
     const cards = [
-        { label:'Deals Created', value:metrics.dealsCreated, tone:'blue',   bKey:'dealsCreated', lowerIsBetter:false },
-        { label:'SAO',           value:metrics.sao,          tone:'purple', bKey:'sao',          lowerIsBetter:false },
-        { label:'Closed Won',    value:metrics.closedWon,    tone:'green',  bKey:'closedWon',    lowerIsBetter:false },
-        { label:'Closed Lost',   value:metrics.closedLost,   tone:'red',    bKey:'closedLost',   lowerIsBetter:true  },
-        { label:'Active Deals',  value:metrics.activeDeals,  tone:'yellow', bKey:null,           lowerIsBetter:false }
+        { label:'Deals Created', value:metrics.dealsCreated, tone:'blue' },
+        { label:'SAO', value:metrics.sao, tone:'purple' },
+        { label:'Closed Won', value:metrics.closedWon, tone:'green' },
+        { label:'Closed Lost', value:metrics.closedLost, tone:'red' },
+        { label:'Active Deals', value:metrics.activeDeals, tone:'yellow' }
     ];
-    document.getElementById('salesKpiGrid').innerHTML = cards.map((card) => {
-        let tone = card.tone;
-        let baselineHtml = '';
-        if (hasBaseline && card.bKey && baseline[card.bKey] !== undefined) {
-            const bVal = baseline[card.bKey];
-            const atl = card.lowerIsBetter ? card.value < bVal : card.value > bVal;
-            const btl = card.lowerIsBetter ? card.value > bVal : card.value < bVal;
-            tone = atl ? 'green' : btl ? 'red' : card.tone;
-            const badgeCls = atl ? 'atl' : btl ? 'btl' : 'neu';
-            const badgeText = atl ? 'ATL' : btl ? 'BTL' : '-';
-            baselineHtml = `<div class="kpi-baseline-row"><span class="kpi-atl-badge kpi-atl-badge--${badgeCls}">${badgeText}</span><span class="kpi-baseline-val">Last Q avg: ${Number(bVal||0).toLocaleString()}</span></div>`;
-        }
-        return `<div class="kpi is-${tone}"><div class="kpi-label">${escapeHtml(card.label)}</div><div class="kpi-value">${Number(card.value || 0).toLocaleString()}</div>${baselineHtml}</div>`;
-    }).join('');
+    document.getElementById('salesKpiGrid').innerHTML = cards.map((card) => `
+        <div class="kpi is-${card.tone}">
+            <div class="kpi-label">${escapeHtml(card.label)}</div>
+            <div class="kpi-value">${Number(card.value || 0).toLocaleString()}</div>
+        </div>
+    `).join('');
 }
 
 function plotTrend(elId, groups, orderedKeys, xAxisTitle, metric = STATE.trendMetric){
@@ -5116,8 +5078,7 @@ function renderSales() {
     const rows = STATE.sales.filtered;
     renderSalesFilterOptions();
     syncSalesFilterStates();
-    const salesBaseline = getSalesMetrics(getLastQSalesRows());
-    renderSalesKpis(getSalesMetrics(rows), salesBaseline);
+    renderSalesKpis(getSalesMetrics(rows));
     document.querySelectorAll('input[name="salesTrendMetric"]').forEach((input) => {
         input.checked = input.value === STATE.sales.trend.metric;
     });
@@ -5966,8 +5927,7 @@ function renderTables(rows){
 function renderAll(){
     const rows = STATE.filtered;
     const metrics = getMetrics(rows);
-    const revBaseline = getMetrics(getLastQRevRows());
-    renderKpis(metrics, revBaseline);
+    renderKpis(metrics);
     syncFilterStates();
 
     document.querySelectorAll('input[name="trendMetricView"]').forEach((input) => {
