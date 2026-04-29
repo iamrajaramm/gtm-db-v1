@@ -17,6 +17,7 @@
         });
     </script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         [data-theme="light"]{--bg:#EEEEEE;--surface:#ffffff;--card-border:#dcdcdc;--text:#0d0d12;--text2:#3d3d4e;--dim:#8a8a99;--green:#00c875;--green-dark:#00a35c;--green-bg:#e6faf0;--navy:#0d0d12;--blue:#4361ee;--amber:#f59e0b;--red:#ef4444;--purple:#7c3aed;--hover-bg:#f0f0f2;--grid-color:#f0f0f2;--pill-active-bg:#0d0d12;--pill-active-text:#fff;--chip-bg:white;--chip-border:#ebebeb}
@@ -31,12 +32,7 @@
         .auth-badge{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--green);color:#fff;font-size:21px;line-height:1;margin-bottom:18px}
         .auth-panel h2{font-size:1.55em;font-weight:900;letter-spacing:-.5px;color:var(--text);margin-bottom:8px}
         .auth-copy{font-size:.95em;line-height:1.65;color:var(--text2);margin-bottom:20px}
-        .auth-form{display:grid;gap:12px}
-        .auth-field{width:100%;border:1px solid var(--card-border);border-radius:16px;background:var(--bg);color:var(--text);padding:14px 16px;font:700 .95em 'Inter',sans-serif;outline:none;transition:border-color .16s ease, box-shadow .16s ease}
-        .auth-field:focus{border-color:var(--green);box-shadow:0 0 0 4px var(--green-bg)}
-        .auth-submit{border:0;border-radius:16px;background:var(--green);color:#fff;padding:14px 18px;font:800 .95em 'Inter',sans-serif;cursor:pointer;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease;box-shadow:0 12px 28px rgba(0,200,117,.22)}
-        .auth-submit:hover{transform:translateY(-1px);filter:brightness(.98)}
-        .auth-submit:active{transform:translateY(0)}
+        .auth-google-wrap{display:flex;justify-content:center;margin:8px 0 4px}
         .auth-error{min-height:20px;font-size:.82em;font-weight:700;color:var(--red)}
         .auth-note{margin-top:12px;font-size:.76em;font-weight:600;color:var(--dim)}
         .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
@@ -466,14 +462,27 @@
 <div class="auth-gate" id="authGate">
     <div class="auth-panel">
         <div class="auth-badge" aria-hidden="true">🔐</div>
-        <h2>Protected Dashboard</h2>
-        <div class="auth-copy">Enter the password to open the GTMB dashboard.</div>
-        <form class="auth-form" onsubmit="submitPassword(event)">
-            <input class="auth-field" id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" aria-label="Dashboard password">
-            <button class="auth-submit" type="submit">Open Dashboard</button>
-        </form>
+        <h2>GTMB Dashboard</h2>
+        <div class="auth-copy">Sign in with your GTM Buddy account to access the dashboard.</div>
+        <div id="g_id_onload"
+             data-client_id="PASTE_YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+             data-callback="onGoogleSignIn"
+             data-auto_prompt="true"
+             data-itp_support="true">
+        </div>
+        <div class="auth-google-wrap">
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left"
+                 data-width="400">
+            </div>
+        </div>
         <div class="auth-error" id="passwordError"></div>
-        <div class="auth-note">This is a temporary password gate for the shared dashboard link.</div>
+        <div class="auth-note">Access restricted to @gtmbuddy.ai accounts only.</div>
     </div>
 </div>
 <div class="container">
@@ -1608,7 +1617,6 @@ const SALES_CHART_KEYS = ['salesCreated','salesSao','salesClosedWon','salesClose
 const MARKETING_TREND_VIEW_OPTIONS = ['Yearly','Quarterly','Monthly'];
 const MARKETING_SUBTABS = ['websiteFormFills', 'websitePerformance', 'linkedInAds', 'googleAds', 'campaignPerformance'];
 const TABLE_PAGE_SIZE = 10;
-const DASHBOARD_PASSWORD = 'marketing#2026';
 const DASHBOARD_UNLOCK_KEY = 'gtmb-dashboard-unlocked';
 let dashboardBootstrapped = false;
 const STATE = {
@@ -5948,13 +5956,14 @@ function renderAll(){
     renderTables(rows);
 }
 
-function unlockDashboard(remember = true) {
+function unlockDashboard(remember = true, email = '') {
     const gate = document.getElementById('authGate');
     document.body.classList.remove('auth-locked');
     if (gate) gate.style.display = 'none';
     if (remember) {
         try {
             sessionStorage.setItem(DASHBOARD_UNLOCK_KEY, 'true');
+            if (email) sessionStorage.setItem('gtmb-auth-email', email);
         } catch (error) {}
     }
 }
@@ -5966,21 +5975,21 @@ function bootstrapDashboard() {
     if (typeof cpInit === 'function') cpInit();
 }
 
-function submitPassword(event) {
-    if (event) event.preventDefault();
-    const input = document.getElementById('passwordInput');
-    const error = document.getElementById('passwordError');
-    const submitted = String(input?.value || '').trim();
-    if (submitted === DASHBOARD_PASSWORD) {
-        if (error) error.textContent = '';
-        unlockDashboard(true);
-        bootstrapDashboard();
-        return;
-    }
-    if (error) error.textContent = 'Incorrect password. Please try again.';
-    if (input) {
-        input.value = '';
-        input.focus();
+function onGoogleSignIn(response) {
+    const errEl = document.getElementById('passwordError');
+    try {
+        const b64 = response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(decodeURIComponent(escape(atob(b64))));
+        const email = (payload.email || '').toLowerCase();
+        if (email.endsWith('@gtmbuddy.ai')) {
+            if (errEl) errEl.textContent = '';
+            unlockDashboard(true, email);
+            bootstrapDashboard();
+        } else {
+            if (errEl) errEl.textContent = 'Access restricted to @gtmbuddy.ai accounts only.';
+        }
+    } catch (e) {
+        if (errEl) errEl.textContent = 'Sign-in failed. Please try again.';
     }
 }
 
