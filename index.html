@@ -6042,6 +6042,10 @@ async function manualRefresh(){
     } finally {
         document.body.classList.remove('is-refreshing');
         btn.classList.remove('is-loading');
+        setTimeout(() => {
+            ['trendChart','salesTrendChart','salesDistributionPie','marketingFunnelChart','marketingAcquisitionChart','marketingMeetingChart','marketingOutcomeChart','ga4TotalUsersTrendChart','ga4ChannelTrendChart','ga4UsersByChannelChart','linkedInCostCpmChart','linkedInImpressionsCtrChart','linkedInClicksCpcChart','linkedInLeadsCpcvChart','googleAdsCostCpmChart','googleAdsImpressionsCtrChart','googleAdsClicksCpcChart','googleAdsLeadsCpcvChart']
+                .forEach(id => { const el = document.getElementById(id); if (el && el.data) Plotly.Plots.resize(el); });
+        }, 50);
     }
 }
 
