@@ -6002,6 +6002,7 @@ function onGoogleSignIn(response) {
         if (email.endsWith('@gtmbuddy.ai')) {
             if (errEl) errEl.textContent = '';
             unlockDashboard(true, email);
+            logSessionStart(email);
             bootstrapDashboard();
         } else {
             if (errEl) errEl.textContent = 'Access restricted to @gtmbuddy.ai accounts only.';
@@ -8120,9 +8121,97 @@ function mmapZoomReset() {
 try {
     if (sessionStorage.getItem(DASHBOARD_UNLOCK_KEY) === 'true') {
         unlockDashboard(false);
+        const _restoredEmail = sessionStorage.getItem('gtmb-auth-email') || '';
+        if (_restoredEmail) logSessionStart(_restoredEmail);
         bootstrapDashboard();
     }
 } catch (error) {}
+
+// =====================================================================
+// ACTIVITY LOGGER
+// =====================================================================
+const APPS_SCRIPT_LOG_URL = 'https://script.google.com/macros/s/AKfycbxvGilVnww-IG8Jl55L7l68zgC2nq4gSJrQ1cJik-qTkNYv8Z9m3mGXSS5h5zYYErV1/exec';
+
+const SESSION_LOG = {
+    email: null,
+    loginTimeRaw: null,
+    clicks: 0,
+    filterClicks: 0,
+    tabsViewed: new Set(),
+    flushed: false
+};
+
+function logSessionStart(email) {
+    SESSION_LOG.email = email;
+    SESSION_LOG.loginTimeRaw = new Date();
+    SESSION_LOG.clicks = 0;
+    SESSION_LOG.filterClicks = 0;
+    SESSION_LOG.tabsViewed = new Set(['Revenue']);
+    SESSION_LOG.flushed = false;
+}
+
+function formatISTLog(date) {
+    var ist = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var d = ist.getUTCDate();
+    var m = months[ist.getUTCMonth()];
+    var y = ist.getUTCFullYear();
+    var h = ist.getUTCHours();
+    var min = String(ist.getUTCMinutes()).padStart(2, '0');
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return d + '-' + m + '-' + y + ' ' + h + ':' + min + ' ' + ampm;
+}
+
+function formatSessionDuration(ms) {
+    var totalSecs = Math.floor(ms / 1000);
+    var mins = Math.floor(totalSecs / 60);
+    var secs = totalSecs % 60;
+    if (mins === 0) return secs + 's';
+    return mins + 'm ' + secs + 's';
+}
+
+function flushSessionLog() {
+    if (SESSION_LOG.flushed || !SESSION_LOG.email || !SESSION_LOG.loginTimeRaw) return;
+    SESSION_LOG.flushed = true;
+    var duration = Date.now() - SESSION_LOG.loginTimeRaw.getTime();
+    var payload = JSON.stringify({
+        email: SESSION_LOG.email,
+        loginTime: formatISTLog(SESSION_LOG.loginTimeRaw),
+        sessionDuration: formatSessionDuration(duration),
+        totalClicks: SESSION_LOG.clicks,
+        filterClicks: SESSION_LOG.filterClicks,
+        tabsViewed: SESSION_LOG.tabsViewed.size > 0 ? Array.from(SESSION_LOG.tabsViewed).join(', ') : 'Revenue'
+    });
+    try {
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(APPS_SCRIPT_LOG_URL, new Blob([payload], {type: 'application/json'}));
+        } else {
+            fetch(APPS_SCRIPT_LOG_URL, {method:'POST', body:payload, keepalive:true, headers:{'Content-Type':'application/json'}}).catch(function(){});
+        }
+    } catch(e) {}
+}
+
+document.addEventListener('click', function(e) {
+    if (!SESSION_LOG.email) return;
+    SESSION_LOG.clicks++;
+    if (e.target.closest('.multi-option, .filter-trigger, [data-filter-key], [data-filter-search], .campaign-option')) {
+        SESSION_LOG.filterClicks++;
+    }
+    var tabBtn = e.target.closest('.tab-btn');
+    if (tabBtn) {
+        var label = (tabBtn.textContent || '').trim().replace(/\s+/g, ' ');
+        if (label) SESSION_LOG.tabsViewed.add(label);
+    }
+}, true);
+
+window.addEventListener('beforeunload', flushSessionLog);
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') flushSessionLog();
+});
+// =====================================================================
+// END ACTIVITY LOGGER
+// =====================================================================
 </script>
 </body>
 </html>
