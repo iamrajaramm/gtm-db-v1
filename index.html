@@ -1586,7 +1586,7 @@
         </section>
     </div>
 
-    <div class="footer">GTMB Dashboard | <span id="ts">Last refreshed: -</span></div>
+    <div class="footer"><span id="ts">GTMB Dashboard | Last refreshed: -</span></div>
 </div>
 
 <script>
@@ -2865,6 +2865,20 @@ async function fetchTSV(gid) {
     }
 }
 
+
+async function fetchLastUpdated() {
+    try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${LIVE_WORKBOOK_SHEET_ID}/values/${encodeURIComponent('GTMDB-Deals')}!A1?key=${SHEETS_API_KEY}`;
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        const raw = (data.values?.[0]?.[0] || '').trim();
+        const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+        return lines.find(l => /last updated/i.test(l)) || null;
+    } catch (e) {
+        return null;
+    }
+}
 
 async function fetchSheet() {
     const [dealsResult, inboundResult, liResult, gadsResult, ga4Result] = await Promise.all([
@@ -6060,10 +6074,11 @@ async function manualRefresh(){
         applyLinkedInAdsFilters();
         applyGoogleAdsFilters();
         setActiveTab(STATE.activeTab);
-        document.getElementById('ts').textContent = 'Last refreshed: ' + new Date().toLocaleString();
+        const lastUpdated = await fetchLastUpdated();
+        document.getElementById('ts').textContent = lastUpdated ? `GTMB Dashboard | ${lastUpdated}` : 'GTMB Dashboard | Last refreshed: ' + new Date().toLocaleString();
     } catch (error) {
         console.error('Dashboard refresh failed:', error);
-        document.getElementById('ts').textContent = 'Refresh failed: ' + error.message;
+        document.getElementById('ts').textContent = 'GTMB Dashboard | Refresh failed: ' + error.message;
     } finally {
         document.body.classList.remove('is-refreshing');
         btn.classList.remove('is-loading');
